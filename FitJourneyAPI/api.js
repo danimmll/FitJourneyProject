@@ -47,6 +47,14 @@ app.post('/users', async (req, res) => {
     }
 
     try {
+        const existingUserQuery = await db.collection('users')
+            .where('email', '==', body.email)
+            .get();
+
+        if (!existingUserQuery.empty) {
+            return res.status(400).json({ message: 'El email ya está registrado' });
+        }
+
         const saltRounds = 10;
         const passwordHash = await bcrypt.hash(body.password, saltRounds);
 
