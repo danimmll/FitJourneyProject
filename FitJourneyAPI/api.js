@@ -70,6 +70,7 @@ app.post('/users', async (req, res) => {
     res.status(201).json({ message: 'Usuario registrado correctamente' });
 
   } catch (err) {
+      console.error('Error en /users:', err);
     res.status(500).json({ message: 'Error interno: ' + err.message });
   }
 });
