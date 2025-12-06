@@ -12,7 +12,7 @@ import retrofit2.http.POST;
 public interface AppApi {
 
     @POST("users")
-    Call<Void> registerUser(@Body User user);
+    Call<LoginResponse> registerUser(@Body User user);
 
     @POST("login")
     Call<LoginResponse> login(@Body LoginRequest request);

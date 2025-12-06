@@ -25,28 +25,29 @@ public class UserRepository {
     }
 
     public interface RegisterCallback {
-        void onResult(Resource<Void> result);
+        void onResult(Resource<LoginResponse> result);
     }
 
     public void registerUser(User user, RegisterCallback callback) {
         callback.onResult(Resource.loading());
 
-        api.registerUser(user).enqueue(new Callback<>() {
+        api.registerUser(user).enqueue(new Callback<LoginResponse>() {
             @Override
-            public void onResponse(@NonNull Call<Void> call, @NonNull Response<Void> response) {
-                if (response.isSuccessful()) {
-                    callback.onResult(Resource.success(null));
+            public void onResponse(@NonNull Call<LoginResponse> call, @NonNull Response<LoginResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    callback.onResult(Resource.success(response.body()));
                 } else {
                     callback.onResult(Resource.error("Error al registrar: " + response.code()));
                 }
             }
 
             @Override
-            public void onFailure(@NonNull Call<Void> call, @NonNull Throwable t) {
+            public void onFailure(@NonNull Call<LoginResponse> call, @NonNull Throwable t) {
                 callback.onResult(Resource.error("Error de conexión: " + t.getMessage()));
             }
         });
     }
+
 
     public void login(String email, String password, LoginCallBack callback) {
         callback.onResult(Resource.loading());

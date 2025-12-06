@@ -41,11 +41,6 @@ public class RegisterFragment extends Fragment {
     private String[] goals;
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
-
-    @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         binding = FragmentRegisterBinding.inflate(inflater, container, false);
@@ -56,7 +51,8 @@ public class RegisterFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        viewModel =  new ViewModelProvider(this).get(UserViewModel.class);
+        viewModel = new ViewModelProvider(this).get(UserViewModel.class);
+        navController = Navigation.findNavController(view);
 
         viewModel.getRegisterState().observe(getViewLifecycleOwner(), resource -> {
             if (resource == null) return;
@@ -67,11 +63,15 @@ public class RegisterFragment extends Fragment {
                     break;
                 case SUCCESS:
                     binding.btnRegisterSubmit.setEnabled(true);
+                    if (resource.data != null && resource.data.getToken() != null) {
+                        requireContext().getSharedPreferences("APP_PREFS", Context.MODE_PRIVATE)
+                                .edit()
+                                .putString("TOKEN", resource.data.getToken())
+                                .apply();
 
-                    String email = binding.etEmail.getText().toString().trim();
-                    String pass = binding.etPassword.getText().toString().trim();
-                    viewModel.login(email, pass);
-
+                        Toast.makeText(requireContext(), R.string.registration_completed, Toast.LENGTH_SHORT).show();
+                        navController.navigate(R.id.action_registerFragment_to_homeFragment);
+                    }
                     break;
                 case ERROR:
                     binding.btnRegisterSubmit.setEnabled(true);
@@ -80,57 +80,20 @@ public class RegisterFragment extends Fragment {
             }
         });
 
-        viewModel.getLoginState().observe(getViewLifecycleOwner(), resource -> {
-            if (resource == null) return;
-
-            switch (resource.status) {
-                case LOADING:
-                    binding.btnRegisterSubmit.setEnabled(false);
-                    break;
-                case SUCCESS:
-                    binding.btnRegisterSubmit.setEnabled(true);
-                    if (resource.data != null) {
-                        requireContext().getSharedPreferences("APP_PREFS", Context.MODE_PRIVATE)
-                                .edit()
-                                .putString("TOKEN", resource.data.getToken())
-                                .apply();
-
-                        Toast.makeText(requireContext(), R.string.registration_completed, Toast.LENGTH_SHORT).show();
-
-                        navController = Navigation.findNavController(requireView());
-                        navController.navigate(R.id.action_registerFragment_to_homeFragment);
-                    }
-                    break;
-                case ERROR:
-                    binding.btnRegisterSubmit.setEnabled(true);
-                    Toast.makeText(requireContext(), resource.message, Toast.LENGTH_SHORT).show();
-                    break;
-            }
-        });
-
         genders = new String[]{getString(R.string.masculine), getString(R.string.feminine),
                 getString(R.string.other)};
-
         goals = new String[]{getString(R.string.lose_weight), getString(R.string.maintain_weight),
                 getString(R.string.gain_muscle), getString(R.string.lose_fat),
                 getString(R.string.gain_strength), getString(R.string.gain_endurance),
                 getString(R.string.gain_flexibility), getString(R.string.recover_from_injury)};
-
         establecerListas();
 
-        DatePickerDialog.OnDateSetListener dateSetListener = new DatePickerDialog.OnDateSetListener() {
-            @SuppressLint({"DefaultLocale"})
-            @Override
-            public void onDateSet(DatePicker datePicker, int anio, int mes, int dia) {
+        DatePickerDialog.OnDateSetListener dateSetListener = (datePicker, anio, mes, dia) ->
                 binding.etBirthDate.setText(String.format("%02d/%02d/%04d", dia, mes + 1, anio));
-            }
-        };
 
         binding.etBirthDate.setFocusable(false);
         binding.etBirthDate.setInputType(InputType.TYPE_NULL);
-
         binding.etBirthDate.setOnClickListener(v -> {
-
             DatePickerDialog calendario = new DatePickerDialog(
                     requireContext(),
                     R.style.calendarioPersonalizado,
@@ -139,16 +102,12 @@ public class RegisterFragment extends Fragment {
                     mesActual,
                     diaActual
             );
-
-            calendario.getDatePicker().setMaxDate(System.currentTimeMillis());
-
             Calendar minDate = Calendar.getInstance();
             Calendar maxDate = Calendar.getInstance();
             minDate.add(Calendar.YEAR, -110);
             maxDate.add(Calendar.YEAR, -16);
             calendario.getDatePicker().setMinDate(minDate.getTimeInMillis());
             calendario.getDatePicker().setMaxDate(maxDate.getTimeInMillis());
-
             calendario.show();
         });
 
@@ -157,25 +116,15 @@ public class RegisterFragment extends Fragment {
                 realizarRegistro();
             }
         });
-
     }
 
     private void establecerListas() {
-
-        ArrayAdapter<String> adapterGender = new ArrayAdapter<>(
-                requireContext(),
-                android.R.layout.simple_expandable_list_item_1,
-                genders
-        );
-
+        ArrayAdapter<String> adapterGender = new ArrayAdapter<>(requireContext(),
+                android.R.layout.simple_expandable_list_item_1, genders);
         binding.actvGender.setAdapter(adapterGender);
 
-        ArrayAdapter<String> adapterGoals = new ArrayAdapter<>(
-                requireContext(),
-                android.R.layout.simple_expandable_list_item_1,
-                goals
-        );
-
+        ArrayAdapter<String> adapterGoals = new ArrayAdapter<>(requireContext(),
+                android.R.layout.simple_expandable_list_item_1, goals);
         binding.actvGoal.setAdapter(adapterGoals);
     }
 
@@ -186,26 +135,12 @@ public class RegisterFragment extends Fragment {
             String pass = binding.etPassword.getText().toString().trim();
             String gender = binding.actvGender.getText().toString().trim();
             String goal = binding.actvGoal.getText().toString().trim();
-
             int height = Integer.parseInt(binding.etHeight.getText().toString().trim());
             float weight = Float.parseFloat(binding.etWeight.getText().toString().trim());
-
             String idUser = UUID.randomUUID().toString();
+            String birthDate = convertirFecha(binding.etBirthDate.getText().toString().trim());
 
-            String fechaVisual = binding.etBirthDate.getText().toString().trim();
-            String birthDate = convertirFecha(fechaVisual);
-
-            User newUser = new User(
-                    idUser,
-                    name,
-                    email,
-                    pass,
-                    birthDate,
-                    gender,
-                    goal,
-                    height,
-                    weight
-            );
+            User newUser = new User(idUser, name, email, pass, birthDate, gender, goal, height, weight);
 
             viewModel.register(newUser);
 
@@ -218,7 +153,6 @@ public class RegisterFragment extends Fragment {
     private String convertirFecha(String fechaVisual) {
         try {
             String[] partes = fechaVisual.split("/");
-
             return partes[2] + "-" + partes[1] + "-" + partes[0];
         } catch (Exception e) {
             Toast.makeText(requireContext(), getString(R.string.error_processing_date) + e.getMessage(),
@@ -228,7 +162,6 @@ public class RegisterFragment extends Fragment {
     }
 
     private boolean validarDatos() {
-
         boolean valido = true;
 
         if (binding.etName.getText().toString().trim().isEmpty()) {

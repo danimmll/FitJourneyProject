@@ -8,7 +8,7 @@ require('dotenv').config();
 
 const serviceAccount = require('./serviceAccountKey.json');
 admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount)
+credential: admin.credential.cert(serviceAccount)
 });
 const db = admin.firestore();
 
@@ -19,117 +19,127 @@ app.use(bodyParser.json());
 const JWT_SECRET = process.env.JWT_SECRET;
 
 const authenticate = (req, res, next) => {
-  const authHeader = req.headers.authorization;
+const authHeader = req.headers.authorization;
 
-  if (!authHeader)
-    return res.status(401).json({ message: 'No autorizado (sin token)' });
+if (!authHeader)
+return res.status(401).json({ message: 'No autorizado (sin token)' });
 
-  const token = authHeader.split(' ')[1];
+const token = authHeader.split(' ')[1];
 
-  try {
-    const decoded = jwt.verify(token, JWT_SECRET);
-    req.user = decoded;
-    next();
-  } catch {
-    return res.status(401).json({ message: 'Token inválido' });
-  }
+try {
+const decoded = jwt.verify(token, JWT_SECRET);
+req.user = decoded;
+next();
+} catch {
+return res.status(401).json({ message: 'Token inválido' });
+}
 };
 
 app.post('/users', async (req, res) => {
-  const body = req.body;
+const body = req.body;
 
-  const requiredFields = [
-    'id_user','email','name','password','gender',
-    'goal','height','weight','birth_date'
-  ];
+const requiredFields = [
+'id_user','email','name','password','gender',
+'goal','height','weight','birth_date'
+];
 
-  const missingFields = requiredFields.filter(f => !body[f]);
-  if (missingFields.length > 0) {
-    return res.status(400).json({
-      message: 'Faltan datos obligatorios',
-      missing_fields: missingFields
-    });
-  }
+const missingFields = requiredFields.filter(f => !body[f]);
+if (missingFields.length > 0) {
+return res.status(400).json({
+message: 'Faltan datos obligatorios',
+missing_fields: missingFields
+});
+}
 
-  try {
-    const existingUser = await db.collection('users')
-      .where('email', '==', body.email)
-      .get();
+try {
+const emailNormalized = body.email.trim().toLowerCase();
 
-    if (!existingUser.empty)
-      return res.status(400).json({ message: 'Email ya registrado' });
+const existingUser = await db.collection('users')
+  .where('email', '==', emailNormalized)
+  .get();
 
-    const passwordHash = await bcrypt.hash(body.password, 10);
+if (!existingUser.empty)
+  return res.status(400).json({ message: 'Email ya registrado' });
 
-    await db.collection('users').doc(body.id_user).set({
-      ...body,
-      password: passwordHash,
-      register_date: admin.firestore.FieldValue.serverTimestamp()
-    });
+const passwordHash = await bcrypt.hash(body.password, 10);
 
-    res.status(201).json({ message: 'Usuario registrado correctamente' });
+await db.collection('users').doc(body.id_user).set({
+  ...body,
+  email: emailNormalized,
+  password: passwordHash,
+  register_date: admin.firestore.FieldValue.serverTimestamp()
+});
 
-  } catch (err) {
-      console.error('Error en /users:', err);
-    res.status(500).json({ message: 'Error interno: ' + err.message });
-  }
+res.status(201).json({ message: 'Usuario registrado correctamente' });
+
+
+} catch (err) {
+console.error('Error en /users:', err);
+res.status(500).json({ message: 'Error interno: ' + err.message });
+}
 });
 
 app.post('/login', async (req, res) => {
-  const { email, password } = req.body;
+const { email, password } = req.body;
 
-  if (!email || !password)
-    return res.status(400).json({ message: 'Faltan datos' });
+if (!email || !password)
+return res.status(400).json({ message: 'Faltan datos' });
 
-  try {
-    const query = await db.collection('users')
-      .where('email', '==', email)
-      .get();
+try {
+const emailNormalized = email.trim().toLowerCase();
 
-    if (query.empty)
-      return res.status(404).json({ message: 'Usuario no encontrado' });
+const query = await db.collection('users')
+  .where('email', '==', emailNormalized)
+  .get();
 
-    const user = query.docs[0].data();
+if (query.empty)
+  return res.status(404).json({ message: 'Usuario no encontrado' });
 
-    const match = await bcrypt.compare(password, user.password);
-    if (!match)
-      return res.status(401).json({ message: 'Contraseña incorrecta' });
+const user = query.docs[0].data();
 
-    const token = jwt.sign(
-      { id_user: user.id_user, email: user.email },
-      JWT_SECRET,
-      { expiresIn: '24h' }
-    );
+const match = await bcrypt.compare(password, user.password);
+if (!match)
+  return res.status(401).json({ message: 'Contraseña incorrecta' });
 
-    delete user.password;
+const token = jwt.sign(
+  { id_user: user.id_user, email: user.email },
+  JWT_SECRET,
+  { expiresIn: '24h' }
+);
 
-    res.status(200).json({ user, token });
+delete user.password;
 
-  } catch (err) {
-    res.status(500).json({ message: 'Error interno: ' + err.message });
-  }
+res.status(200).json({ user, token });
+
+
+} catch (err) {
+console.error('Error en /login:', err);
+res.status(500).json({ message: 'Error interno: ' + err.message });
+}
 });
 
 app.get('/profile', authenticate, async (req, res) => {
-  const userId = req.user.id_user;
+const userId = req.user.id_user;
 
-  try {
-    const doc = await db.collection('users').doc(userId).get();
+try {
+const doc = await db.collection('users').doc(userId).get();
 
-    if (!doc.exists)
-      return res.status(404).json({ message: 'Usuario no encontrado' });
+if (!doc.exists)
+  return res.status(404).json({ message: 'Usuario no encontrado' });
 
-    const userData = doc.data();
-    delete userData.password;
+const userData = doc.data();
+delete userData.password;
 
-    res.status(200).json(userData);
+res.status(200).json(userData);
 
-  } catch (err) {
-    res.status(500).json({ message: 'Error interno: ' + err.message });
-  }
+
+} catch (err) {
+console.error('Error en /profile:', err);
+res.status(500).json({ message: 'Error interno: ' + err.message });
+}
 });
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`🔥 Servidor FitJourney CON TOKEN listo en el puerto ${PORT}`);
+console.log(`🔥 Servidor FitJourney listo en el puerto ${PORT}`);
 });

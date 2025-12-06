@@ -13,7 +13,7 @@ public class UserViewModel extends ViewModel {
     private final UserRepository repository;
 
     private final MutableLiveData<Resource<LoginResponse>> loginState = new MutableLiveData<>();
-    private final MutableLiveData<Resource<Void>> registerState = new MutableLiveData<>();
+    private final MutableLiveData<Resource<LoginResponse>> registerState = new MutableLiveData<>();
 
     public UserViewModel() {
         this.repository = new UserRepository();
@@ -23,14 +23,14 @@ public class UserViewModel extends ViewModel {
         return loginState;
     }
 
-    public MutableLiveData<Resource<Void>> getRegisterState() {
+    public MutableLiveData<Resource<LoginResponse>> getRegisterState() {
         return registerState;
     }
 
     public void register(User user) {
         repository.registerUser(user, new UserRepository.RegisterCallback() {
             @Override
-            public void onResult(Resource<Void> result) {
+            public void onResult(Resource<LoginResponse> result) {
                 registerState.postValue(result);
             }
         });
@@ -49,8 +49,9 @@ public class UserViewModel extends ViewModel {
         repository.getUser(token, new UserRepository.LoginCallBack() {
             @Override
             public void onResult(Resource<LoginResponse> result) {
-                loginState.postValue(result); // Puedes usar la misma LiveData que login
+                loginState.postValue(result);
             }
         });
     }
+
 }
