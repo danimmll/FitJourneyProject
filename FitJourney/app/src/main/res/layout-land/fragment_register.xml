@@ -36,6 +36,7 @@
         app:layout_constraintEnd_toEndOf="parent">
 
         <LinearLayout
+            android:id="@+id/formRegister"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
@@ -45,22 +46,34 @@
                 android:id="@+id/tlName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/name">
+                android:hint="@string/name"
+                android:textColorHint="@color/inputsregister"
+                app:hintTextColor="@color/inputsregister"
+                app:boxBackgroundMode="outline"
+                app:boxStrokeWidth="2dp"
+                app:boxStrokeColor="@color/inputsregister">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etName"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="textPersonName"
-                    android:textColor="#FFFFFF" />
+                    android:textColor="#FFFFFF"/>
             </com.google.android.material.textfield.TextInputLayout>
+
+
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/tlEmail"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
-                android:hint="@string/email">
+                android:hint="@string/email"
+                android:textColorHint="@color/inputsregister"
+                app:hintTextColor="@color/inputsregister"
+                app:boxBackgroundMode="outline"
+                app:boxStrokeWidth="2dp"
+                app:boxStrokeColor="@color/inputsregister">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etEmail"
@@ -76,10 +89,36 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
                 android:hint="@string/password"
-                app:passwordToggleEnabled="true">
+                app:passwordToggleEnabled="true"
+                android:textColorHint="@color/inputsregister"
+                app:hintTextColor="@color/inputsregister"
+                app:boxBackgroundMode="outline"
+                app:boxStrokeWidth="2dp"
+                app:boxStrokeColor="@color/inputsregister">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etPassword"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textPassword"
+                    android:textColor="#FFFFFF" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tlConfirmPassword"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:hint="@string/confirm_password"
+                app:passwordToggleEnabled="true"
+                android:textColorHint="@color/inputsregister"
+                app:hintTextColor="@color/inputsregister"
+                app:boxBackgroundMode="outline"
+                app:boxStrokeWidth="2dp"
+                app:boxStrokeColor="@color/inputsregister">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etConfirmPassword"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="textPassword"
@@ -91,7 +130,12 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
-                android:hint="@string/birth_date">
+                android:hint="@string/birth_date"
+                android:textColorHint="@color/inputsregister"
+                app:hintTextColor="@color/inputsregister"
+                app:boxBackgroundMode="outline"
+                app:boxStrokeWidth="2dp"
+                app:boxStrokeColor="@color/inputsregister">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etBirthDate"
@@ -108,8 +152,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
+                android:hint="@string/gender"
                 app:endIconMode="dropdown_menu"
-                android:hint="@string/gender">
+                app:endIconTint="@color/inputsregister"
+                android:textColorHint="@color/inputsregister"
+                app:hintTextColor="@color/inputsregister"
+                app:boxBackgroundMode="outline"
+                app:boxStrokeWidth="2dp"
+                app:boxStrokeColor="@color/inputsregister">
 
                 <AutoCompleteTextView
                     android:id="@+id/actvGender"
@@ -127,8 +177,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
+                android:hint="@string/goal"
                 app:endIconMode="dropdown_menu"
-                android:hint="@string/goal">
+                app:endIconTint="@color/inputsregister"
+                android:textColorHint="@color/inputsregister"
+                app:hintTextColor="@color/inputsregister"
+                app:boxBackgroundMode="outline"
+                app:boxStrokeWidth="2dp"
+                app:boxStrokeColor="@color/inputsregister">
 
                 <AutoCompleteTextView
                     android:id="@+id/actvGoal"
@@ -146,7 +202,12 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
-                android:hint="@string/height_cm">
+                android:hint="@string/height_cm"
+                android:textColorHint="@color/inputsregister"
+                app:hintTextColor="@color/inputsregister"
+                app:boxBackgroundMode="outline"
+                app:boxStrokeWidth="2dp"
+                app:boxStrokeColor="@color/inputsregister">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etHeight"
@@ -161,7 +222,12 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
-                android:hint="@string/weight_kg">
+                android:hint="@string/weight_kg"
+                android:textColorHint="@color/inputsregister"
+                app:hintTextColor="@color/inputsregister"
+                app:boxBackgroundMode="outline"
+                app:boxStrokeWidth="2dp"
+                app:boxStrokeColor="@color/inputsregister">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etWeight"

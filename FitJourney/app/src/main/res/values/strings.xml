@@ -25,4 +25,27 @@
     <string name="gain_endurance">Gain endurance</string>
     <string name="gain_flexibility">Gain flexibility</string>
     <string name="recover_from_injury">Recover from injury</string>
+    <string name="email_already_in_use">Email already in use</string>
+    <string name="registration_completed">Registration completed!</string>
+    <string name="error_processing_data">"Error processing data: "</string>
+    <string name="error_processing_date">"Error processing date: "</string>
+    <string name="name_cannot_be_empty">Name cannot be empty</string>
+    <string name="email_is_required">Email is required</string>
+    <string name="invalid_email_format">Invalid email format</string>
+    <string name="password_is_required">Password is required</string>
+    <string name="password_must_be_at_least_8_characters">Password must be at least 8 characters</string>
+    <string name="password_must_contain_at_least_one_uppercase_letter">Password must contain at least one uppercase letter</string>
+    <string name="password_must_contain_at_least_one_number">Password must contain at least one number</string>
+    <string name="select_a_valid_date">Select a valid date</string>
+    <string name="select_a_gender">Select a gender</string>
+    <string name="select_a_goal">Select a goal</string>
+    <string name="enter_your_height">Enter your height</string>
+    <string name="height_out_of_range">Height out of range</string>
+    <string name="invalid_value">Invalid value</string>
+    <string name="enter_your_weight">Enter your weight</string>
+    <string name="weight_out_of_range">Weight out of range</string>
+    <string name="confirm_password">Confirm Password</string>
+    <string name="repeat_password_required">Confirm password required</string>
+    <string name="passwords_do_not_match">Passwords do not match\n</string>
+    <string name="welcome_back">Welcome Back!</string>
 </resources>

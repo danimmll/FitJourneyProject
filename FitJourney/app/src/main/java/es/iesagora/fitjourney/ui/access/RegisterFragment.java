@@ -1,6 +1,7 @@
 package es.iesagora.fitjourney.ui.access;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.app.DatePickerDialog;
 import android.os.Bundle;
 
@@ -42,7 +43,6 @@ public class RegisterFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
     }
 
     @Override
@@ -52,7 +52,6 @@ public class RegisterFragment extends Fragment {
         return binding.getRoot();
     }
 
-
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -60,40 +59,62 @@ public class RegisterFragment extends Fragment {
         viewModel =  new ViewModelProvider(this).get(UserViewModel.class);
 
         viewModel.getRegisterState().observe(getViewLifecycleOwner(), resource -> {
-            if (resource.status == es.iesagora.fitjourney.data.remote.Resource.Status.LOADING) {
-                if (binding.btnRegisterSubmit != null) {
+            if (resource == null) return;
+
+            switch (resource.status) {
+                case LOADING:
                     binding.btnRegisterSubmit.setEnabled(false);
-                }
-            }
-            else if (resource.status == es.iesagora.fitjourney.data.remote.Resource.Status.SUCCESS) {
-                if (binding.btnRegisterSubmit != null) {
+                    break;
+                case SUCCESS:
                     binding.btnRegisterSubmit.setEnabled(true);
-                    Toast.makeText(requireContext(), "¡Registro completado!", Toast.LENGTH_SHORT).show();
-                    navController = Navigation.findNavController(view);
-                    navController.navigate(R.id.action_registerFragment_to_homeFragment);
-                }
 
-            }
-            else if (resource.status == es.iesagora.fitjourney.data.remote.Resource.Status.ERROR) {
-                if (binding.btnRegisterSubmit != null) {
+                    String email = binding.etEmail.getText().toString().trim();
+                    String pass = binding.etPassword.getText().toString().trim();
+                    viewModel.login(email, pass);
+
+                    break;
+                case ERROR:
                     binding.btnRegisterSubmit.setEnabled(true);
-                    binding.btnRegisterSubmit.setText(R.string.register);
-                    Toast.makeText(requireContext(), "Error: " + resource.message, Toast.LENGTH_LONG).show();
-                }
-
+                    binding.tlEmail.setError(getString(R.string.email_already_in_use));
+                    break;
             }
         });
 
+        viewModel.getLoginState().observe(getViewLifecycleOwner(), resource -> {
+            if (resource == null) return;
 
-        genders = new String[]{getString(R.string.masculine),getString(R.string.feminine),
-                getString(R.string.other)
-        };
+            switch (resource.status) {
+                case LOADING:
+                    binding.btnRegisterSubmit.setEnabled(false);
+                    break;
+                case SUCCESS:
+                    binding.btnRegisterSubmit.setEnabled(true);
+                    if (resource.data != null) {
+                        requireContext().getSharedPreferences("APP_PREFS", Context.MODE_PRIVATE)
+                                .edit()
+                                .putString("TOKEN", resource.data.getToken())
+                                .apply();
+
+                        Toast.makeText(requireContext(), R.string.registration_completed, Toast.LENGTH_SHORT).show();
+
+                        navController = Navigation.findNavController(requireView());
+                        navController.navigate(R.id.action_registerFragment_to_homeFragment);
+                    }
+                    break;
+                case ERROR:
+                    binding.btnRegisterSubmit.setEnabled(true);
+                    Toast.makeText(requireContext(), resource.message, Toast.LENGTH_SHORT).show();
+                    break;
+            }
+        });
+
+        genders = new String[]{getString(R.string.masculine), getString(R.string.feminine),
+                getString(R.string.other)};
 
         goals = new String[]{getString(R.string.lose_weight), getString(R.string.maintain_weight),
-                getString(R.string.gain_muscle),getString(R.string.lose_fat),
-                getString(R.string.gain_strength),
-                getString(R.string.gain_endurance),getString(R.string.gain_flexibility),
-                getString(R.string.recover_from_injury)};
+                getString(R.string.gain_muscle), getString(R.string.lose_fat),
+                getString(R.string.gain_strength), getString(R.string.gain_endurance),
+                getString(R.string.gain_flexibility), getString(R.string.recover_from_injury)};
 
         establecerListas();
 
@@ -101,53 +122,41 @@ public class RegisterFragment extends Fragment {
             @SuppressLint({"DefaultLocale"})
             @Override
             public void onDateSet(DatePicker datePicker, int anio, int mes, int dia) {
-                if (binding.etBirthDate != null) {
-                    binding.etBirthDate.setText(String.format("%02d/%02d/%04d", dia, mes + 1, anio));
-                }
+                binding.etBirthDate.setText(String.format("%02d/%02d/%04d", dia, mes + 1, anio));
             }
         };
 
-        if (binding.etBirthDate != null) {
+        binding.etBirthDate.setFocusable(false);
+        binding.etBirthDate.setInputType(InputType.TYPE_NULL);
 
-            binding.etBirthDate.setFocusable(false);
-            binding.etBirthDate.setInputType(InputType.TYPE_NULL);
+        binding.etBirthDate.setOnClickListener(v -> {
 
-            binding.etBirthDate.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
+            DatePickerDialog calendario = new DatePickerDialog(
+                    requireContext(),
+                    R.style.calendarioPersonalizado,
+                    dateSetListener,
+                    anioActual,
+                    mesActual,
+                    diaActual
+            );
 
-                    DatePickerDialog calendario = new DatePickerDialog(
-                            requireContext(),
-                            R.style.calendarioPersonalizado,
-                            dateSetListener,
-                            anioActual,
-                            mesActual,
-                            diaActual
-                    );
+            calendario.getDatePicker().setMaxDate(System.currentTimeMillis());
 
+            Calendar minDate = Calendar.getInstance();
+            Calendar maxDate = Calendar.getInstance();
+            minDate.add(Calendar.YEAR, -110);
+            maxDate.add(Calendar.YEAR, -16);
+            calendario.getDatePicker().setMinDate(minDate.getTimeInMillis());
+            calendario.getDatePicker().setMaxDate(maxDate.getTimeInMillis());
 
-                    calendario.getDatePicker().setMaxDate(System.currentTimeMillis());
+            calendario.show();
+        });
 
-                    Calendar minDate = Calendar.getInstance();
-                    Calendar maxDate = Calendar.getInstance();
-                    minDate.add(Calendar.YEAR, -110);
-                    maxDate.add(Calendar.YEAR, -16);
-                    calendario.getDatePicker().setMinDate(minDate.getTimeInMillis());
-                    calendario.getDatePicker().setMaxDate(maxDate.getTimeInMillis());
-
-                    calendario.show();
-                }
-            });
-        }
-
-
-        if (binding.btnRegisterSubmit != null) {
-            binding.btnRegisterSubmit.setOnClickListener( v -> {
-                if (validarDatos()) {
-                    realizarRegistro();
-                }
-            });
-        }
+        binding.btnRegisterSubmit.setOnClickListener(v -> {
+            if (validarDatos()) {
+                realizarRegistro();
+            }
+        });
 
     }
 
@@ -159,9 +168,7 @@ public class RegisterFragment extends Fragment {
                 genders
         );
 
-        if (binding.actvGender != null) {
-            binding.actvGender.setAdapter(adapterGender);
-        }
+        binding.actvGender.setAdapter(adapterGender);
 
         ArrayAdapter<String> adapterGoals = new ArrayAdapter<>(
                 requireContext(),
@@ -169,9 +176,7 @@ public class RegisterFragment extends Fragment {
                 goals
         );
 
-        if (binding.actvGoal != null) {
-            binding.actvGoal.setAdapter(adapterGoals);
-        }
+        binding.actvGoal.setAdapter(adapterGoals);
     }
 
     private void realizarRegistro() {
@@ -205,7 +210,7 @@ public class RegisterFragment extends Fragment {
             viewModel.register(newUser);
 
         } catch (Exception e) {
-            Toast.makeText(requireContext(), "Error procesando datos: " + e.getMessage(),
+            Toast.makeText(requireContext(), getString(R.string.error_processing_data) + e.getMessage(),
                     Toast.LENGTH_SHORT).show();
         }
     }
@@ -216,7 +221,7 @@ public class RegisterFragment extends Fragment {
 
             return partes[2] + "-" + partes[1] + "-" + partes[0];
         } catch (Exception e) {
-            Toast.makeText(requireContext(), "Error procesando fecha: " + e.getMessage(),
+            Toast.makeText(requireContext(), getString(R.string.error_processing_date) + e.getMessage(),
                     Toast.LENGTH_SHORT).show();
             return fechaVisual;
         }
@@ -226,9 +231,8 @@ public class RegisterFragment extends Fragment {
 
         boolean valido = true;
 
-
         if (binding.etName.getText().toString().trim().isEmpty()) {
-            binding.tlName.setError("El nombre no puede estar vacío");
+            binding.tlName.setError(getString(R.string.name_cannot_be_empty));
             valido = false;
         } else {
             binding.tlName.setError(null);
@@ -236,54 +240,59 @@ public class RegisterFragment extends Fragment {
 
         String email = binding.etEmail.getText().toString().trim();
         if (email.isEmpty()) {
-            binding.tlEmail.setError("El email es obligatorio");
+            binding.tlEmail.setError(getString(R.string.email_is_required));
             valido = false;
         } else if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            binding.tlEmail.setError("Formato de email no válido");
+            binding.tlEmail.setError(getString(R.string.invalid_email_format));
             valido = false;
         } else {
             binding.tlEmail.setError(null);
         }
 
         String pass = binding.etPassword.getText().toString().trim();
-
         if (pass.isEmpty()) {
-            binding.tlPassword.setError("La contraseña es obligatoria");
+            binding.tlPassword.setError(getString(R.string.password_is_required));
             valido = false;
-
         } else if (pass.length() < 8) {
-            binding.tlPassword.setError("Debe tener al menos 8 caracteres");
+            binding.tlPassword.setError(getString(R.string.password_must_be_at_least_8_characters));
             valido = false;
-
         } else if (!pass.matches(".*[A-Z].*")) {
-            binding.tlPassword.setError("Debe contener al menos una letra mayúscula");
+            binding.tlPassword.setError(getString(R.string.password_must_contain_at_least_one_uppercase_letter));
             valido = false;
-
         } else if (!pass.matches(".*\\d.*")) {
-            binding.tlPassword.setError("Debe contener al menos un número");
+            binding.tlPassword.setError(getString(R.string.password_must_contain_at_least_one_number));
             valido = false;
-
         } else {
             binding.tlPassword.setError(null);
         }
 
+        String repeatPass = binding.etConfirmPassword.getText().toString().trim();
+        if (repeatPass.isEmpty()) {
+            binding.tlConfirmPassword.setError(getString(R.string.repeat_password_required));
+            valido = false;
+        } else if (!repeatPass.equals(pass)) {
+            binding.tlConfirmPassword.setError(getString(R.string.passwords_do_not_match));
+            valido = false;
+        } else {
+            binding.tlConfirmPassword.setError(null);
+        }
 
         if (binding.etBirthDate.getText().toString().trim().isEmpty()) {
-            binding.tlBirthDate.setError("Selecciona una fecha válida");
+            binding.tlBirthDate.setError(getString(R.string.select_a_valid_date));
             valido = false;
         } else {
             binding.tlBirthDate.setError(null);
         }
 
         if (binding.actvGender.getText().toString().trim().isEmpty()) {
-            binding.tlGender.setError("Selecciona un género");
+            binding.tlGender.setError(getString(R.string.select_a_gender));
             valido = false;
         } else {
             binding.tlGender.setError(null);
         }
 
         if (binding.actvGoal.getText().toString().trim().isEmpty()) {
-            binding.tLGoal.setError("Selecciona un objetivo");
+            binding.tLGoal.setError(getString(R.string.select_a_goal));
             valido = false;
         } else {
             binding.tLGoal.setError(null);
@@ -291,38 +300,38 @@ public class RegisterFragment extends Fragment {
 
         String altura = binding.etHeight.getText().toString().trim();
         if (altura.isEmpty()) {
-            binding.tlHeight.setError("Introduce tu altura");
+            binding.tlHeight.setError(getString(R.string.enter_your_height));
             valido = false;
         } else {
             try {
                 int h = Integer.parseInt(altura);
                 if (h < 50 || h > 250) {
-                    binding.tlHeight.setError("Altura fuera de rango");
+                    binding.tlHeight.setError(getString(R.string.height_out_of_range));
                     valido = false;
                 } else {
                     binding.tlHeight.setError(null);
                 }
             } catch (Exception e) {
-                binding.tlHeight.setError("Dato no válido");
+                binding.tlHeight.setError(getString(R.string.invalid_value));
                 valido = false;
             }
         }
 
         String peso = binding.etWeight.getText().toString().trim();
         if (peso.isEmpty()) {
-            binding.tlWeight.setError("Introduce tu peso");
+            binding.tlWeight.setError(getString(R.string.enter_your_weight));
             valido = false;
         } else {
             try {
                 float weight = Float.parseFloat(peso);
                 if (weight < 20 || weight > 300) {
-                    binding.tlWeight.setError("Peso fuera de rango");
+                    binding.tlWeight.setError(getString(R.string.weight_out_of_range));
                     valido = false;
                 } else {
                     binding.tlWeight.setError(null);
                 }
             } catch (Exception e) {
-                binding.tlWeight.setError("Dato no válido");
+                binding.tlWeight.setError(getString(R.string.invalid_value));
                 valido = false;
             }
         }

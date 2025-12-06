@@ -18,7 +18,7 @@ public class RetrofitClient {
         }
         return retrofit;
     }
-    
+
     public static AppApi getApiService() {
         return getInstance().create(AppApi.class);
     }
