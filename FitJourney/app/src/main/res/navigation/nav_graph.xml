@@ -15,12 +15,20 @@
         android:id="@+id/loginFragment"
         android:name="es.iesagora.fitjourney.ui.access.LoginFragment"
         android:label=""
-        tools:layout="@layout/fragment_login" />
+        tools:layout="@layout/fragment_login" >
+        <action
+            android:id="@+id/action_loginFragment_to_homeFragment"
+            app:destination="@id/homeFragment" />
+    </fragment>
     <fragment
         android:id="@+id/registerFragment"
         android:name="es.iesagora.fitjourney.ui.access.RegisterFragment"
         android:label=""
-        tools:layout="@layout/fragment_register" />
+        tools:layout="@layout/fragment_register" >
+        <action
+            android:id="@+id/action_registerFragment_to_homeFragment"
+            app:destination="@id/homeFragment" />
+    </fragment>
     <fragment
         android:id="@+id/accessFragment"
         android:name="es.iesagora.fitjourney.ui.access.AccessFragment"

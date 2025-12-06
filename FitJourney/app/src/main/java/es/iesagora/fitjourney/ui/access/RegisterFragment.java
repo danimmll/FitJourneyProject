@@ -7,6 +7,9 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 
 import android.text.InputType;
 import android.util.Patterns;
@@ -18,13 +21,18 @@ import android.widget.DatePicker;
 import android.widget.Toast;
 
 import java.util.Calendar;
+import java.util.UUID;
 
 import es.iesagora.fitjourney.R;
+import es.iesagora.fitjourney.data.model.User;
 import es.iesagora.fitjourney.databinding.FragmentRegisterBinding;
+import es.iesagora.fitjourney.viewmodel.UserViewModel;
 
 public class RegisterFragment extends Fragment {
 
     private FragmentRegisterBinding binding;
+    private NavController navController;
+    private UserViewModel viewModel;
     private final int anioActual = Calendar.getInstance().get(Calendar.YEAR);
     private final int mesActual = Calendar.getInstance().get(Calendar.MONTH);
     private final int diaActual = Calendar.getInstance().get(Calendar.DAY_OF_MONTH);
@@ -48,6 +56,34 @@ public class RegisterFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        viewModel =  new ViewModelProvider(this).get(UserViewModel.class);
+
+        viewModel.getRegisterState().observe(getViewLifecycleOwner(), resource -> {
+            if (resource.status == es.iesagora.fitjourney.data.remote.Resource.Status.LOADING) {
+                if (binding.btnRegisterSubmit != null) {
+                    binding.btnRegisterSubmit.setEnabled(false);
+                }
+            }
+            else if (resource.status == es.iesagora.fitjourney.data.remote.Resource.Status.SUCCESS) {
+                if (binding.btnRegisterSubmit != null) {
+                    binding.btnRegisterSubmit.setEnabled(true);
+                    Toast.makeText(requireContext(), "¡Registro completado!", Toast.LENGTH_SHORT).show();
+                    navController = Navigation.findNavController(view);
+                    navController.navigate(R.id.action_registerFragment_to_homeFragment);
+                }
+
+            }
+            else if (resource.status == es.iesagora.fitjourney.data.remote.Resource.Status.ERROR) {
+                if (binding.btnRegisterSubmit != null) {
+                    binding.btnRegisterSubmit.setEnabled(true);
+                    binding.btnRegisterSubmit.setText(R.string.register);
+                    Toast.makeText(requireContext(), "Error: " + resource.message, Toast.LENGTH_LONG).show();
+                }
+
+            }
+        });
+
 
         genders = new String[]{getString(R.string.masculine),getString(R.string.feminine),
                 getString(R.string.other)
@@ -104,11 +140,14 @@ public class RegisterFragment extends Fragment {
             });
         }
 
-        binding.btnRegisterSubmit.setOnClickListener( v -> {
-            if (validarDatos()) {
 
-            }
-        });
+        if (binding.btnRegisterSubmit != null) {
+            binding.btnRegisterSubmit.setOnClickListener( v -> {
+                if (validarDatos()) {
+                    realizarRegistro();
+                }
+            });
+        }
 
     }
 
@@ -132,6 +171,54 @@ public class RegisterFragment extends Fragment {
 
         if (binding.actvGoal != null) {
             binding.actvGoal.setAdapter(adapterGoals);
+        }
+    }
+
+    private void realizarRegistro() {
+        try {
+            String name = binding.etName.getText().toString().trim();
+            String email = binding.etEmail.getText().toString().trim();
+            String pass = binding.etPassword.getText().toString().trim();
+            String gender = binding.actvGender.getText().toString().trim();
+            String goal = binding.actvGoal.getText().toString().trim();
+
+            int height = Integer.parseInt(binding.etHeight.getText().toString().trim());
+            float weight = Float.parseFloat(binding.etWeight.getText().toString().trim());
+
+            String idUser = UUID.randomUUID().toString();
+
+            String fechaVisual = binding.etBirthDate.getText().toString().trim();
+            String birthDate = convertirFecha(fechaVisual);
+
+            User newUser = new User(
+                    idUser,
+                    name,
+                    email,
+                    pass,
+                    birthDate,
+                    gender,
+                    goal,
+                    height,
+                    weight
+            );
+
+            viewModel.register(newUser);
+
+        } catch (Exception e) {
+            Toast.makeText(requireContext(), "Error procesando datos: " + e.getMessage(),
+                    Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private String convertirFecha(String fechaVisual) {
+        try {
+            String[] partes = fechaVisual.split("/");
+
+            return partes[2] + "-" + partes[1] + "-" + partes[0];
+        } catch (Exception e) {
+            Toast.makeText(requireContext(), "Error procesando fecha: " + e.getMessage(),
+                    Toast.LENGTH_SHORT).show();
+            return fechaVisual;
         }
     }
 
