@@ -1,4 +1,5 @@
 require('dotenv').config();
+
 const express = require('express');
 const admin = require('firebase-admin');
 const cors = require('cors');
@@ -17,6 +18,11 @@ app.use(cors());
 app.use(bodyParser.json());
 
 const JWT_SECRET = process.env.JWT_SECRET;
+if (!JWT_SECRET) {
+  console.error('❌ JWT_SECRET no está definido en .env');
+  process.exit(1);
+}
+console.log('✅ JWT_SECRET cargado correctamente');
 
 const authenticate = (req, res, next) => {
   const authHeader = req.headers.authorization;
@@ -35,7 +41,6 @@ const authenticate = (req, res, next) => {
 
 app.post('/users', async (req, res) => {
   const body = req.body;
-
   const requiredFields = [
     'id_user','email','name','password','gender',
     'goal','height','weight','birth_date'
@@ -50,7 +55,6 @@ app.post('/users', async (req, res) => {
 
   try {
     const emailNormalized = body.email.trim().toLowerCase();
-
     const existingUser = await db.collection('users')
       .where('email', '==', emailNormalized)
       .get();
