@@ -19,7 +19,6 @@ app.use(bodyParser.json());
 app.post('/users', async (req, res) => {
     const body = req.body;
 
-    // --- A. VALIDACIÓN ---
     const requiredFields = [
         'id_user',      
         'email', 
@@ -88,6 +87,10 @@ app.get('/users/:id', async (req, res) => {
 
         if (userData.register_date && typeof userData.register_date.toDate === 'function') {
             userData.register_date = userData.register_date.toDate().toISOString().split('T')[0];
+        }
+
+        if (userData.birth_date && typeof userData.birth_date.toDate === 'function') {
+            userData.birth_date = userData.birth_date.toDate().toISOString().split('T')[0];
         }
 
         res.status(200).json(userData);
