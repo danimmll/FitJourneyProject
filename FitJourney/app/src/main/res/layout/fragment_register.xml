@@ -13,16 +13,17 @@
         android:id="@+id/tvRegister"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
         android:fontFamily="sans-serif-black"
         android:shadowColor="#BF360C"
         android:shadowRadius="50"
         android:text="@string/register"
         android:textColor="#FF6F00"
         android:textSize="60sp"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintVertical_bias="0.08"/>
+        app:layout_constraintHorizontal_bias="0.497"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.core.widget.NestedScrollView
         android:id="@+id/scrollRegister"
@@ -41,6 +42,7 @@
             android:padding="24dp">
 
             <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tlName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/name">
@@ -49,56 +51,65 @@
                     android:id="@+id/etName"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="textPersonName"/>
+                    android:inputType="textPersonName"
+                    android:textColor="#FFFFFF" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tlEmail"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/email"
-                android:layout_marginTop="20dp">
+                android:layout_marginTop="20dp"
+                android:hint="@string/email">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etEmail"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="textEmailAddress"/>
+                    android:inputType="textEmailAddress"
+                    android:textColor="#FFFFFF" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tlPassword"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/password"
                 android:layout_marginTop="20dp"
+                android:hint="@string/password"
                 app:passwordToggleEnabled="true">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etPassword"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="textPassword"/>
+                    android:inputType="textPassword"
+                    android:textColor="#FFFFFF" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tlBirthDate"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/birth_date"
-                android:layout_marginTop="20dp">
+                android:layout_marginTop="20dp"
+                android:hint="@string/birth_date">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etBirthDate"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:focusable="true"
                     android:clickable="true"
-                    android:inputType="none"/>
+                    android:focusable="true"
+                    android:inputType="none"
+                    android:textColor="#FFFFFF" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tlGender"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/gender"
-                android:layout_marginTop="20dp">
+                android:layout_marginTop="20dp"
+                app:endIconMode="dropdown_menu"
+                android:hint="@string/gender">
 
                 <AutoCompleteTextView
                     android:id="@+id/actvGender"
@@ -106,14 +117,18 @@
                     android:layout_height="50dp"
                     android:focusable="false"
                     android:inputType="none"
-                    tools:ignore="LabelFor" />
+                    android:paddingStart="20dp"
+                    android:textColor="#FFFFFF"
+                    tools:ignore="LabelFor,RtlSymmetry" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tLGoal"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/goal"
-                android:layout_marginTop="20dp">
+                android:layout_marginTop="20dp"
+                app:endIconMode="dropdown_menu"
+                android:hint="@string/goal">
 
                 <AutoCompleteTextView
                     android:id="@+id/actvGoal"
@@ -121,33 +136,39 @@
                     android:layout_height="50dp"
                     android:focusable="false"
                     android:inputType="none"
-                    tools:ignore="LabelFor" />
+                    android:paddingStart="20dp"
+                    android:textColor="#FFFFFF"
+                    tools:ignore="LabelFor,RtlSymmetry" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tlHeight"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/height_cm"
-                android:layout_marginTop="20dp">
+                android:layout_marginTop="20dp"
+                android:hint="@string/height_cm">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etHeight"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="number"/>
+                    android:inputType="number"
+                    android:textColor="#FFFFFF" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tlWeight"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/weight_kg"
-                android:layout_marginTop="20dp">
+                android:layout_marginTop="20dp"
+                android:hint="@string/weight_kg">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etWeight"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="numberDecimal" />
+                    android:inputType="numberDecimal"
+                    android:textColor="#FFFFFF" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <Button

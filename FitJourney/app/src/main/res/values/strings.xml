@@ -1,7 +1,5 @@
 <resources>
     <string name="app_name">FitJourney</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="title">title</string>
     <string name="fit">Fit</string>
     <string name="journey">Journey</string>
@@ -16,4 +14,15 @@
     <string name="password">Password</string>
     <string name="email">Email</string>
     <string name="name">Name</string>
+    <string name="other">Other</string>
+    <string name="feminine">Feminine</string>
+    <string name="masculine">Masculine</string>
+    <string name="lose_weight">Lose weight</string>
+    <string name="maintain_weight">Maintain weight</string>
+    <string name="gain_muscle">Gain muscle</string>
+    <string name="lose_fat">Lose fat</string>
+    <string name="gain_strength">Gain strength</string>
+    <string name="gain_endurance">Gain endurance</string>
+    <string name="gain_flexibility">Gain flexibility</string>
+    <string name="recover_from_injury">Recover from injury</string>
 </resources>

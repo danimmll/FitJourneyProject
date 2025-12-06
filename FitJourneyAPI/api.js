@@ -2,6 +2,7 @@ const express = require('express');
 const admin = require('firebase-admin');
 const cors = require('cors');
 const bodyParser = require('body-parser');
+const bcrypt = require('bcrypt');
 
 const serviceAccount = require('./serviceAccountKey.json');
 
@@ -22,7 +23,8 @@ app.post('/users', async (req, res) => {
     const requiredFields = [
         'id_user',      
         'email', 
-        'name', 
+        'name',
+        'password',
         'gender', 
         'goal', 
         'height', 
@@ -46,9 +48,13 @@ app.post('/users', async (req, res) => {
     }
 
     try {
+        const saltRounds = 10;
+        const passwordHash = await bcrypt.hash(body.password, saltRounds);
+
         await db.collection('users').doc(body.id_user).set({
             id_user: body.id_user,
             email: body.email,
+            password: passwordHash,
             name: body.name,
             gender: body.gender,
             goal: body.goal,
@@ -77,6 +83,8 @@ app.get('/users/:id', async (req, res) => {
         }
 
         const userData = doc.data();
+
+        if(userData.password) delete userData.password; 
 
         if (userData.register_date && typeof userData.register_date.toDate === 'function') {
             userData.register_date = userData.register_date.toDate().toISOString().split('T')[0];
