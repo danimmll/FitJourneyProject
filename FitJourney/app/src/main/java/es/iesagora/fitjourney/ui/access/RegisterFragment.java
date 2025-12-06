@@ -144,6 +144,7 @@ public class RegisterFragment extends Fragment {
 
             viewModel.register(newUser);
 
+
         } catch (Exception e) {
             Toast.makeText(requireContext(), getString(R.string.error_processing_data) + e.getMessage(),
                     Toast.LENGTH_SHORT).show();
