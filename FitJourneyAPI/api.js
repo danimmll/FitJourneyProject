@@ -1,10 +1,10 @@
+require('dotenv').config();
 const express = require('express');
 const admin = require('firebase-admin');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-require('dotenv').config();
 
 const serviceAccount = require('./serviceAccountKey.json');
 admin.initializeApp({
