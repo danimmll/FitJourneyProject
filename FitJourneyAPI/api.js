@@ -59,12 +59,14 @@ app.post('/users', async (req, res) => {
 
     const passwordHash = await bcrypt.hash(body.password, 10);
 
-    await db.collection('users').doc(body.id_user).set({
+    const userDataToSave = {
       ...body,
       email: emailNormalized,
       password: passwordHash,
       register_date: admin.firestore.FieldValue.serverTimestamp()
-    });
+    };
+
+    await db.collection('users').doc(body.id_user).set(userDataToSave);
 
     const token = jwt.sign(
       { id_user: body.id_user, email: emailNormalized },
@@ -72,8 +74,7 @@ app.post('/users', async (req, res) => {
       { expiresIn: '24h' }
     );
 
-    const userResponse = { ...body };
-    delete userResponse.password;
+    const { password, ...userResponse } = body;
 
     res.status(201).json({ user: userResponse, token });
 
@@ -107,8 +108,9 @@ app.post('/login', async (req, res) => {
       { expiresIn: '24h' }
     );
 
-    delete user.password;
-    res.status(200).json({ user, token });
+    const { password: pw, ...userResponse } = user;
+
+    res.status(200).json({ user: userResponse, token });
 
   } catch (err) {
     console.error('Error en /login:', err);
@@ -123,8 +125,7 @@ app.get('/profile', authenticate, async (req, res) => {
     if (!doc.exists)
       return res.status(404).json({ message: 'Usuario no encontrado' });
 
-    const userData = doc.data();
-    delete userData.password;
+    const { password, ...userData } = doc.data();
     res.status(200).json(userData);
 
   } catch (err) {
