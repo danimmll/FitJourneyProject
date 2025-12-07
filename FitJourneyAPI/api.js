@@ -42,8 +42,8 @@ const authenticate = (req, res, next) => {
 app.post('/users', async (req, res) => {
   const body = req.body;
   const requiredFields = [
-    'id_user','email','name','password','gender',
-    'goal','height','weight','birth_date'
+    'id_user', 'email', 'name', 'password', 'gender',
+    'goal', 'height', 'weight', 'birth_date'
   ];
   const missingFields = requiredFields.filter(f => !body[f]);
   if (missingFields.length > 0) {
@@ -131,6 +131,7 @@ app.get('/profile', authenticate, async (req, res) => {
       return res.status(404).json({ message: 'Usuario no encontrado' });
 
     const { password, ...userData } = doc.data();
+
     if (userData.birth_date && userData.birth_date.toDate) {
       userData.birth_date = userData.birth_date.toDate().toISOString();
     }
@@ -144,4 +145,9 @@ app.get('/profile', authenticate, async (req, res) => {
     console.error('Error en /profile:', err);
     res.status(500).json({ message: 'Error interno: ' + err.message });
   }
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Servidor FitJourney listo en el puerto ${PORT}`);
 });
