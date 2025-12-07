@@ -48,6 +48,6 @@
     <string name="repeat_password_required">Confirm password required</string>
     <string name="passwords_do_not_match">Passwords do not match\n</string>
     <string name="welcome_back">Welcome Back!</string>
-    <string name="welcome">Welcome</string>
     <string name="log_out">Log Out</string>
+    <string name="welcome">¡Welcome</string>
 </resources>

@@ -70,9 +70,11 @@ public class HomeFragment extends Fragment {
                         binding.progressBarHome.setVisibility(View.GONE);
                         if (resource.data != null) {
                             String[] nameParts = resource.data.getName().split(" ");
-                            String firstName = nameParts[0];
-                            String displayName = nameParts.length > 1 ? firstName + " " + nameParts[1] : firstName;
-                            binding.tvName.setText(displayName + " !");
+                            if (nameParts.length <= 3) {
+                                binding.tvName.setText(nameParts[0] + " !");
+                            } else {
+                                binding.tvName.setText(nameParts[0] + " " + nameParts[1] + " !");
+                            }
                         }
                         break;
 
