@@ -10,6 +10,9 @@
         android:name="es.iesagora.fitjourney.ui.home.HomeFragment"
         android:label=""
         tools:layout="@layout/fragment_home" >
+        <action
+            android:id="@+id/action_homeFragment_to_accessFragment"
+            app:destination="@id/accessFragment" />
     </fragment>
     <fragment
         android:id="@+id/loginFragment"

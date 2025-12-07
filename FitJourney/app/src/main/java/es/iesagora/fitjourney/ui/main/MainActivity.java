@@ -22,7 +22,6 @@ public class MainActivity extends AppCompatActivity {
 
     private ActivityMainBinding binding;
     private NavController navController;
-    private AppBarConfiguration appBarConfiguration;
     private UserViewModel viewModel;
 
     @Override
@@ -31,16 +30,14 @@ public class MainActivity extends AppCompatActivity {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        if (binding.progressBar != null) {
-            binding.progressBar.setVisibility(View.GONE);
-        }
+        binding.progressBar.setVisibility(View.GONE);
 
         setSupportActionBar(binding.toolbar);
 
         navController = ((NavHostFragment) Objects.requireNonNull(getSupportFragmentManager()
                 .findFragmentById(R.id.nav_host_fragment))).getNavController();
 
-        appBarConfiguration = new AppBarConfiguration.Builder(navController.getGraph()).build();
+        AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(navController.getGraph()).build();
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
 
         viewModel = new ViewModelProvider(this).get(UserViewModel.class);
@@ -51,34 +48,30 @@ public class MainActivity extends AppCompatActivity {
         if (token != null) {
             viewModel.fetchUser(token);
 
-            viewModel.getLoginState().observe(this, resource -> {
+            viewModel.getUserProfileState().observe(this, resource -> {
                 if (resource == null) return;
 
                 switch (resource.status) {
                     case LOADING:
-                        if (binding.progressBar != null) {
-                            binding.progressBar.setVisibility(View.VISIBLE);
-                        }
+                        binding.progressBar.setVisibility(View.VISIBLE);
                         break;
+
                     case SUCCESS:
-                        if (binding.progressBar != null) {
-                            binding.progressBar.setVisibility(View.GONE);
-                        }
-                        if (resource.data != null) {
-                            Toast.makeText(this, R.string.welcome_back, Toast.LENGTH_SHORT).show();
-                            navController.navigate(R.id.homeFragment);
-                        }
+                        binding.progressBar.setVisibility(View.GONE);
+                        Toast.makeText(this, "¡Bienvenido de nuevo!", Toast.LENGTH_SHORT).show();
+                        navController.navigate(R.id.homeFragment);
                         break;
+
                     case ERROR:
+                        binding.progressBar.setVisibility(View.GONE);
                         getSharedPreferences("APP_PREFS", Context.MODE_PRIVATE)
-                                .edit()
-                                .remove("TOKEN")
-                                .apply();
-                        Toast.makeText(this, resource.message, Toast.LENGTH_SHORT).show();
+                                .edit().remove("TOKEN").apply();
+                        Toast.makeText(this, resource.message, Toast.LENGTH_LONG).show();
                         navController.navigate(R.id.accessFragment);
                         break;
                 }
             });
+
         } else {
             navController.navigate(R.id.accessFragment);
         }
@@ -86,8 +79,8 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onSupportNavigateUp() {
-        return NavigationUI.navigateUp(navController, appBarConfiguration)
+        return NavigationUI.navigateUp(navController,
+                new AppBarConfiguration.Builder(navController.getGraph()).build())
                 || super.onSupportNavigateUp();
     }
-
 }

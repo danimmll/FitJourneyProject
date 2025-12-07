@@ -1,8 +1,6 @@
 package es.iesagora.fitjourney.data.remote;
 
 import es.iesagora.fitjourney.data.model.User;
-import es.iesagora.fitjourney.data.remote.LoginRequest;
-import es.iesagora.fitjourney.data.remote.LoginResponse;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;

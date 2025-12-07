@@ -8,19 +8,23 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavOptions;
+import androidx.navigation.fragment.NavHostFragment;
 
+import es.iesagora.fitjourney.R;
 import es.iesagora.fitjourney.databinding.FragmentHomeBinding;
-import es.iesagora.fitjourney.viewmodel.HomeViewModel;
-import es.iesagora.fitjourney.data.remote.Resource;
+import es.iesagora.fitjourney.viewmodel.UserViewModel;
 
 public class HomeFragment extends Fragment {
 
     private FragmentHomeBinding binding;
-    private HomeViewModel viewModel;
+    private UserViewModel viewModel;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
@@ -34,43 +38,68 @@ public class HomeFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        viewModel = new ViewModelProvider(this).get(HomeViewModel.class);
+        requireActivity().getOnBackPressedDispatcher().addCallback(getViewLifecycleOwner(),
+                new OnBackPressedCallback(true) {
+                    @Override
+                    public void handleOnBackPressed() {
+                        Toast.makeText(requireContext(), "No puedes volver atrás", Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+        if (getActivity() instanceof AppCompatActivity) {
+            ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+        }
+
+        viewModel = new ViewModelProvider(this).get(UserViewModel.class);
 
         String token = requireContext().getSharedPreferences("APP_PREFS", Context.MODE_PRIVATE)
                 .getString("TOKEN", null);
 
         if (token != null) {
-            viewModel.getUserLiveData().observe(getViewLifecycleOwner(), resource -> {
+            viewModel.fetchUser(token);
+
+            viewModel.getUserProfileState().observe(getViewLifecycleOwner(), resource -> {
+                if (resource == null) return;
+
                 switch (resource.status) {
                     case LOADING:
-                        if (binding.progressBarHome != null) {
-                            binding.progressBarHome.setVisibility(View.VISIBLE);
-                        }
+                        binding.progressBarHome.setVisibility(View.VISIBLE);
                         break;
+
                     case SUCCESS:
-                        if (binding.progressBarHome != null) {
-                            binding.progressBarHome.setVisibility(View.GONE);
-                        }
+                        binding.progressBarHome.setVisibility(View.GONE);
                         if (resource.data != null) {
-                            if (binding.tvPrueba2 != null) {
-                                binding.tvPrueba2.setText("¡Bienvenido, " + resource.data.getName() + "!");
-                            }
+                            String[] nameParts = resource.data.getName().split(" ");
+                            String firstName = nameParts[0];
+                            String displayName = nameParts.length > 1 ? firstName + " " + nameParts[1] : firstName;
+                            binding.tvName.setText(displayName + " !");
                         }
                         break;
+
                     case ERROR:
-                        if (binding.progressBarHome != null) {
-                            binding.progressBarHome.setVisibility(View.GONE);
-                        }
-                        Toast.makeText(requireContext(), resource.message, Toast.LENGTH_SHORT).show();
+                        binding.progressBarHome.setVisibility(View.GONE);
+                        Toast.makeText(requireContext(), resource.message, Toast.LENGTH_LONG).show();
                         break;
                 }
             });
 
-            viewModel.fetchUser(token);
-
         } else {
-            Toast.makeText(requireContext(), "No se encontró token, inicia sesión primero", Toast.LENGTH_SHORT).show();
+            Toast.makeText(requireContext(), "Token no encontrado", Toast.LENGTH_SHORT).show();
         }
+
+        binding.btnLogout.setOnClickListener(v -> {
+            requireContext().getSharedPreferences("APP_PREFS", Context.MODE_PRIVATE)
+                    .edit()
+                    .remove("TOKEN")
+                    .apply();
+
+            NavOptions navOptions = new NavOptions.Builder()
+                    .setPopUpTo(R.id.homeFragment, true)
+                    .build();
+
+            NavHostFragment.findNavController(this)
+                    .navigate(R.id.action_homeFragment_to_accessFragment, null, navOptions);
+        });
     }
 
     @Override

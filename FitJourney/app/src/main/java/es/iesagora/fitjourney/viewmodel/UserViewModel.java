@@ -15,6 +15,8 @@ public class UserViewModel extends ViewModel {
     private final MutableLiveData<Resource<LoginResponse>> loginState = new MutableLiveData<>();
     private final MutableLiveData<Resource<LoginResponse>> registerState = new MutableLiveData<>();
 
+    private final MutableLiveData<Resource<User>> userProfileState = new MutableLiveData<>();
+
     public UserViewModel() {
         this.repository = new UserRepository();
     }
@@ -27,31 +29,27 @@ public class UserViewModel extends ViewModel {
         return registerState;
     }
 
-    public void register(User user) {
-        repository.registerUser(user, new UserRepository.RegisterCallback() {
-            @Override
-            public void onResult(Resource<LoginResponse> result) {
-                registerState.postValue(result);
-            }
-        });
+    public MutableLiveData<Resource<User>> getUserProfileState() {
+        return userProfileState;
     }
 
     public void login(String email, String password) {
-        repository.login(email, password, new UserRepository.LoginCallBack() {
-            @Override
-            public void onResult(Resource<LoginResponse> result) {
-                loginState.postValue(result);
-            }
-        });
+        repository.login(email, password, result -> loginState.postValue(result));
+    }
+
+    public void register(User user) {
+        repository.registerUser(user, result -> registerState.postValue(result));
     }
 
     public void fetchUser(String token) {
-        repository.getUser(token, new UserRepository.LoginCallBack() {
-            @Override
-            public void onResult(Resource<LoginResponse> result) {
-                loginState.postValue(result);
+        repository.getUser(token, result -> {
+            if (result.status == Resource.Status.SUCCESS && result.data != null) {
+                userProfileState.postValue(Resource.success(result.data.getUser()));
+            } else if (result.status == Resource.Status.ERROR) {
+                userProfileState.postValue(Resource.error(result.message));
+            } else {
+                userProfileState.postValue(Resource.loading());
             }
         });
     }
-
 }

@@ -113,6 +113,13 @@ app.post('/login', async (req, res) => {
       { expiresIn: '24h' }
     );
 
+    if (user.birth_date && user.birth_date.toDate) {
+      user.birth_date = user.birth_date.toDate().toISOString();
+    }
+    if (user.register_date && user.register_date.toDate) {
+      user.register_date = user.register_date.toDate().toISOString();
+    }
+
     const { password: pw, ...userResponse } = user;
 
     res.status(200).json({ user: userResponse, token });
