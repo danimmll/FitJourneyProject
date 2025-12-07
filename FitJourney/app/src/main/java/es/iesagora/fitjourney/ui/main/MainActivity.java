@@ -31,6 +31,10 @@ public class MainActivity extends AppCompatActivity {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
+        if (binding.progressBar != null) {
+            binding.progressBar.setVisibility(View.GONE);
+        }
+
         setSupportActionBar(binding.toolbar);
 
         navController = ((NavHostFragment) Objects.requireNonNull(getSupportFragmentManager()
@@ -71,7 +75,7 @@ public class MainActivity extends AppCompatActivity {
                                 .remove("TOKEN")
                                 .apply();
                         Toast.makeText(this, resource.message, Toast.LENGTH_SHORT).show();
-                        navController.navigate(R.id.loginFragment);
+                        navController.navigate(R.id.accessFragment);
                         break;
                 }
             });

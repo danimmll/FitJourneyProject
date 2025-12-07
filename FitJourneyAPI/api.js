@@ -131,15 +131,17 @@ app.get('/profile', authenticate, async (req, res) => {
       return res.status(404).json({ message: 'Usuario no encontrado' });
 
     const { password, ...userData } = doc.data();
+    if (userData.birth_date && userData.birth_date.toDate) {
+      userData.birth_date = userData.birth_date.toDate().toISOString();
+    }
+    if (userData.register_date && userData.register_date.toDate) {
+      userData.register_date = userData.register_date.toDate().toISOString();
+    }
+
     res.status(200).json(userData);
 
   } catch (err) {
     console.error('Error en /profile:', err);
     res.status(500).json({ message: 'Error interno: ' + err.message });
   }
-});
-
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`🔥 Servidor FitJourney listo en el puerto ${PORT}`);
 });

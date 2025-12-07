@@ -18,7 +18,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.DatePicker;
 import android.widget.Toast;
 
 import java.util.Calendar;
@@ -88,7 +87,7 @@ public class RegisterFragment extends Fragment {
                 getString(R.string.gain_flexibility), getString(R.string.recover_from_injury)};
         establecerListas();
 
-        DatePickerDialog.OnDateSetListener dateSetListener = (datePicker, anio, mes, dia) ->
+        @SuppressLint("DefaultLocale") DatePickerDialog.OnDateSetListener dateSetListener = (datePicker, anio, mes, dia) ->
                 binding.etBirthDate.setText(String.format("%02d/%02d/%04d", dia, mes + 1, anio));
 
         binding.etBirthDate.setFocusable(false);
