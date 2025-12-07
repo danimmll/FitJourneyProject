@@ -67,6 +67,7 @@ app.post('/users', async (req, res) => {
       ...body,
       email: emailNormalized,
       password: passwordHash,
+      birth_date: new Date(body.birth_date).toISOString(),
       register_date: admin.firestore.FieldValue.serverTimestamp()
     };
 
