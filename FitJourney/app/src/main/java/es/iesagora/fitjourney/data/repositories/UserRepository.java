@@ -3,6 +3,7 @@ package es.iesagora.fitjourney.data.repositories;
 import androidx.annotation.NonNull;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 
 import es.iesagora.fitjourney.data.model.User;
 import es.iesagora.fitjourney.data.remote.LoginRequest;
@@ -11,7 +12,6 @@ import es.iesagora.fitjourney.data.remote.AppApi;
 import es.iesagora.fitjourney.data.remote.Resource;
 import es.iesagora.fitjourney.data.remote.RetrofitClient;
 
-import java.io.IOException;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -103,25 +103,34 @@ public class UserRepository {
     }
 
     private String parseError(Response<?> response) {
-        if (response.errorBody() != null) {
-            try {
-                String errorJson = response.errorBody().string();
-                ErrorResponse error = gson.fromJson(errorJson, ErrorResponse.class);
-                if (error != null && error.getMessage() != null) {
-                    return error.getMessage();
-                } else {
-                    return "Error desconocido: " + response.code();
+        try {
+            if (response.errorBody() != null) {
+                String json = response.errorBody().string();
+                JsonObject obj = gson.fromJson(json, JsonObject.class);
+                if (obj.has("message") && !obj.get("message").isJsonNull()) {
+                    return obj.get("message").getAsString();
                 }
-            } catch (IOException e) {
-                return "Error desconocido: " + response.code();
             }
-        } else {
-            return "Error desconocido: " + response.code();
-        }
-    }
+        } catch (Exception ignored) {
 
-    private static class ErrorResponse {
-        private String message;
-        public String getMessage() { return message; }
+        }
+
+        int code = response.code();
+        switch (code) {
+            case 400:
+                return "Datos incorrectos";
+            case 401:
+                return "Email o contraseña incorrectos";
+            case 404:
+                return "Usuario no encontrado";
+            case 409:
+                return "Email ya registrado";
+            case 422:
+                return "Revisa los datos introducidos";
+            case 500:
+                return "Error interno del servidor";
+            default:
+                return "Error del servidor (" + code + ")";
+        }
     }
 }

@@ -71,9 +71,9 @@ public class HomeFragment extends Fragment {
                         if (resource.data != null) {
                             String[] nameParts = resource.data.getName().split(" ");
                             if (nameParts.length <= 3) {
-                                binding.tvName.setText(nameParts[0] + " !");
+                                binding.tvName.setText(nameParts[0]);
                             } else {
-                                binding.tvName.setText(nameParts[0] + " " + nameParts[1] + " !");
+                                binding.tvName.setText(nameParts[0] + " " + nameParts[1]);
                             }
                         }
                         break;

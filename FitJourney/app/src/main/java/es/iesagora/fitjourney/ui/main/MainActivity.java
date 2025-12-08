@@ -54,16 +54,20 @@ public class MainActivity extends AppCompatActivity {
                 switch (resource.status) {
                     case LOADING:
                         binding.progressBar.setVisibility(View.VISIBLE);
+                        binding.navHostFragment.setVisibility(View.GONE);
                         break;
 
                     case SUCCESS:
                         binding.progressBar.setVisibility(View.GONE);
-                        Toast.makeText(this, "¡Bienvenido de nuevo!", Toast.LENGTH_SHORT).show();
+                        binding.navHostFragment.setVisibility(View.VISIBLE);
+                        Toast.makeText(this, getString(R.string.welcome_back),
+                                Toast.LENGTH_SHORT).show();
                         navController.navigate(R.id.homeFragment);
                         break;
 
                     case ERROR:
                         binding.progressBar.setVisibility(View.GONE);
+                        binding.navHostFragment.setVisibility(View.VISIBLE);
                         getSharedPreferences("APP_PREFS", Context.MODE_PRIVATE)
                                 .edit().remove("TOKEN").apply();
                         Toast.makeText(this, resource.message, Toast.LENGTH_LONG).show();

@@ -1,2 +1,54 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources></resources>
+<resources>
+    <string name="app_name">FitJourney</string>
+    <string name="title">Título</string>
+    <string name="fit">Fit</string>
+    <string name="journey">Journey</string>
+    <string name="register">Registrarse</string>
+    <string name="applogo">Logo de la App</string>
+    <string name="login">Iniciar sesión</string>
+    <string name="weight_kg">Peso (kg)</string>
+    <string name="height_cm">Altura (cm)</string>
+    <string name="goal">Objetivo</string>
+    <string name="gender">Género</string>
+    <string name="birth_date">Fecha de nacimiento</string>
+    <string name="password">Contraseña</string>
+    <string name="email">Correo electrónico</string>
+    <string name="name">Nombre</string>
+    <string name="other">Otro</string>
+    <string name="feminine">Femenino</string>
+    <string name="masculine">Masculino</string>
+    <string name="lose_weight">Perder peso</string>
+    <string name="maintain_weight">Mantener peso</string>
+    <string name="gain_muscle">Ganar músculo</string>
+    <string name="lose_fat">Perder grasa</string>
+    <string name="gain_strength">Ganar fuerza</string>
+    <string name="gain_endurance">Mejorar resistencia</string>
+    <string name="gain_flexibility">Ganar flexibilidad</string>
+    <string name="recover_from_injury">Recuperarse de una lesión</string>
+    <string name="email_already_in_use">Este email ya está en uso</string>
+    <string name="registration_completed">¡Registro completado!</string>
+    <string name="error_processing_data">Error al procesar los datos: </string>
+    <string name="error_processing_date">Error al procesar la fecha: </string>
+    <string name="name_cannot_be_empty">El nombre no puede estar vacío</string>
+    <string name="email_is_required">El correo electrónico es obligatorio</string>
+    <string name="invalid_email_format">Formato de email inválido</string>
+    <string name="password_is_required">La contraseña es obligatoria</string>
+    <string name="password_must_be_at_least_8_characters">La contraseña debe tener al menos 8 caracteres</string>
+    <string name="password_must_contain_at_least_one_uppercase_letter">La contraseña debe contener al menos una mayúscula</string>
+    <string name="password_must_contain_at_least_one_number">La contraseña debe contener al menos un número</string>
+    <string name="select_a_valid_date">Selecciona una fecha válida</string>
+    <string name="select_a_gender">Selecciona un género</string>
+    <string name="select_a_goal">Selecciona un objetivo</string>
+    <string name="enter_your_height">Introduce tu altura</string>
+    <string name="height_out_of_range">Altura fuera de rango</string>
+    <string name="invalid_value">Valor no válido</string>
+    <string name="enter_your_weight">Introduce tu peso</string>
+    <string name="weight_out_of_range">Peso fuera de rango</string>
+    <string name="confirm_password">Confirmar contraseña</string>
+    <string name="repeat_password_required">Es necesario confirmar la contraseña</string>
+    <string name="passwords_do_not_match">Las contraseñas no coinciden</string>
+    <string name="welcome_back">¡Bienvenido de nuevo!</string>
+    <string name="log_out">Cerrar sesión</string>
+    <string name="welcome">¡Bienvenido!</string>
+</resources>
