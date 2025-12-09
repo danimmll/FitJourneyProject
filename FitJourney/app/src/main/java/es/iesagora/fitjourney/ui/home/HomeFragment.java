@@ -17,6 +17,8 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavOptions;
 import androidx.navigation.fragment.NavHostFragment;
 
+import java.util.Objects;
+
 import es.iesagora.fitjourney.R;
 import es.iesagora.fitjourney.databinding.FragmentHomeBinding;
 import es.iesagora.fitjourney.viewmodel.UserViewModel;
@@ -47,7 +49,7 @@ public class HomeFragment extends Fragment {
                 });
 
         if (getActivity() instanceof AppCompatActivity) {
-            ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+            Objects.requireNonNull(((AppCompatActivity) getActivity()).getSupportActionBar()).setDisplayHomeAsUpEnabled(false);
         }
 
         viewModel = new ViewModelProvider(this).get(UserViewModel.class);

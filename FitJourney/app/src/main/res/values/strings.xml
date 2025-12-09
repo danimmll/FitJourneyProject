@@ -50,4 +50,5 @@
     <string name="welcome_back">Welcome Back!</string>
     <string name="log_out">Log Out</string>
     <string name="welcome">¡Welcome!</string>
+    <string name="minimum_8_characters_one_uppercase_letter_and_a_number">Minimum 8 characters, one uppercase letter, and a number.</string>
 </resources>

@@ -51,4 +51,5 @@
     <string name="welcome_back">Bienvenue de retour !</string>
     <string name="log_out">Se déconnecter</string>
     <string name="welcome">Bienvenue !</string>
+    <string name="minimum_8_characters_one_uppercase_letter_and_a_number">Minimum 8 caractères, une lettre majuscule et un chiffre.</string>
 </resources>
