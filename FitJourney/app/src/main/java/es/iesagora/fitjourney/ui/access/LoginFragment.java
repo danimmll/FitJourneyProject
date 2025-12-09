@@ -24,11 +24,19 @@ public class LoginFragment extends Fragment {
     private FragmentLoginBinding binding;
     private UserViewModel viewModel;
     private NavController navController;
+    private static final String KEY_EMAIL = "email";
+    private static final String KEY_PASSWORD = "password";
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         binding = FragmentLoginBinding.inflate(inflater, container, false);
+
+        if (savedInstanceState != null) {
+            binding.etEmail.setText(savedInstanceState.getString(KEY_EMAIL, ""));
+            binding.etPassword.setText(savedInstanceState.getString(KEY_PASSWORD, ""));
+        }
+
         return binding.getRoot();
     }
 
@@ -48,8 +56,6 @@ public class LoginFragment extends Fragment {
                     break;
                 case SUCCESS:
                     binding.btnLoginSubmit.setEnabled(true);
-                    binding.btnLoginSubmit.setText(R.string.login);
-
                     if (resource.data != null && resource.data.getToken() != null) {
                         requireContext().getSharedPreferences("APP_PREFS",
                                         Context.MODE_PRIVATE)
@@ -63,7 +69,6 @@ public class LoginFragment extends Fragment {
                     break;
                 case ERROR:
                     binding.btnLoginSubmit.setEnabled(true);
-                    binding.btnLoginSubmit.setText(R.string.login);
                     Toast.makeText(requireContext(), "Error: " + resource.message, Toast.LENGTH_SHORT).show();
                     break;
             }
@@ -100,5 +105,12 @@ public class LoginFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString(KEY_EMAIL, binding.etEmail.getText().toString());
+        outState.putString(KEY_PASSWORD, binding.etPassword.getText().toString());
     }
 }

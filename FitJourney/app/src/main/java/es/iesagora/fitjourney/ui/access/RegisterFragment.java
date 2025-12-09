@@ -38,11 +38,33 @@ public class RegisterFragment extends Fragment {
     private final int diaActual = Calendar.getInstance().get(Calendar.DAY_OF_MONTH);
     private String[] genders;
     private String[] goals;
+    private static final String KEY_NAME = "name";
+    private static final String KEY_EMAIL = "email";
+    private static final String KEY_PASSWORD = "password";
+    private static final String KEY_CONFIRM_PASSWORD = "confirmPassword";
+    private static final String KEY_BIRTH_DATE = "birthDate";
+    private static final String KEY_GENDER = "gender";
+    private static final String KEY_GOAL = "goal";
+    private static final String KEY_HEIGHT = "height";
+    private static final String KEY_WEIGHT = "weight";
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         binding = FragmentRegisterBinding.inflate(inflater, container, false);
+
+        if (savedInstanceState != null) {
+            binding.etName.setText(savedInstanceState.getString(KEY_NAME, ""));
+            binding.etEmail.setText(savedInstanceState.getString(KEY_EMAIL, ""));
+            binding.etPassword.setText(savedInstanceState.getString(KEY_PASSWORD, ""));
+            binding.etConfirmPassword.setText(savedInstanceState.getString(KEY_CONFIRM_PASSWORD, ""));
+            binding.etBirthDate.setText(savedInstanceState.getString(KEY_BIRTH_DATE, ""));
+            binding.actvGender.setText(savedInstanceState.getString(KEY_GENDER, ""), false);
+            binding.actvGoal.setText(savedInstanceState.getString(KEY_GOAL, ""), false);
+            binding.etHeight.setText(savedInstanceState.getString(KEY_HEIGHT, ""));
+            binding.etWeight.setText(savedInstanceState.getString(KEY_WEIGHT, ""));
+        }
+
         return binding.getRoot();
     }
 
@@ -270,6 +292,21 @@ public class RegisterFragment extends Fragment {
         }
 
         return valido;
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        outState.putString(KEY_NAME, binding.etName.getText().toString());
+        outState.putString(KEY_EMAIL, binding.etEmail.getText().toString());
+        outState.putString(KEY_PASSWORD, binding.etPassword.getText().toString());
+        outState.putString(KEY_CONFIRM_PASSWORD, binding.etConfirmPassword.getText().toString());
+        outState.putString(KEY_BIRTH_DATE, binding.etBirthDate.getText().toString());
+        outState.putString(KEY_GENDER, binding.actvGender.getText().toString());
+        outState.putString(KEY_GOAL, binding.actvGoal.getText().toString());
+        outState.putString(KEY_HEIGHT, binding.etHeight.getText().toString());
+        outState.putString(KEY_WEIGHT, binding.etWeight.getText().toString());
     }
 
 }

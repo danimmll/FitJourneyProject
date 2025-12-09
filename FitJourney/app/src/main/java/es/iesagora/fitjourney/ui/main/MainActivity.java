@@ -70,7 +70,6 @@ public class MainActivity extends AppCompatActivity {
                         binding.navHostFragment.setVisibility(View.VISIBLE);
                         getSharedPreferences("APP_PREFS", Context.MODE_PRIVATE)
                                 .edit().remove("TOKEN").apply();
-                        Toast.makeText(this, resource.message, Toast.LENGTH_LONG).show();
                         navController.navigate(R.id.accessFragment);
                         break;
                 }
