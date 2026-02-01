@@ -1,4 +1,4 @@
-package es.iesagora.fitjourney.ui.access;
+package es.iesagora.fitjourney.ui.main.origin.register;
 
 import android.annotation.SuppressLint;
 import android.content.Context;

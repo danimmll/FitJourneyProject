@@ -1,4 +1,4 @@
-package es.iesagora.fitjourney.ui.access;
+package es.iesagora.fitjourney.ui.main.origin.login;
 
 import android.content.Context;
 import android.os.Bundle;

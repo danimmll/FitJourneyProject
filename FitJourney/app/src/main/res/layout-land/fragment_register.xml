@@ -7,7 +7,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#000000"
-    tools:context=".ui.access.RegisterFragment">
+    tools:context=".ui.main.origin.register.RegisterFragment">
 
     <TextView
         android:id="@+id/tvRegister"

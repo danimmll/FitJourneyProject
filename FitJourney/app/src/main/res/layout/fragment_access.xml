@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#000000"
-    tools:context=".ui.access.AccessFragment">
+    tools:context=".ui.main.origin.access.AccessFragment">
 
     <ImageView
         android:id="@+id/ivLogo"
