@@ -1,160 +1,150 @@
-require('dotenv').config();
-
+require('dotenv').config(); 
 const express = require('express');
-const admin = require('firebase-admin');
+const { Pool } = require('pg'); 
 const cors = require('cors');
 const bodyParser = require('body-parser');
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-
-const serviceAccount = require('./serviceAccountKey.json');
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount)
-});
-const db = admin.firestore();
+const bcrypt = require('bcryptjs'); 
+const jwt = require('jsonwebtoken'); 
 
 const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 
-const JWT_SECRET = process.env.JWT_SECRET;
-if (!JWT_SECRET) {
-  console.error('❌ JWT_SECRET no está definido en .env');
-  process.exit(1);
-}
-console.log('✅ JWT_SECRET cargado correctamente');
+
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: { rejectUnauthorized: false } 
+});
+
+const JWT_SECRET = process.env.JWT_SECRET; 
+
 
 const authenticate = (req, res, next) => {
-  const authHeader = req.headers.authorization;
-  if (!authHeader)
-    return res.status(401).json({ message: 'No autorizado (sin token)' });
-
-  const token = authHeader.split(' ')[1];
-  try {
-    const decoded = jwt.verify(token, JWT_SECRET);
-    req.user = decoded;
-    next();
-  } catch {
-    return res.status(401).json({ message: 'Token inválido' });
+  const authHeader = req.headers['authorization'];
+  
+  // Si no me mandan cabecera de autorización, corto el acceso
+  if (!authHeader) {
+    return res.status(401).send('Falta el token de autorización');
   }
+
+  // El token suele venir como bearer y algo mas así que lo separo y me quedo con la parte 1
+  const token = authHeader.split(' ')[1];
+
+  jwt.verify(token, JWT_SECRET, (err, user) => {
+    if (err) {
+      return res.status(403).send('Token no válido');
+    }
+    req.user = user; // Guardo los datos del usuario para usarlos luego en la ruta
+    next(); 
+  });
 };
 
 app.post('/users', async (req, res) => {
-  const body = req.body;
-  const requiredFields = [
-    'id_user', 'email', 'name', 'password', 'gender',
-    'goal', 'height', 'weight', 'birth_date'
-  ];
-  const missingFields = requiredFields.filter(f => !body[f]);
-  if (missingFields.length > 0) {
-    return res.status(400).json({
-      message: 'Faltan datos obligatorios',
-      missing_fields: missingFields
-    });
+  const { id_user, email, name, password, gender, goal, height, weight, birth_date, photoUrl } = req.body;
+
+  if (!id_user || !email || !name || !password) {
+    return res.status(400).send('Faltan datos obligatorios (email, pass, nombre...)');
   }
 
   try {
-    const emailNormalized = body.email.trim().toLowerCase();
-    const existingUser = await db.collection('users')
-      .where('email', '==', emailNormalized)
-      .get();
-    if (!existingUser.empty)
-      return res.status(400).json({ message: 'Email ya registrado' });
+    const checkEmail = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
+    
+    if (checkEmail.rows.length > 0) {
+      return res.status(400).send('El usuario ya existe');
+    }
 
-    const passwordHash = await bcrypt.hash(body.password, 10);
+    //Encriptar la contraseña 
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-    const userDataToSave = {
-      ...body,
-      email: emailNormalized,
-      password: passwordHash,
-      birth_date: new Date(body.birth_date).toISOString(),
-      register_date: admin.firestore.FieldValue.serverTimestamp()
-    };
+    // Si no hay foto guardo null para que no pete
+    const text = 'INSERT INTO users (id_user, email, name, password, gender, goal, height, weight, birth_date, photo_url) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *';
+    const values = [id_user, email, name, hashedPassword, gender, goal, height, weight, birth_date, photoUrl ? photoUrl : null];
 
-    await db.collection('users').doc(body.id_user).set(userDataToSave);
+    const result = await pool.query(text, values);
+    const newUser = result.rows[0];
 
-    const token = jwt.sign(
-      { id_user: body.id_user, email: emailNormalized },
-      JWT_SECRET,
-      { expiresIn: '24h' }
-    );
+    //Crear el token para que el usuario entre directo sin tener que loguearse después
+    const token = jwt.sign({ id_user: newUser.id_user }, JWT_SECRET, { expiresIn: '24h' });
 
-    const { password, ...userResponse } = body;
+    res.status(201).json({
+      user: {
+        id_user: newUser.id_user,
+        email: newUser.email,
+        name: newUser.name
+      },
+      token: token
+    });
 
-    res.status(201).json({ user: userResponse, token });
-
-  } catch (err) {
-    console.error('Error en /users:', err);
-    res.status(500).json({ message: 'Error interno: ' + err.message });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send('Error al registrar usuario');
   }
 });
 
 app.post('/login', async (req, res) => {
   const { email, password } = req.body;
-  if (!email || !password)
-    return res.status(400).json({ message: 'Faltan datos' });
+
+  if (!email || !password) {
+    return res.status(400).send('Introduce email y contraseña');
+  }
 
   try {
-    const emailNormalized = email.trim().toLowerCase();
-    const query = await db.collection('users')
-      .where('email', '==', emailNormalized)
-      .get();
-    if (query.empty)
-      return res.status(404).json({ message: 'Usuario no encontrado' });
 
-    const user = query.docs[0].data();
-    const match = await bcrypt.compare(password, user.password);
-    if (!match)
-      return res.status(401).json({ message: 'Contraseña incorrecta' });
+    const result = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
 
-    const token = jwt.sign(
-      { id_user: user.id_user, email: user.email },
-      JWT_SECRET,
-      { expiresIn: '24h' }
-    );
-
-    if (user.birth_date && user.birth_date.toDate) {
-      user.birth_date = user.birth_date.toDate().toISOString();
-    }
-    if (user.register_date && user.register_date.toDate) {
-      user.register_date = user.register_date.toDate().toISOString();
+    if (result.rows.length === 0) {
+      return res.status(404).send('Usuario no encontrado');
     }
 
-    const { password: pw, ...userResponse } = user;
+    const user = result.rows[0];
 
-    res.status(200).json({ user: userResponse, token });
+    const validPassword = await bcrypt.compare(password, user.password);
+    if (!validPassword) {
+      return res.status(401).send('Contraseña incorrecta');
+    }
 
-  } catch (err) {
-    console.error('Error en /login:', err);
-    res.status(500).json({ message: 'Error interno: ' + err.message });
+    // 3. Generar token de sesión (dura 24 horas)
+    const token = jwt.sign({ id_user: user.id_user }, JWT_SECRET, { expiresIn: '24h' });
+
+    res.json({
+      user: {
+        id_user: user.id_user,
+        email: user.email,
+        name: user.name,
+        photoUrl: user.photo_url 
+      },
+      token: token
+    });
+
+  } catch (error) {
+    console.log(error);
+    res.status(500).send('Error en el servidor');
   }
 });
 
+// Aquí uso el authenticate para asegurarme de que está logueado
 app.get('/profile', authenticate, async (req, res) => {
-  const userId = req.user.id_user;
   try {
-    const doc = await db.collection('users').doc(userId).get();
-    if (!doc.exists)
-      return res.status(404).json({ message: 'Usuario no encontrado' });
-
-    const { password, ...userData } = doc.data();
-
-    if (userData.birth_date && userData.birth_date.toDate) {
-      userData.birth_date = userData.birth_date.toDate().toISOString();
-    }
-    if (userData.register_date && userData.register_date.toDate) {
-      userData.register_date = userData.register_date.toDate().toISOString();
+    const result = await pool.query('SELECT * FROM users WHERE id_user = $1', [req.user.id_user]);
+    
+    if (result.rows.length === 0) {
+      return res.status(404).send('Usuario no encontrado');
     }
 
-    res.status(200).json(userData);
+    const user = result.rows[0];
+  
+    delete user.password;
 
-  } catch (err) {
-    console.error('Error en /profile:', err);
-    res.status(500).json({ message: 'Error interno: ' + err.message });
+    res.json(user);
+
+  } catch (error) {
+    console.log(error);
+    res.status(500).send('Error al obtener perfil');
   }
 });
 
+// Arrancar el servidor
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`Servidor FitJourney listo en el puerto ${PORT}`);
+  console.log('Servidor activo en el puerto ' + PORT);
 });
