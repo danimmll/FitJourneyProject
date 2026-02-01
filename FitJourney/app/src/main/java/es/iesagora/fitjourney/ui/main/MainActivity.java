@@ -1,6 +1,9 @@
 package es.iesagora.fitjourney.ui.main;
 
+import static androidx.core.content.ContentProviderCompat.requireContext;
+
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
@@ -16,6 +19,7 @@ import java.util.Objects;
 
 import es.iesagora.fitjourney.R;
 import es.iesagora.fitjourney.databinding.ActivityMainBinding;
+import es.iesagora.fitjourney.ui.second.SecondActivity;
 import es.iesagora.fitjourney.viewmodel.UserViewModel;
 
 public class MainActivity extends AppCompatActivity {
@@ -62,8 +66,10 @@ public class MainActivity extends AppCompatActivity {
                         binding.navHostFragment.setVisibility(View.VISIBLE);
                         Toast.makeText(this, getString(R.string.welcome_back),
                                 Toast.LENGTH_SHORT).show();
-                        navController.navigate(R.id.homeFragment);
-                        break;
+                        Intent intent = new Intent(this,SecondActivity.class);
+                        startActivity(intent);
+                        finish();
+                        return;
 
                     case ERROR:
                         binding.progressBar.setVisibility(View.GONE);

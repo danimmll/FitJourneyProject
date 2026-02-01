@@ -6,33 +6,16 @@
     app:startDestination="@id/accessFragment">
 
     <fragment
-        android:id="@+id/homeFragment"
-        android:name="es.iesagora.fitjourney.ui.home.HomeFragment"
-        android:label=""
-        tools:layout="@layout/fragment_home" >
-        <action
-            android:id="@+id/action_homeFragment_to_accessFragment"
-            app:destination="@id/accessFragment" />
-    </fragment>
-    <fragment
         android:id="@+id/loginFragment"
         android:name="es.iesagora.fitjourney.ui.main.origin.login.LoginFragment"
         android:label=""
         tools:layout="@layout/fragment_login" >
-        <action
-            android:id="@+id/action_loginFragment_to_homeFragment"
-            app:destination="@id/homeFragment" />
     </fragment>
     <fragment
         android:id="@+id/registerFragment"
         android:name="es.iesagora.fitjourney.ui.main.origin.register.RegisterFragment"
         android:label=""
         tools:layout="@layout/fragment_register" >
-        <action
-            android:id="@+id/action_registerFragment_to_homeFragment"
-            app:destination="@id/homeFragment"
-            app:popUpTo="@id/nav_graph"
-            app:popUpToInclusive="true"/>
     </fragment>
     <fragment
         android:id="@+id/accessFragment"

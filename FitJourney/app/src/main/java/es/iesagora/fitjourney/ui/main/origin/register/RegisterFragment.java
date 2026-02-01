@@ -3,6 +3,7 @@ package es.iesagora.fitjourney.ui.main.origin.register;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.app.DatePickerDialog;
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -26,6 +27,7 @@ import java.util.UUID;
 import es.iesagora.fitjourney.R;
 import es.iesagora.fitjourney.data.model.User;
 import es.iesagora.fitjourney.databinding.FragmentRegisterBinding;
+import es.iesagora.fitjourney.ui.second.SecondActivity;
 import es.iesagora.fitjourney.viewmodel.UserViewModel;
 
 public class RegisterFragment extends Fragment {
@@ -91,7 +93,10 @@ public class RegisterFragment extends Fragment {
                                 .apply();
 
                         Toast.makeText(requireContext(), R.string.registration_completed, Toast.LENGTH_SHORT).show();
-                        navController.navigate(R.id.action_registerFragment_to_homeFragment);
+                        Intent intent = new Intent(requireContext(), SecondActivity.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        startActivity(intent);
+                        requireActivity().finish();
                     }
                     break;
                 case ERROR:

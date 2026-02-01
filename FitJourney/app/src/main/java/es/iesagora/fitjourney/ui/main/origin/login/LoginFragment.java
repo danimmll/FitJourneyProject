@@ -1,6 +1,7 @@
 package es.iesagora.fitjourney.ui.main.origin.login;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -17,6 +18,8 @@ import android.widget.Toast;
 
 import es.iesagora.fitjourney.R;
 import es.iesagora.fitjourney.databinding.FragmentLoginBinding;
+import es.iesagora.fitjourney.ui.main.MainActivity;
+import es.iesagora.fitjourney.ui.second.SecondActivity;
 import es.iesagora.fitjourney.viewmodel.UserViewModel;
 
 public class LoginFragment extends Fragment {
@@ -64,7 +67,10 @@ public class LoginFragment extends Fragment {
                                 .apply();
 
                         Toast.makeText(requireContext(), "¡WELCOME!", Toast.LENGTH_SHORT).show();
-                        navController.navigate(R.id.action_loginFragment_to_homeFragment);
+                        Intent intent = new Intent(requireContext(), SecondActivity.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        startActivity(intent);
+                        requireActivity().finish();
                     }
                     break;
                 case ERROR:
