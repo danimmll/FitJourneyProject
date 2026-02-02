@@ -7,8 +7,8 @@
     <string name="register">S\'inscrire</string>
     <string name="applogo">Logo de l\'application</string>
     <string name="login">Se connecter</string>
-    <string name="weight_kg">Poids (kg)</string>
-    <string name="height_cm">Taille (cm)</string>
+    <string name="weight_kg">Poids</string>
+    <string name="height_cm">Taille</string>
     <string name="goal">Objectif</string>
     <string name="gender">Genre</string>
     <string name="birth_date">Date de naissance</string>

@@ -10,4 +10,14 @@
         android:name="es.iesagora.fitjourney.HomeFragment"
         android:label="fragment_home"
         tools:layout="@layout/fragment_home" />
+    <fragment
+        android:id="@+id/exercisesFragment"
+        android:name="es.iesagora.fitjourney.ExercisesFragment"
+        android:label="fragment_exercises"
+        tools:layout="@layout/fragment_exercises" />
+    <fragment
+        android:id="@+id/profileFragment"
+        android:name="es.iesagora.fitjourney.ProfileFragment"
+        android:label="fragment_profile"
+        tools:layout="@layout/fragment_profile" />
 </navigation>

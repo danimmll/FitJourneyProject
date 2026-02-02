@@ -6,8 +6,8 @@
     <string name="register">Register</string>
     <string name="applogo">AppLogo</string>
     <string name="login">Login</string>
-    <string name="weight_kg">Weight (kg)</string>
-    <string name="height_cm">Height (cm)</string>
+    <string name="weight_kg">Weight</string>
+    <string name="height_cm">Height</string>
     <string name="goal">Goal</string>
     <string name="gender">Gender</string>
     <string name="birth_date">Birth Date</string>
