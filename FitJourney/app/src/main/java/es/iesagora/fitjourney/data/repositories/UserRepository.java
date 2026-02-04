@@ -1,5 +1,7 @@
 package es.iesagora.fitjourney.data.repositories;
 
+import android.content.Context;
+
 import androidx.annotation.NonNull;
 
 import com.google.gson.Gson;
@@ -22,8 +24,8 @@ public class UserRepository {
     private final AppApi api;
     private final Gson gson = new Gson();
 
-    public UserRepository() {
-        api = RetrofitClient.getApiService();
+    public UserRepository(Context context) {
+        api = RetrofitClient.getApiService(context);
     }
 
     public interface LoginCallBack {
