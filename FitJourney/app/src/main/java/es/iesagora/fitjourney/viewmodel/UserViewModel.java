@@ -8,7 +8,7 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
 
 import es.iesagora.fitjourney.data.model.User;
-import es.iesagora.fitjourney.data.remote.LoginResponse;
+import es.iesagora.fitjourney.data.remote.AccessResponse;
 import es.iesagora.fitjourney.data.remote.Resource;
 import es.iesagora.fitjourney.data.repositories.PreferencesRepository;
 import es.iesagora.fitjourney.data.repositories.UserRepository;
@@ -18,8 +18,8 @@ public class UserViewModel extends AndroidViewModel {
     private final UserRepository repository;
     private final PreferencesRepository preferencesRepository;
 
-    private final MutableLiveData<Resource<LoginResponse>> loginState = new MutableLiveData<>();
-    private final MutableLiveData<Resource<LoginResponse>> registerState = new MutableLiveData<>();
+    private final MutableLiveData<Resource<AccessResponse>> loginState = new MutableLiveData<>();
+    private final MutableLiveData<Resource<AccessResponse>> registerState = new MutableLiveData<>();
     private final MutableLiveData<Resource<User>> userProfileState = new MutableLiveData<>();
 
     public UserViewModel(@NonNull Application application) {
@@ -28,11 +28,11 @@ public class UserViewModel extends AndroidViewModel {
         this.preferencesRepository = new PreferencesRepository(application);
     }
 
-    public MutableLiveData<Resource<LoginResponse>> getLoginState() {
+    public MutableLiveData<Resource<AccessResponse>> getLoginState() {
         return loginState;
     }
 
-    public MutableLiveData<Resource<LoginResponse>> getRegisterState() {
+    public MutableLiveData<Resource<AccessResponse>> getRegisterState() {
         return registerState;
     }
 
@@ -62,7 +62,7 @@ public class UserViewModel extends AndroidViewModel {
         });
     }
 
-    public void fetchUser(String token) {
+    public void getProfile(String token) {
         repository.getUser(token, result -> {
             if (result.status == Resource.Status.SUCCESS && result.data != null) {
                 userProfileState.postValue(Resource.success(result.data.getUser()));
@@ -74,7 +74,7 @@ public class UserViewModel extends AndroidViewModel {
         });
     }
 
-    private void saveSession(LoginResponse data) {
+    private void saveSession(AccessResponse data) {
         if (data.getToken() != null) {
             preferencesRepository.setToken(data.getToken());
         }

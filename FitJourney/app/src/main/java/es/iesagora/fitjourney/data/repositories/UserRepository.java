@@ -9,7 +9,7 @@ import com.google.gson.JsonObject;
 
 import es.iesagora.fitjourney.data.model.User;
 import es.iesagora.fitjourney.data.remote.LoginRequest;
-import es.iesagora.fitjourney.data.remote.LoginResponse;
+import es.iesagora.fitjourney.data.remote.AccessResponse;
 import es.iesagora.fitjourney.data.remote.AppApi;
 import es.iesagora.fitjourney.data.remote.Resource;
 import es.iesagora.fitjourney.data.remote.RetrofitClient;
@@ -29,29 +29,29 @@ public class UserRepository {
     }
 
     public interface LoginCallBack {
-        void onResult(Resource<LoginResponse> result);
+        void onResult(Resource<AccessResponse> result);
     }
 
     public interface RegisterCallback {
-        void onResult(Resource<LoginResponse> result);
+        void onResult(Resource<AccessResponse> result);
     }
 
     public void registerUser(User user, RegisterCallback callback) {
         callback.onResult(Resource.loading());
 
-        api.registerUser(user).enqueue(new Callback<LoginResponse>() {
+        api.registerUser(user).enqueue(new Callback<AccessResponse>() {
             @Override
-            public void onResponse(@NonNull Call<LoginResponse> call, @NonNull Response<LoginResponse> response) {
+            public void onResponse(@NonNull Call<AccessResponse> call, @NonNull Response<AccessResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     callback.onResult(Resource.success(response.body()));
                 } else {
-                    String errorMsg = parseError(response);
+                    String errorMsg = getError(response);
                     callback.onResult(Resource.error(errorMsg));
                 }
             }
 
             @Override
-            public void onFailure(@NonNull Call<LoginResponse> call, @NonNull Throwable t) {
+            public void onFailure(@NonNull Call<AccessResponse> call, @NonNull Throwable t) {
                 callback.onResult(Resource.error("Error de conexión: " + t.getMessage()));
             }
         });
@@ -62,19 +62,19 @@ public class UserRepository {
 
         LoginRequest request = new LoginRequest(email, password);
 
-        api.login(request).enqueue(new Callback<LoginResponse>() {
+        api.login(request).enqueue(new Callback<AccessResponse>() {
             @Override
-            public void onResponse(@NonNull Call<LoginResponse> call, @NonNull Response<LoginResponse> response) {
+            public void onResponse(@NonNull Call<AccessResponse> call, @NonNull Response<AccessResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     callback.onResult(Resource.success(response.body()));
                 } else {
-                    String errorMsg = parseError(response);
+                    String errorMsg = getError(response);
                     callback.onResult(Resource.error(errorMsg));
                 }
             }
 
             @Override
-            public void onFailure(@NonNull Call<LoginResponse> call, @NonNull Throwable t) {
+            public void onFailure(@NonNull Call<AccessResponse> call, @NonNull Throwable t) {
                 callback.onResult(Resource.error("Error de conexión: " + t.getMessage()));
             }
         });
@@ -83,16 +83,16 @@ public class UserRepository {
     public void getUser(String token, LoginCallBack callback) {
         callback.onResult(Resource.loading());
 
-        api.getUser("Bearer " + token).enqueue(new Callback<User>() {
+        api.getUser().enqueue(new Callback<User>() {
             @Override
             public void onResponse(@NonNull Call<User> call, @NonNull Response<User> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    LoginResponse result = new LoginResponse();
+                    AccessResponse result = new AccessResponse();
                     result.setUser(response.body());
                     result.setToken(token);
                     callback.onResult(Resource.success(result));
                 } else {
-                    String errorMsg = parseError(response);
+                    String errorMsg = getError(response);
                     callback.onResult(Resource.error(errorMsg));
                 }
             }
@@ -104,7 +104,7 @@ public class UserRepository {
         });
     }
 
-    private String parseError(Response<?> response) {
+    private String getError(Response<?> response) {
         try {
             if (response.errorBody() != null) {
                 String json = response.errorBody().string();

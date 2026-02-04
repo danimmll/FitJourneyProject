@@ -47,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
 
         if (viewModel.isUserLoggedIn()) {
-            viewModel.fetchUser(viewModel.getToken());
+            viewModel.getProfile(viewModel.getToken());
 
             viewModel.getUserProfileState().observe(this, resource -> {
                 if (resource == null) return;
