@@ -53,4 +53,8 @@
     <string name="minimum_8_characters_one_uppercase_letter_and_a_number">Minimum 8 characters, one uppercase letter, and a number.</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="profile">Profile</string>
+    <string name="fitness_center">Fitness Center</string>
+    <string name="home">Home</string>
+    <string name="settings">Settings</string>
 </resources>

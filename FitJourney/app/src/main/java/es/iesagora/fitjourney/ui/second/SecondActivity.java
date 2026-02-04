@@ -1,13 +1,11 @@
 package es.iesagora.fitjourney.ui.second;
 
 import android.os.Bundle;
-
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
-
 import es.iesagora.fitjourney.R;
 import es.iesagora.fitjourney.databinding.ActivitySecondBinding;
 
@@ -26,10 +24,17 @@ public class SecondActivity extends AppCompatActivity {
 
         setSupportActionBar(binding.toolbar);
 
-        navController = ((NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment)).getNavController();
+        navController = ((NavHostFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.nav_host_fragment)).getNavController();
 
-        appBarConfiguration = new AppBarConfiguration.Builder(navController.getGraph()).build();
+        appBarConfiguration = new AppBarConfiguration.Builder(
+                R.id.homeFragment,
+                R.id.exercisesFragment,
+                R.id.profileFragment)
+                .build();
+
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
+        NavigationUI.setupWithNavController(binding.bottomNavigationView, navController);
     }
 
     @Override

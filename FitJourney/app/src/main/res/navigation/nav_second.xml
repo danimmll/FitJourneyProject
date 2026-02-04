@@ -7,17 +7,22 @@
 
     <fragment
         android:id="@+id/homeFragment"
-        android:name="es.iesagora.fitjourney.HomeFragment"
+        android:name="es.iesagora.fitjourney.ui.second.home.HomeFragment"
         android:label="fragment_home"
         tools:layout="@layout/fragment_home" />
     <fragment
         android:id="@+id/exercisesFragment"
-        android:name="es.iesagora.fitjourney.ExercisesFragment"
+        android:name="es.iesagora.fitjourney.ui.second.exercises.ExercisesFragment"
         android:label="fragment_exercises"
         tools:layout="@layout/fragment_exercises" />
     <fragment
         android:id="@+id/profileFragment"
-        android:name="es.iesagora.fitjourney.ProfileFragment"
+        android:name="es.iesagora.fitjourney.ui.second.profile.ProfileFragment"
         android:label="fragment_profile"
         tools:layout="@layout/fragment_profile" />
+    <fragment
+        android:id="@+id/fitnessCenterFragment"
+        android:name="es.iesagora.fitjourney.ui.second.fitnesscenter.FitnessCenterFragment"
+        android:label="fragment_fitness_center"
+        tools:layout="@layout/fragment_fitness_center" />
 </navigation>
