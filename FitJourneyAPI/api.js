@@ -22,7 +22,7 @@ const JWT_SECRET = process.env.JWT_SECRET;
 const authenticate = (req, res, next) => {
   const authHeader = req.headers['authorization'];
   
-  // Si no me mandan cabecera de autorización, corto el acceso
+  // Si no me mandan cabecera de autorización corto el acceso
   if (!authHeader) {
     return res.status(401).send('Falta el token de autorización');
   }
@@ -34,13 +34,13 @@ const authenticate = (req, res, next) => {
     if (err) {
       return res.status(403).send('Token no válido');
     }
-    req.user = user; // Guardo los datos del usuario para usarlos luego en la ruta
+    req.user = user;
     next(); 
   });
 };
 
 app.post('/users', async (req, res) => {
-  const { id_user, email, name, password, gender, goal, height, weight, birth_date, photoUrl } = req.body;
+  const { id_user, email, name, password, gender, goal, height, weight, birth_date, photoUrl, role } = req.body;
 
   if (!id_user || !email || !name || !password) {
     return res.status(400).send('Faltan datos obligatorios (email, pass, nombre...)');
@@ -53,24 +53,25 @@ app.post('/users', async (req, res) => {
       return res.status(400).send('El usuario ya existe');
     }
 
-    //Encriptar la contraseña 
+    // Encriptar la contraseña 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Si no hay foto guardo null para que no pete
-    const text = 'INSERT INTO users (id_user, email, name, password, gender, goal, height, weight, birth_date, photo_url) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *';
-    const values = [id_user, email, name, hashedPassword, gender, goal, height, weight, birth_date, photoUrl ? photoUrl : null];
+    const userRole = role ? role : 'user';
+
+    const text = 'INSERT INTO users (id_user, email, name, password, gender, goal, height, weight, birth_date, photo_url, role) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING *';
+    const values = [id_user, email, name, hashedPassword, gender, goal, height, weight, birth_date, photoUrl ? photoUrl : null, userRole];
 
     const result = await pool.query(text, values);
     const newUser = result.rows[0];
 
-    //Crear el token para que el usuario entre directo sin tener que loguearse después
-    const token = jwt.sign({ id_user: newUser.id_user }, JWT_SECRET, { expiresIn: '24h' });
+    const token = jwt.sign({ id_user: newUser.id_user, role: newUser.role }, JWT_SECRET, { expiresIn: '24h' });
 
     res.status(201).json({
       user: {
         id_user: newUser.id_user,
         email: newUser.email,
-        name: newUser.name
+        name: newUser.name,
+        role: newUser.role 
       },
       token: token
     });
@@ -89,7 +90,6 @@ app.post('/login', async (req, res) => {
   }
 
   try {
-
     const result = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
 
     if (result.rows.length === 0) {
@@ -103,15 +103,15 @@ app.post('/login', async (req, res) => {
       return res.status(401).send('Contraseña incorrecta');
     }
 
-    // 3. Generar token de sesión (dura 24 horas)
-    const token = jwt.sign({ id_user: user.id_user }, JWT_SECRET, { expiresIn: '24h' });
+    const token = jwt.sign({ id_user: user.id_user, role: user.role }, JWT_SECRET, { expiresIn: '24h' });
 
     res.json({
       user: {
         id_user: user.id_user,
         email: user.email,
         name: user.name,
-        photoUrl: user.photo_url 
+        photoUrl: user.photo_url,
+        role: user.role
       },
       token: token
     });
@@ -122,7 +122,6 @@ app.post('/login', async (req, res) => {
   }
 });
 
-// Aquí uso el authenticate para asegurarme de que está logueado
 app.get('/profile', authenticate, async (req, res) => {
   try {
     const result = await pool.query('SELECT * FROM users WHERE id_user = $1', [req.user.id_user]);
@@ -132,8 +131,7 @@ app.get('/profile', authenticate, async (req, res) => {
     }
 
     const user = result.rows[0];
-  
-    delete user.password;
+    delete user.password; 
 
     res.json(user);
 
@@ -143,7 +141,7 @@ app.get('/profile', authenticate, async (req, res) => {
   }
 });
 
-// Arrancar el servidor
+//ARRANCA EL SERVER
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log('Servidor activo en el puerto ' + PORT);

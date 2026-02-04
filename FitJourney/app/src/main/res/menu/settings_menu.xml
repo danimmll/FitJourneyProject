@@ -5,7 +5,6 @@
     <item
         android:id="@+id/settingsFragment"
         android:icon="@drawable/ic_settings"
-        android:iconTint="@color/black"
         android:title="@string/settings"
         app:showAsAction="always" />
 </menu>

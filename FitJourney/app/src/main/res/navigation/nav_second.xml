@@ -25,4 +25,14 @@
         android:name="es.iesagora.fitjourney.ui.second.fitnesscenter.FitnessCenterFragment"
         android:label="fragment_fitness_center"
         tools:layout="@layout/fragment_fitness_center" />
+    <fragment
+        android:id="@+id/exerciseDetailFragment"
+        android:name="es.iesagora.fitjourney.ExerciseDetailFragment"
+        android:label="fragment_exercise_detail"
+        tools:layout="@layout/fragment_exercise_detail" />
+    <fragment
+        android:id="@+id/settingsFragment2"
+        android:name="es.iesagora.fitjourney.SettingsFragment"
+        android:label="fragment_settings"
+        tools:layout="@layout/fragment_settings" />
 </navigation>

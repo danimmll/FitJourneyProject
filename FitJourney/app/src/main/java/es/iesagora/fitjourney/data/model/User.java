@@ -34,6 +34,9 @@ public class User implements Serializable {
     @SerializedName("register_date")
     private String registerDate;
 
+    @SerializedName("role")
+    private String role;
+
     public User() {
     }
 
@@ -77,4 +80,7 @@ public class User implements Serializable {
     public void setWeight(float weight) { this.weight = weight; }
 
     public String getRegisterDate() { return registerDate; }
+
+    public String getRole() { return role; }
+    public void setRole(String role) { this.role = role; }
 }

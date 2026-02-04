@@ -86,18 +86,12 @@ public class RegisterFragment extends Fragment {
                     break;
                 case SUCCESS:
                     binding.btnRegisterSubmit.setEnabled(true);
-                    if (resource.data != null && resource.data.getToken() != null) {
-                        requireContext().getSharedPreferences("APP_PREFS", Context.MODE_PRIVATE)
-                                .edit()
-                                .putString("TOKEN", resource.data.getToken())
-                                .apply();
 
-                        Toast.makeText(requireContext(), R.string.registration_completed, Toast.LENGTH_SHORT).show();
-                        Intent intent = new Intent(requireContext(), SecondActivity.class);
-                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                        startActivity(intent);
-                        requireActivity().finish();
-                    }
+                    Toast.makeText(requireContext(), R.string.registration_completed, Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(requireContext(), SecondActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
+                    requireActivity().finish();
                     break;
                 case ERROR:
                     binding.btnRegisterSubmit.setEnabled(true);
