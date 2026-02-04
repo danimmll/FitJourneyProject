@@ -12,7 +12,7 @@
         tools:layout="@layout/fragment_home" />
     <fragment
         android:id="@+id/exercisesFragment"
-        android:name="es.iesagora.fitjourney.ui.second.exercises.ExercisesFragment"
+        android:name="es.iesagora.fitjourney.ui.second.fitnesscenter.exercises.ExercisesFragment"
         android:label="fragment_exercises"
         tools:layout="@layout/fragment_exercises" />
     <fragment
@@ -27,12 +27,17 @@
         tools:layout="@layout/fragment_fitness_center" />
     <fragment
         android:id="@+id/exerciseDetailFragment"
-        android:name="es.iesagora.fitjourney.ExerciseDetailFragment"
+        android:name="es.iesagora.fitjourney.ui.second.fitnesscenter.exercises.ExerciseDetailFragment"
         android:label="fragment_exercise_detail"
         tools:layout="@layout/fragment_exercise_detail" />
     <fragment
         android:id="@+id/settingsFragment2"
-        android:name="es.iesagora.fitjourney.SettingsFragment"
+        android:name="es.iesagora.fitjourney.ui.second.settings.SettingsFragment"
         android:label="fragment_settings"
         tools:layout="@layout/fragment_settings" />
+    <fragment
+        android:id="@+id/routinesFragment"
+        android:name="es.iesagora.fitjourney.ui.second.fitnesscenter.routines.RoutinesFragment"
+        android:label="fragment_routines"
+        tools:layout="@layout/fragment_routines" />
 </navigation>

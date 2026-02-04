@@ -141,6 +141,20 @@ app.get('/profile', authenticate, async (req, res) => {
   }
 });
 
+app.get('/exercises', authenticate, async (req, res) => {
+  try {
+    // Selecciono todo de la tabla exercises
+    const result = await pool.query('SELECT * FROM exercises ORDER BY name ASC');
+    
+    // Devuelve el array de ejercicios en formato JSON
+    res.json(result.rows);
+
+  } catch (error) {
+    console.log(error);
+    res.status(500).send('Error al obtener los ejercicios');
+  }
+});
+
 //ARRANCA EL SERVER
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
