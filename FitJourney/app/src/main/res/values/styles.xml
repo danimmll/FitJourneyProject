@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <style name="calendarioPersonalizado" parent="ThemeOverlay.MaterialComponents.MaterialCalendar">
-        <item name="colorPrimary">#FF6F00</item>
-        <item name="colorOnPrimary">#FFFFFF</item>
-        <item name="android:colorAccent">#FF6F00</item>
-        <item name="android:textColorPrimary">#FFFFFF</item>
-        <item name="android:background">#000000</item>
+        <item name="colorPrimary">@color/mainrosa</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="android:colorAccent">@color/mainrosa</item>
+        <item name="android:textColorPrimary">@color/white</item>
+        <item name="android:background">@color/black</item>
     </style>
 </resources>

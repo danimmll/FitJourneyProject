@@ -6,7 +6,7 @@
     android:id="@+id/registerLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#000000"
+    android:background="@color/fondo"
     tools:context=".ui.main.origin.register.RegisterFragment">
 
     <TextView
@@ -15,10 +15,10 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
         android:fontFamily="sans-serif-black"
-        android:shadowColor="#BF360C"
+        android:shadowColor="@color/sombramainrosa"
         android:shadowRadius="50"
         android:text="@string/register"
-        android:textColor="#FF6F00"
+        android:textColor="@color/mainrosa"
         android:textSize="60sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.497"
@@ -58,7 +58,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="textPersonName"
-                    android:textColor="#FFFFFF"/>
+                    android:textColor="@color/white"/>
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
@@ -78,7 +78,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="textEmailAddress"
-                    android:textColor="#FFFFFF"/>
+                    android:textColor="@color/white"/>
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
@@ -101,7 +101,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="textPassword"
-                    android:textColor="#FFFFFF"/>
+                    android:textColor="@color/white"/>
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
@@ -124,7 +124,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="textPassword"
-                    android:textColor="#FFFFFF"/>
+                    android:textColor="@color/white"/>
             </com.google.android.material.textfield.TextInputLayout>
 
             <LinearLayout
@@ -137,7 +137,7 @@
                     android:id="@+id/tlBirthDate"
                     android:layout_width="150dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="20dp"
+                    android:layout_marginStart="20dp"
                     android:hint="@string/birth_date"
                     android:textColorHint="@color/inputsregister"
                     app:boxBackgroundMode="outline"
@@ -152,7 +152,7 @@
                         android:clickable="true"
                         android:focusable="true"
                         android:inputType="none"
-                        android:textColor="#FFFFFF" />
+                        android:textColor="@color/white" />
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
@@ -176,7 +176,7 @@
                         android:focusable="false"
                         android:inputType="none"
                         android:paddingStart="20dp"
-                        android:textColor="#FFFFFF"
+                        android:textColor="@color/white"
                         tools:ignore="LabelFor,RtlSymmetry" />
                 </com.google.android.material.textfield.TextInputLayout>
 
@@ -192,7 +192,7 @@
                     android:id="@+id/tLGoal"
                     android:layout_width="100dp"
                     android:layout_height="match_parent"
-                    android:layout_marginRight="10dp"
+                    android:layout_marginEnd="10dp"
                     android:hint="@string/goal"
                     android:textColorHint="@color/inputsregister"
                     app:boxBackgroundMode="outline"
@@ -209,7 +209,7 @@
                         android:focusable="false"
                         android:inputType="none"
                         android:paddingStart="20dp"
-                        android:textColor="#FFFFFF"
+                        android:textColor="@color/white"
                         tools:ignore="LabelFor,RtlSymmetry" />
                 </com.google.android.material.textfield.TextInputLayout>
 
@@ -230,7 +230,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:inputType="number"
-                        android:textColor="#FFFFFF" />
+                        android:textColor="@color/white" />
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
@@ -250,7 +250,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:inputType="numberDecimal"
-                        android:textColor="#FFFFFF" />
+                        android:textColor="@color/white" />
                 </com.google.android.material.textfield.TextInputLayout>
 
             </LinearLayout>
@@ -260,7 +260,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
                 android:layout_marginTop="40dp"
-                android:backgroundTint="#FF6F00"
+                android:backgroundTint="@color/mainrosa"
                 android:text="@string/register"
                 android:textAllCaps="false"
                 android:textColor="#FFFFFF"

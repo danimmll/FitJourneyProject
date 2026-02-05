@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/loginLayout"
     android:layout_width="match_parent"
-    android:background="#000000"
+    android:background="@color/fondo"
     android:layout_height="match_parent"
     tools:context=".ui.main.origin.login.LoginFragment" >
 
@@ -14,10 +14,10 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
         android:fontFamily="sans-serif-black"
-        android:shadowColor="#00796B"
+        android:shadowColor="@color/sombramainazul"
         android:shadowRadius="50"
         android:text="@string/login"
-        android:textColor="#00C2B2"
+        android:textColor="@color/mainazul"
         android:textSize="60sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.497"
@@ -54,7 +54,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="textEmailAddress"
-                android:textColor="#FFFFFF" />
+                android:textColor="@color/white" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
@@ -75,20 +75,21 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="textPassword"
-                android:textColor="#FFFFFF" />
+                android:textColor="@color/white" />
         </com.google.android.material.textfield.TextInputLayout>
 
 
         <Button
             android:id="@+id/btnLoginSubmit"
-            android:layout_width="match_parent"
-            android:layout_height="60dp"
+            android:layout_width="680dp"
+            android:layout_height="58dp"
             android:layout_marginTop="40dp"
-            android:backgroundTint="#00C2B2"
+            android:backgroundTint="@color/mainazul"
             android:text="@string/login"
             android:textAllCaps="false"
-            android:textColor="#FFFFFF"
-            android:textSize="20sp" />
+            android:textColor="@color/white"
+            android:textSize="20sp"
+            android:verticalScrollbarPosition="defaultPosition" />
 
     </LinearLayout>
 

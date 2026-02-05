@@ -2,4 +2,9 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="fondo">#121212</color>
+    <color name="mainazul">#00FFE5</color>
+    <color name="mainrosa">#FF00DD</color>
+    <color name="sombramainazul">#00796B</color>
+    <color name="sombramainrosa">#9B0CBF</color>
 </resources>
