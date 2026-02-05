@@ -18,19 +18,19 @@ import java.util.Objects;
 import es.iesagora.fitjourney.R;
 import es.iesagora.fitjourney.databinding.ActivityMainBinding;
 import es.iesagora.fitjourney.ui.second.SecondActivity;
-import es.iesagora.fitjourney.viewmodel.UserViewModel;
+import es.iesagora.fitjourney.viewmodel.MainViewModel;
 
 public class MainActivity extends AppCompatActivity {
 
     private ActivityMainBinding binding;
     private NavController navController;
-    private UserViewModel viewModel;
+    private MainViewModel viewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        viewModel = new ViewModelProvider(this).get(UserViewModel.class);
+        viewModel = new ViewModelProvider(this).get(MainViewModel.class);
 
         AppCompatDelegate.setDefaultNightMode(viewModel.getTheme());
 

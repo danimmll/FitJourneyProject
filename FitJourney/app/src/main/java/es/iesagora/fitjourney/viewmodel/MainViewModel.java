@@ -13,7 +13,7 @@ import es.iesagora.fitjourney.data.remote.Resource;
 import es.iesagora.fitjourney.data.repositories.PreferencesRepository;
 import es.iesagora.fitjourney.data.repositories.UserRepository;
 
-public class UserViewModel extends AndroidViewModel {
+public class MainViewModel extends AndroidViewModel {
 
     private final UserRepository repository;
     private final PreferencesRepository preferencesRepository;
@@ -22,7 +22,7 @@ public class UserViewModel extends AndroidViewModel {
     private final MutableLiveData<Resource<AccessResponse>> registerState = new MutableLiveData<>();
     private final MutableLiveData<Resource<User>> userProfileState = new MutableLiveData<>();
 
-    public UserViewModel(@NonNull Application application) {
+    public MainViewModel(@NonNull Application application) {
         super(application);
         this.repository = new UserRepository(application);
         this.preferencesRepository = new PreferencesRepository(application);

@@ -1,6 +1,5 @@
 package es.iesagora.fitjourney.ui.main.origin.login;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
@@ -16,16 +15,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-import es.iesagora.fitjourney.R;
 import es.iesagora.fitjourney.databinding.FragmentLoginBinding;
-import es.iesagora.fitjourney.ui.main.MainActivity;
 import es.iesagora.fitjourney.ui.second.SecondActivity;
-import es.iesagora.fitjourney.viewmodel.UserViewModel;
+import es.iesagora.fitjourney.viewmodel.MainViewModel;
 
 public class LoginFragment extends Fragment {
 
     private FragmentLoginBinding binding;
-    private UserViewModel viewModel;
+    private MainViewModel viewModel;
     private NavController navController;
     private static final String KEY_EMAIL = "email";
     private static final String KEY_PASSWORD = "password";
@@ -47,7 +44,7 @@ public class LoginFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        viewModel = new ViewModelProvider(this).get(UserViewModel.class);
+        viewModel = new ViewModelProvider(this).get(MainViewModel.class);
         navController = Navigation.findNavController(view);
 
         viewModel.getLoginState().observe(getViewLifecycleOwner(), resource -> {

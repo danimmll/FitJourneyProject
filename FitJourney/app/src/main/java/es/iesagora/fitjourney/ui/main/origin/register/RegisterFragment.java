@@ -1,7 +1,6 @@
 package es.iesagora.fitjourney.ui.main.origin.register;
 
 import android.annotation.SuppressLint;
-import android.content.Context;
 import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
@@ -28,13 +27,13 @@ import es.iesagora.fitjourney.R;
 import es.iesagora.fitjourney.data.model.User;
 import es.iesagora.fitjourney.databinding.FragmentRegisterBinding;
 import es.iesagora.fitjourney.ui.second.SecondActivity;
-import es.iesagora.fitjourney.viewmodel.UserViewModel;
+import es.iesagora.fitjourney.viewmodel.MainViewModel;
 
 public class RegisterFragment extends Fragment {
 
     private FragmentRegisterBinding binding;
     private NavController navController;
-    private UserViewModel viewModel;
+    private MainViewModel viewModel;
     private final int anioActual = Calendar.getInstance().get(Calendar.YEAR);
     private final int mesActual = Calendar.getInstance().get(Calendar.MONTH);
     private final int diaActual = Calendar.getInstance().get(Calendar.DAY_OF_MONTH);
@@ -74,7 +73,7 @@ public class RegisterFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        viewModel = new ViewModelProvider(this).get(UserViewModel.class);
+        viewModel = new ViewModelProvider(this).get(MainViewModel.class);
         navController = Navigation.findNavController(view);
 
         viewModel.getRegisterState().observe(getViewLifecycleOwner(), resource -> {

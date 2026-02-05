@@ -1,5 +1,7 @@
 package es.iesagora.fitjourney.data.remote;
 
+import static java.security.AccessController.getContext;
+
 import android.content.Context;
 
 import java.util.concurrent.TimeUnit;
@@ -15,7 +17,7 @@ public class RetrofitClient {
 
     private static Retrofit retrofit = null;
 
-    public static AppApi getApiService(Context context) {
+    public static AppApi getInstance(Context context) {
         if (retrofit == null) {
 
             OkHttpClient client = new OkHttpClient.Builder()
@@ -30,4 +32,5 @@ public class RetrofitClient {
         }
         return retrofit.create(AppApi.class);
     }
+
 }
