@@ -8,36 +8,36 @@
     <fragment
         android:id="@+id/homeFragment"
         android:name="es.iesagora.fitjourney.ui.second.home.HomeFragment"
-        android:label="fragment_home"
+        android:label=""
         tools:layout="@layout/fragment_home" />
     <fragment
         android:id="@+id/exercisesFragment"
         android:name="es.iesagora.fitjourney.ui.second.fitnesscenter.exercises.ExercisesFragment"
-        android:label="fragment_exercises"
+        android:label=""
         tools:layout="@layout/fragment_exercises" />
     <fragment
         android:id="@+id/profileFragment"
         android:name="es.iesagora.fitjourney.ui.second.profile.ProfileFragment"
-        android:label="fragment_profile"
+        android:label=""
         tools:layout="@layout/fragment_profile" />
     <fragment
         android:id="@+id/fitnessCenterFragment"
         android:name="es.iesagora.fitjourney.ui.second.fitnesscenter.FitnessCenterFragment"
-        android:label="fragment_fitness_center"
+        android:label=""
         tools:layout="@layout/fragment_fitness_center" />
     <fragment
         android:id="@+id/exerciseDetailFragment"
         android:name="es.iesagora.fitjourney.ui.second.fitnesscenter.exercises.ExerciseDetailFragment"
-        android:label="fragment_exercise_detail"
+        android:label=""
         tools:layout="@layout/fragment_exercise_detail" />
     <fragment
-        android:id="@+id/settingsFragment2"
+        android:id="@+id/settingsFragment"
         android:name="es.iesagora.fitjourney.ui.second.settings.SettingsFragment"
-        android:label="fragment_settings"
+        android:label=""
         tools:layout="@layout/fragment_settings" />
     <fragment
         android:id="@+id/routinesFragment"
         android:name="es.iesagora.fitjourney.ui.second.fitnesscenter.routines.RoutinesFragment"
-        android:label="fragment_routines"
+        android:label=""
         tools:layout="@layout/fragment_routines" />
 </navigation>
