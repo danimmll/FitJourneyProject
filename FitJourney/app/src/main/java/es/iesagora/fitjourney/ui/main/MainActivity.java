@@ -3,7 +3,6 @@ package es.iesagora.fitjourney.ui.main;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
@@ -34,6 +33,13 @@ public class MainActivity extends AppCompatActivity {
 
         AppCompatDelegate.setDefaultNightMode(viewModel.getTheme());
 
+        if (viewModel.isUserLoggedIn()) {
+            Intent intent = new Intent(this, SecondActivity.class);
+            startActivity(intent);
+            finish();
+            return;
+        }
+
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
@@ -46,42 +52,7 @@ public class MainActivity extends AppCompatActivity {
         AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(navController.getGraph()).build();
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
 
-        if (viewModel.isUserLoggedIn()) {
-            viewModel.getProfile(viewModel.getToken());
-
-            viewModel.getUserProfileState().observe(this, resource -> {
-                if (resource == null) return;
-
-                switch (resource.status) {
-                    case LOADING:
-                        binding.progressBar.setVisibility(View.VISIBLE);
-                        binding.navHostFragment.setVisibility(View.GONE);
-                        break;
-
-                    case SUCCESS:
-                        binding.progressBar.setVisibility(View.GONE);
-                        binding.navHostFragment.setVisibility(View.VISIBLE);
-                        Toast.makeText(this, getString(R.string.welcome_back), Toast.LENGTH_SHORT).show();
-
-                        Intent intent = new Intent(this, SecondActivity.class);
-                        startActivity(intent);
-                        finish();
-                        break;
-
-                    case ERROR:
-                        binding.progressBar.setVisibility(View.GONE);
-                        binding.navHostFragment.setVisibility(View.VISIBLE);
-
-                        viewModel.logout();
-
-                        navController.navigate(R.id.accessFragment);
-                        break;
-                }
-            });
-
-        } else {
-            navController.navigate(R.id.accessFragment);
-        }
+        navController.navigate(R.id.accessFragment);
     }
 
     @Override

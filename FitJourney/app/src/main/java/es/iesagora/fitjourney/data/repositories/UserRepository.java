@@ -25,7 +25,7 @@ public class UserRepository {
     private final Gson gson = new Gson();
 
     public UserRepository(Context context) {
-        api = RetrofitClient.getApiService(context);
+        api = RetrofitClient.getInstance(context);
     }
 
     public interface LoginCallBack {
