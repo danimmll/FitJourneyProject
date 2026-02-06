@@ -68,7 +68,7 @@
     <string name="profile">Perfil</string>
     <string name="settings">Ajustes</string>
     <string name="exercises">Ejercicios</string>
-    <string name="routines">Rutinas\n</string>
+    <string name="routines">Rutinas</string>
     <string name="no_exercises_aviable">No hay ejercicios disponibles</string>
 
 </resources>
