@@ -6,8 +6,7 @@
     android:id="@+id/fitnessCenterLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/fondo"
-    android:fitsSystemWindows="true">
+    android:background="@color/fondo">
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
@@ -20,6 +19,7 @@
             android:layout_height="wrap_content"
             app:tabIndicatorColor="@color/inputsregister"
             app:tabMode="fixed"
+            app:tabGravity="fill"
             app:tabSelectedTextColor="@color/inputsregister"
             app:tabTextColor="@color/black"/>
     </com.google.android.material.appbar.AppBarLayout>
