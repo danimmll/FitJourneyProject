@@ -17,11 +17,12 @@
             android:id="@+id/tabLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            app:tabBackground="@color/mainrosa"
             app:tabIndicatorColor="@color/inputsregister"
             app:tabMode="fixed"
             app:tabGravity="fill"
-            app:tabSelectedTextColor="@color/inputsregister"
-            app:tabTextColor="@color/black"/>
+            app:tabSelectedTextColor="@color/sombramainrosa"
+            app:tabTextColor="@color/white"/>
     </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.viewpager2.widget.ViewPager2
