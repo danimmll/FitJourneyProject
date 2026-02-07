@@ -10,6 +10,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.lifecycle.ViewModel;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -20,11 +21,19 @@ import java.util.List;
 
 import es.iesagora.fitjourney.R;
 import es.iesagora.fitjourney.data.model.Exercise;
+import es.iesagora.fitjourney.viewmodel.SecondViewModel;
 
 public class ExerciseAdapter extends RecyclerView.Adapter<ExerciseAdapter.ExerciseViewHolder> {
 
-    private List<Exercise> exercises = new ArrayList<>();
+    private List<Exercise> exercises;
     private Context context;
+    private  SecondViewModel viewModel;
+
+    public ExerciseAdapter(Context context, ViewModel viewModel) {
+        this.context = context;
+        this.exercises = new ArrayList<>();
+        this.viewModel = (SecondViewModel) viewModel;
+    }
 
     @SuppressLint("NotifyDataSetChanged")
     public void setExercises(List<Exercise> exercises) {
@@ -56,11 +65,10 @@ public class ExerciseAdapter extends RecyclerView.Adapter<ExerciseAdapter.Exerci
                 .into(holder.ivImage);
 
         holder.itemView.setOnClickListener(v -> {
-
-            Bundle bundle = new Bundle();
-            bundle.putSerializable("exercise_data", exercise);
-
-            Navigation.findNavController(v).navigate(R.id.exerciseDetailFragment, bundle);
+            if (viewModel != null) {
+                viewModel.selectExercise(exercise);
+            }
+            Navigation.findNavController(v).navigate(R.id.exerciseDetailFragment);
         });
     }
 

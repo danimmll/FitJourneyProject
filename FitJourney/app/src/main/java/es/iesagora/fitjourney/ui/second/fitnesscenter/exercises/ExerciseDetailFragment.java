@@ -1,66 +1,81 @@
 package es.iesagora.fitjourney.ui.second.fitnesscenter.exercises;
 
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import es.iesagora.fitjourney.R;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link ExerciseDetailFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
+
+import es.iesagora.fitjourney.R;
+import es.iesagora.fitjourney.data.model.Exercise;
+import es.iesagora.fitjourney.databinding.FragmentExerciseDetailBinding;
+import es.iesagora.fitjourney.viewmodel.SecondViewModel;
+
 public class ExerciseDetailFragment extends Fragment {
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+    private FragmentExerciseDetailBinding binding;
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
-    public ExerciseDetailFragment() {
-        // Required empty public constructor
-    }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment ExerciseDetailFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static ExerciseDetailFragment newInstance(String param1, String param2) {
-        ExerciseDetailFragment fragment = new ExerciseDetailFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
+    private SecondViewModel viewModel;
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_exercise_detail, container, false);
+        binding = FragmentExerciseDetailBinding.inflate(inflater, container, false);
+        return binding.getRoot();
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        viewModel = new ViewModelProvider(requireActivity()).get(SecondViewModel.class);
+
+        viewModel.exerciseSelected.observe(getViewLifecycleOwner(), exercise -> {
+            if (exercise != null) {
+                fillData(exercise);
+            }
+        });
+    }
+
+    private void fillData(Exercise exercise) {
+        binding.tvDetailName.setText(exercise.getName());
+        binding.tvDetailMuscle.setText(exercise.getMuscleGroup());
+        binding.tvDetailDifficulty.setText(exercise.getDifficulty());
+        binding.tvDetailInstructions.setText(getInstructions(exercise));
+
+        Glide.with(this)
+                .load(exercise.getImageUrl())
+                .transition(DrawableTransitionOptions.withCrossFade())
+                .placeholder(R.drawable.ic_launcher_background)
+                .error(android.R.drawable.ic_menu_report_image)
+                .centerCrop()
+                .into(binding.ivDetailImage);
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        binding = null;
+    }
+
+    private String getInstructions(Exercise exercise) {
+        String description = exercise.getDescription();
+
+        String []steps = description.split("\\.");
+
+        String instructions = "";
+        for (int i = 0; i < steps.length; i++) {
+            String number = String.valueOf(i+1);
+            instructions = instructions + number + " " + steps[i] +"\n";
+        }
+
+        return instructions;
+
     }
 }

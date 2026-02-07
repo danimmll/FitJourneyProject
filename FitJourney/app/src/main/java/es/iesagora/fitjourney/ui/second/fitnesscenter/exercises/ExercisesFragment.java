@@ -77,7 +77,7 @@ public class ExercisesFragment extends Fragment {
 
     private void setupRecyclerView() {
         binding.rvExercises.setLayoutManager(new LinearLayoutManager(getContext()));
-        adapter = new ExerciseAdapter();
+        adapter = new ExerciseAdapter(requireContext(),viewModel);
         binding.rvExercises.setAdapter(adapter);
     }
 

@@ -70,5 +70,11 @@
     <string name="exercises">Ejercicios</string>
     <string name="routines">Rutinas</string>
     <string name="no_exercises_aviable">No hay ejercicios disponibles</string>
+    <string name="exercise_name">Nombre del Ejercicio</string>
+    <string name="instructions">Instrucciones</string>
+    <string name="steps">Pasos</string>
+    <string name="difficulty">Dificultad</string>
+    <string name="muscle">Músculo</string>
+    <string name="exercise_image">Exercise image</string>
 
 </resources>
