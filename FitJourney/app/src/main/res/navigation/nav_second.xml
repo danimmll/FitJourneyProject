@@ -10,39 +10,68 @@
         android:name="es.iesagora.fitjourney.ui.second.home.HomeFragment"
         android:label=""
         tools:layout="@layout/fragment_home" />
+
     <fragment
         android:id="@+id/exercisesFragment"
         android:name="es.iesagora.fitjourney.ui.second.fitnesscenter.exercises.ExercisesFragment"
         android:label=""
-        tools:layout="@layout/fragment_exercises" />
+        tools:layout="@layout/fragment_exercises">
+
+        <action
+            android:id="@+id/action_exercises_to_detail"
+            app:destination="@id/exerciseDetailFragment" />
+
+        <action
+            android:id="@+id/action_exercises_to_form"
+            app:destination="@id/formExerciseFragment" />
+    </fragment>
+
     <fragment
         android:id="@+id/profileFragment"
         android:name="es.iesagora.fitjourney.ui.second.profile.ProfileFragment"
         android:label=""
         tools:layout="@layout/fragment_profile" />
+
     <fragment
         android:id="@+id/fitnessCenterFragment"
         android:name="es.iesagora.fitjourney.ui.second.fitnesscenter.FitnessCenterFragment"
         android:label=""
         tools:layout="@layout/fragment_fitness_center" />
+
     <fragment
         android:id="@+id/exerciseDetailFragment"
         android:name="es.iesagora.fitjourney.ui.second.fitnesscenter.exercises.ExerciseDetailFragment"
         android:label=""
-        tools:layout="@layout/fragment_exercise_detail" />
+        tools:layout="@layout/fragment_exercise_detail">
+
+        <action
+            android:id="@+id/action_detail_to_form"
+            app:destination="@id/formExerciseFragment" />
+    </fragment>
+
     <fragment
         android:id="@+id/settingsFragment"
         android:name="es.iesagora.fitjourney.ui.second.settings.SettingsFragment"
         android:label=""
         tools:layout="@layout/fragment_settings" />
+
     <fragment
         android:id="@+id/routinesFragment"
         android:name="es.iesagora.fitjourney.ui.second.fitnesscenter.routines.RoutinesFragment"
         android:label=""
         tools:layout="@layout/fragment_routines" />
+
     <fragment
         android:id="@+id/formExerciseFragment"
         android:name="es.iesagora.fitjourney.ui.second.fitnesscenter.exercises.FormExerciseFragment"
-        android:label="fragment_form_exercise"
-        tools:layout="@layout/fragment_form_exercise" />
+        android:label=""
+        tools:layout="@layout/fragment_form_exercise">
+
+        <argument
+            android:name="exercise_data"
+            app:argType="es.iesagora.fitjourney.data.model.Exercise"
+            app:nullable="true"
+            android:defaultValue="@null" />
+    </fragment>
+
 </navigation>
