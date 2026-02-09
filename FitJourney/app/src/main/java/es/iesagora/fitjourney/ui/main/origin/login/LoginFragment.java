@@ -57,7 +57,7 @@ public class LoginFragment extends Fragment {
                 case SUCCESS:
                     binding.btnLoginSubmit.setEnabled(true);
 
-                    Toast.makeText(requireContext(), "¡WELCOME!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(requireContext(), "¡BIENVENIDO!", Toast.LENGTH_SHORT).show();
 
                     Intent intent = new Intent(requireContext(), SecondActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -75,13 +75,13 @@ public class LoginFragment extends Fragment {
             String email = binding.etEmail.getText().toString().trim();
             String password = binding.etPassword.getText().toString().trim();
 
-            if (validarDatos(email, password)) {
+            if (checkData(email, password)) {
                 viewModel.login(email, password);
             }
         });
     }
 
-    private boolean validarDatos(String email, String password) {
+    private boolean checkData(String email, String password) {
         if (email.isEmpty()) {
             binding.tlEmail.setError("El email es requerido");
             return false;

@@ -62,7 +62,7 @@ public class ExerciseDetailFragment extends Fragment {
 
             binding.btnDelete.setOnClickListener(v -> {
                 if (currentExercise != null) {
-                    mostrarDialogoBorrar();
+                    showDeleteDialog();
                 }
             });
 
@@ -71,7 +71,7 @@ public class ExerciseDetailFragment extends Fragment {
         }
     }
 
-    private void mostrarDialogoBorrar() {
+    private void showDeleteDialog() {
         new AlertDialog.Builder(requireContext())
                 .setTitle("¿Eliminar Ejercicio?")
                 .setMessage("Esta acción no se puede deshacer.")

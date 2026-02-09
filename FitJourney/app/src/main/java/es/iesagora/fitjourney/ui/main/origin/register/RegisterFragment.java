@@ -105,7 +105,7 @@ public class RegisterFragment extends Fragment {
                 getString(R.string.gain_muscle), getString(R.string.lose_fat),
                 getString(R.string.gain_strength), getString(R.string.gain_endurance),
                 getString(R.string.gain_flexibility), getString(R.string.recover_from_injury)};
-        establecerListas();
+        setLists();
 
         @SuppressLint("DefaultLocale") DatePickerDialog.OnDateSetListener dateSetListener = (datePicker, anio, mes, dia) ->
                 binding.etBirthDate.setText(String.format("%02d/%02d/%04d", dia, mes + 1, anio));
@@ -131,13 +131,13 @@ public class RegisterFragment extends Fragment {
         });
 
         binding.btnRegisterSubmit.setOnClickListener(v -> {
-            if (validarDatos()) {
-                realizarRegistro();
+            if (checkData()) {
+                makeRegister();
             }
         });
     }
 
-    private void establecerListas() {
+    private void setLists() {
         ArrayAdapter<String> adapterGender = new ArrayAdapter<>(requireContext(),
                 android.R.layout.simple_expandable_list_item_1, genders);
         binding.actvGender.setAdapter(adapterGender);
@@ -147,7 +147,7 @@ public class RegisterFragment extends Fragment {
         binding.actvGoal.setAdapter(adapterGoals);
     }
 
-    private void realizarRegistro() {
+    private void makeRegister() {
         try {
             String name = binding.etName.getText().toString().trim();
             String email = binding.etEmail.getText().toString().trim();
@@ -157,7 +157,7 @@ public class RegisterFragment extends Fragment {
             int height = Integer.parseInt(binding.etHeight.getText().toString().trim());
             float weight = Float.parseFloat(binding.etWeight.getText().toString().trim());
             String idUser = UUID.randomUUID().toString();
-            String birthDate = convertirFecha(binding.etBirthDate.getText().toString().trim());
+            String birthDate = convertDate(binding.etBirthDate.getText().toString().trim());
 
             User newUser = new User(idUser, name, email, pass, birthDate, gender, goal, height, weight);
 
@@ -170,7 +170,7 @@ public class RegisterFragment extends Fragment {
         }
     }
 
-    private String convertirFecha(String fechaVisual) {
+    private String convertDate(String fechaVisual) {
         try {
             String[] partes = fechaVisual.split("/");
             return partes[2] + "-" + partes[1] + "-" + partes[0];
@@ -181,7 +181,7 @@ public class RegisterFragment extends Fragment {
         }
     }
 
-    private boolean validarDatos() {
+    private boolean checkData() {
         boolean valido = true;
 
         if (binding.etName.getText().toString().trim().isEmpty()) {
