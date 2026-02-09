@@ -40,4 +40,9 @@
         android:name="es.iesagora.fitjourney.ui.second.fitnesscenter.routines.RoutinesFragment"
         android:label=""
         tools:layout="@layout/fragment_routines" />
+    <fragment
+        android:id="@+id/formExerciseFragment"
+        android:name="es.iesagora.fitjourney.ui.second.fitnesscenter.exercises.FormExerciseFragment"
+        android:label="fragment_form_exercise"
+        tools:layout="@layout/fragment_form_exercise" />
 </navigation>

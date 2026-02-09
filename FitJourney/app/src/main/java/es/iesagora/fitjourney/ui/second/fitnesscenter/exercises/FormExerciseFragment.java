@@ -1,64 +1,136 @@
-package es.iesagora.fitjourney;
+package es.iesagora.fitjourney.ui.second.fitnesscenter.exercises;
 
+import android.app.Activity;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-
+import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link FormExerciseFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
+
+import com.bumptech.glide.Glide;
+
+import es.iesagora.fitjourney.R;
+import es.iesagora.fitjourney.data.model.Exercise;
+import es.iesagora.fitjourney.databinding.FragmentFormExerciseBinding;
+import es.iesagora.fitjourney.utils.ImageUtils;
+import es.iesagora.fitjourney.viewmodel.SecondViewModel;
+
 public class FormExerciseFragment extends Fragment {
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+    private FragmentFormExerciseBinding binding;
+    private SecondViewModel viewModel;
+    private Exercise exerciseToEdit = null;
+    private String currentImageBase64 = null;
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    private final ActivityResultLauncher<Intent> galleryLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
+                    Uri imageUri = result.getData().getData();
+                    binding.ivPreview.setImageURI(imageUri);
+                    currentImageBase64 = ImageUtils.uriToBase64(requireContext().getContentResolver(), imageUri);
+                }
+            }
+    );
 
-    public FormExerciseFragment() {
-        // Required empty public constructor
-    }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment FormExerciseFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static FormExerciseFragment newInstance(String param1, String param2) {
-        FormExerciseFragment fragment = new FormExerciseFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        binding = FragmentFormExerciseBinding.inflate(inflater, container, false);
+        return binding.getRoot();
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        viewModel = new ViewModelProvider(requireActivity()).get(SecondViewModel.class);
+
+        if (getArguments() != null && getArguments().containsKey("exercise_data")) {
+            exerciseToEdit = (Exercise) getArguments().getSerializable("exercise_data");
+        }
+
+        if (exerciseToEdit != null) {
+            setupEditMode();
+        } else {
+            binding.tvFormTitle.setText(R.string.new_exercise);
+            binding.btnSave.setText(R.string.create);
+        }
+
+        binding.btnSelectImage.setOnClickListener(v -> {
+            Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+            galleryLauncher.launch(intent);
+        });
+
+        binding.btnSave.setOnClickListener(v -> saveExercise());
+    }
+
+    private void setupEditMode() {
+        binding.tvFormTitle.setText(R.string.edit_exercise);
+        binding.btnSave.setText(R.string.update);
+
+        binding.etName.setText(exerciseToEdit.getName());
+        binding.etMuscle.setText(exerciseToEdit.getMuscleGroup());
+        binding.etDifficulty.setText(exerciseToEdit.getDifficulty());
+        binding.etDescription.setText(exerciseToEdit.getDescription());
+
+        if (exerciseToEdit.getImageUrl() != null && !exerciseToEdit.getImageUrl().isEmpty()) {
+            currentImageBase64 = exerciseToEdit.getImageUrl();
+
+            if (currentImageBase64.length() > 200) {
+                Bitmap bmp = ImageUtils.base64ToBitmap(currentImageBase64);
+                binding.ivPreview.setImageBitmap(bmp);
+            } else {
+                Glide.with(this).load(currentImageBase64).into(binding.ivPreview);
+            }
+        }
+    }
+
+    private void saveExercise() {
+        String name = binding.etName.getText().toString().trim();
+        String muscle = binding.etMuscle.getText().toString().trim();
+        String difficulty = binding.etDifficulty.getText().toString().trim();
+        String description = binding.etDescription.getText().toString().trim();
+
+        if (name.isEmpty() || muscle.isEmpty()) {
+            Toast.makeText(getContext(), "Faltan datos obligatorios", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        Exercise newExercise = new Exercise();
+        newExercise.setName(name);
+        newExercise.setMuscleGroup(muscle);
+        newExercise.setDifficulty(difficulty);
+        newExercise.setDescription(description);
+        newExercise.setImageUrl(currentImageBase64);
+
+        if (exerciseToEdit == null) {
+            viewModel.createExercise(newExercise, () -> {
+                Toast.makeText(getContext(), "Ejercicio creado", Toast.LENGTH_SHORT).show();
+                requireActivity().onBackPressed();
+            });
+        } else {
+            newExercise.setId_exercise(exerciseToEdit.getId_exercise());
+            viewModel.updateExercise(exerciseToEdit.getId_exercise(), newExercise, () -> {
+                Toast.makeText(getContext(), "Ejercicio actualizado", Toast.LENGTH_SHORT).show();
+                requireActivity().onBackPressed();
+            });
         }
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_form_exercise, container, false);
+    public void onDestroyView() {
+        super.onDestroyView();
+        binding = null;
     }
 }

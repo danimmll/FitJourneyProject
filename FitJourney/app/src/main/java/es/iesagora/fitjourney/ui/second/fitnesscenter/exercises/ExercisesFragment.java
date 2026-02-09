@@ -17,6 +17,7 @@ import java.util.ArrayList;
 
 import es.iesagora.fitjourney.R;
 import es.iesagora.fitjourney.data.model.Exercise;
+import es.iesagora.fitjourney.data.repositories.PreferencesRepository;
 import es.iesagora.fitjourney.databinding.FragmentExercisesBinding;
 import es.iesagora.fitjourney.ui.second.adapters.ExerciseAdapter;
 import es.iesagora.fitjourney.viewmodel.SecondViewModel;
@@ -26,6 +27,7 @@ public class ExercisesFragment extends Fragment {
     private FragmentExercisesBinding binding;
     private SecondViewModel viewModel;
     private ExerciseAdapter adapter;
+    private PreferencesRepository prefs = new PreferencesRepository(requireContext());
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
@@ -82,6 +84,20 @@ public class ExercisesFragment extends Fragment {
                 return true;
             }
         });
+
+        String role = prefs.getRole();
+
+        if ("admin".equalsIgnoreCase(role)) {
+            binding.fabAddExercise.setVisibility(View.VISIBLE);
+
+            binding.fabAddExercise.setOnClickListener(v -> {
+                Navigation.findNavController(v).navigate(R.id.formExerciseFragment);
+            });
+        } else {
+            binding.fabAddExercise.setVisibility(View.GONE);
+        }
+
+
     }
 
     private void setupRecyclerView() {

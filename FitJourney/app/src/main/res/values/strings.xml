@@ -79,5 +79,18 @@
     <string name="dark_mode">Modo Oscuro</string>
     <string name="notifications">Notificaciones</string>
     <string name="LogOut">Cerrar Sesión</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="delete">Borrar</string>
+    <string name="edit">Editar</string>
+    <string name="add_button">add_button</string>
+    <string name="save">Guardar</string>
+    <string name="description">Descripción</string>
+    <string name="choose_photo">Seleccionar Foto</string>
+    <string name="muscle_group">Grupo Muscular</string>
+    <string name="new_exercise">Nuevo Ejercicio</string>
+    <string name="create">crear</string>
+    <string name="edit_exercise">Editar Ejercicio</string>
+    <string name="update">Editar</string>
 
 </resources>

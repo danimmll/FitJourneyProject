@@ -1,6 +1,8 @@
 package es.iesagora.fitjourney.viewmodel;
 
 import android.app.Application;
+import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
@@ -65,6 +67,35 @@ public class SecondViewModel extends AndroidViewModel {
 
     public void selectExercise(Exercise exercise) {
         exerciseSelected.setValue(exercise);
+    }
 
+    public void deleteExercise(int id, Runnable onSuccess) {
+        repository.deleteExercise(id, result -> {
+            if (result.status == Resource.Status.SUCCESS) {
+                loadExercises();
+                onSuccess.run();
+            } else if (result.status == Resource.Status.ERROR) {
+                String msg = result.message != null ? result.message : "Error al eliminar";
+                Toast.makeText(getApplication(), msg, Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    public void createExercise(Exercise exercise, Runnable onSuccess) {
+        repository.createExercise(exercise, result -> {
+            if (result.status == Resource.Status.SUCCESS) {
+                loadExercises();
+                onSuccess.run();
+            }
+        });
+    }
+
+    public void updateExercise(int id, Exercise exercise, Runnable onSuccess) {
+        repository.updateExercise(id, exercise, result -> {
+            if (result.status == Resource.Status.SUCCESS) {
+                loadExercises();
+                onSuccess.run();
+            }
+        });
     }
 }

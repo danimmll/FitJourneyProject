@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -15,6 +16,7 @@ import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 
 import es.iesagora.fitjourney.R;
 import es.iesagora.fitjourney.data.model.Exercise;
+import es.iesagora.fitjourney.data.repositories.PreferencesRepository;
 import es.iesagora.fitjourney.databinding.FragmentExerciseDetailBinding;
 import es.iesagora.fitjourney.viewmodel.SecondViewModel;
 
@@ -41,6 +43,24 @@ public class ExerciseDetailFragment extends Fragment {
                 fillData(exercise);
             }
         });
+
+        PreferencesRepository prefs = new PreferencesRepository(requireContext());
+
+        if ("admin".equals(prefs.getRole())) {
+
+            binding.adminPanel.setVisibility(View.VISIBLE);
+
+            binding.btnEdit.setOnClickListener(v -> {
+                Toast.makeText(getContext(), "Función Editar: Próximamente", Toast.LENGTH_SHORT).show();
+            });
+
+            binding.btnDelete.setOnClickListener(v -> {
+                Toast.makeText(getContext(), "Función Borrar: Próximamente", Toast.LENGTH_SHORT).show();
+            });
+
+        } else {
+            binding.adminPanel.setVisibility(View.GONE);
+        }
     }
 
     private void fillData(Exercise exercise) {

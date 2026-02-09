@@ -8,7 +8,8 @@ const jwt = require('jsonwebtoken');
 
 const app = express();
 app.use(cors());
-app.use(bodyParser.json());
+app.use(bodyParser.json({ limit: '50mb' }));
+app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 
 
 const pool = new Pool({
@@ -155,7 +156,65 @@ app.get('/exercises', authenticate, async (req, res) => {
   }
 });
 
-//ARRANCA EL SERVER
+// CREAR Ejercicio
+app.post('/exercises', authenticate, async (req, res) => {
+    if (req.user.role !== 'admin') {
+        return res.status(403).json({ error: 'Acceso denegado. Se requiere rol de administrador.' });
+    }
+
+    const { name, muscle_group, difficulty, description, image_url } = req.body;
+
+    const text = 'INSERT INTO exercises (name, muscle_group, difficulty, description, image_url) VALUES ($1, $2, $3, $4, $5) RETURNING *';
+    const values = [name, muscle_group, difficulty, description, image_url];
+
+    try {
+        const result = await pool.query(text, values);
+        res.status(201).json(result.rows[0]);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Error al crear ejercicio' });
+    }
+});
+
+// EDITAR Ejercicio
+app.put('/exercises/:id', authenticate, async (req, res) => {
+    if (req.user.role !== 'admin') {
+        return res.status(403).json({ error: 'Acceso denegado.' });
+    }
+
+    const { name, muscle_group, difficulty, description, image_url } = req.body;
+    const { id } = req.params;
+
+    const text = 'UPDATE exercises SET name = $1, muscle_group = $2, difficulty = $3, description = $4, image_url = $5 WHERE id = $6';
+    const values = [name, muscle_group, difficulty, description, image_url, id];
+
+    try {
+        await pool.query(text, values);
+        res.json({ message: 'Ejercicio actualizado correctamente' });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Error al actualizar ejercicio' });
+    }
+});
+
+// BORRAR Ejercicio
+app.delete('/exercises/:id', authenticate, async (req, res) => {
+    if (req.user.role !== 'admin') {
+        return res.status(403).json({ error: 'Acceso denegado.' });
+    }
+
+    const { id } = req.params;
+    
+    try {
+        await pool.query('DELETE FROM exercises WHERE id = $1', [id]);
+        res.json({ message: 'Ejercicio eliminado' });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Error al eliminar ejercicio' });
+    }
+});
+
+// ARRANCA EL SERVER
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log('Servidor activo en el puerto ' + PORT);
