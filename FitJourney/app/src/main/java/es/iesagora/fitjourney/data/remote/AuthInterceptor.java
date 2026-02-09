@@ -19,16 +19,22 @@ public class AuthInterceptor implements Interceptor {
     @NonNull
     @Override
     public Response intercept(@NonNull Chain chain) throws IOException {
+
         Request originalRequest = chain.request();
         Request.Builder builder = originalRequest.newBuilder();
-
         String token = preferences.getToken();
 
         if (token != null && !token.isEmpty()) {
             builder.addHeader("Authorization", "Bearer " + token);
         }
 
-        Request newRequest = builder.build();
-        return chain.proceed(newRequest);
+        Response response = chain.proceed(builder.build());
+
+        if (response.code() == 401) {
+            preferences.clear();
+
+        }
+
+        return response;
     }
 }

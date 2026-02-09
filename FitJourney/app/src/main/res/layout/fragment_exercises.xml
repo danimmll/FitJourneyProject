@@ -5,6 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:id="@+id/exercisesLayout"
     android:background="@color/fondo"
     tools:context=".ui.second.fitnesscenter.exercises.ExercisesFragment">
 
@@ -50,8 +51,8 @@
         android:id="@+id/tvError"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="No se encontraron ejercicios"
-        android:textColor="@color/mainrosa"
+        android:text="@string/no_exercises_aviable"
+        android:textColor="@color/error"
         android:textSize="18sp"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"

@@ -40,7 +40,7 @@ public class ExercisesFragment extends Fragment {
         viewModel = new ViewModelProvider(requireActivity()).get(SecondViewModel.class);
 
         setupRecyclerView();
-        
+
         viewModel.exercises.observe(getViewLifecycleOwner(), resource -> {
             if (resource != null) {
                 switch (resource.status) {
@@ -52,23 +52,19 @@ public class ExercisesFragment extends Fragment {
 
                     case SUCCESS:
                         binding.progressBar.setVisibility(View.GONE);
-                        binding.tvError.setVisibility(View.GONE);
-                        binding.rvExercises.setVisibility(View.VISIBLE);
 
                         if (resource.data != null && !resource.data.isEmpty()) {
+                            binding.rvExercises.setVisibility(View.VISIBLE);
+                            binding.tvError.setVisibility(View.GONE);
+
                             adapter.setExercises(resource.data);
                         } else {
                             binding.tvError.setText(R.string.no_exercises_aviable);
                             binding.tvError.setVisibility(View.VISIBLE);
-                        }
-                        break;
+                            binding.rvExercises.setVisibility(View.GONE);
 
-                    case ERROR:
-                        binding.progressBar.setVisibility(View.GONE);
-                        binding.rvExercises.setVisibility(View.GONE);
-                        binding.tvError.setVisibility(View.VISIBLE);
-                        binding.tvError.setText(resource.message);
-                        Toast.makeText(getContext(), resource.message, Toast.LENGTH_LONG).show();
+                            adapter.setExercises(new ArrayList<>());
+                        }
                         break;
                 }
             }

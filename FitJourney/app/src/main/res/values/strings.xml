@@ -76,5 +76,8 @@
     <string name="difficulty">Dificultad</string>
     <string name="muscle">Músculo</string>
     <string name="exercise_image">Exercise image</string>
+    <string name="dark_mode">Modo Oscuro</string>
+    <string name="notifications">Notificaciones</string>
+    <string name="LogOut">Cerrar Sesión</string>
 
 </resources>

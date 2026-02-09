@@ -11,12 +11,17 @@ import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
+import androidx.work.ExistingPeriodicWorkPolicy;
+import androidx.work.PeriodicWorkRequest;
+import androidx.work.WorkManager;
 
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 import es.iesagora.fitjourney.R;
 import es.iesagora.fitjourney.databinding.ActivityMainBinding;
 import es.iesagora.fitjourney.ui.second.SecondActivity;
+import es.iesagora.fitjourney.utils.NotificationWorker;
 import es.iesagora.fitjourney.viewmodel.MainViewModel;
 
 public class MainActivity extends AppCompatActivity {
@@ -32,6 +37,15 @@ public class MainActivity extends AppCompatActivity {
         viewModel = new ViewModelProvider(this).get(MainViewModel.class);
 
         AppCompatDelegate.setDefaultNightMode(viewModel.getTheme());
+
+        PeriodicWorkRequest avisoDiario = new PeriodicWorkRequest.Builder(NotificationWorker.class, 24, TimeUnit.HOURS)
+                .build();
+
+        WorkManager.getInstance(this).enqueueUniquePeriodicWork(
+                "AvisoDiario",
+                ExistingPeriodicWorkPolicy.KEEP,
+                avisoDiario
+        );
 
         if (viewModel.isUserLoggedIn()) {
             Intent intent = new Intent(this, SecondActivity.class);
