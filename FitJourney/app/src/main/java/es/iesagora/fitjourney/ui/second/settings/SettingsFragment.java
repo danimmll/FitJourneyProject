@@ -95,7 +95,7 @@ public class SettingsFragment extends Fragment {
         preferences.setNotifications(true);
 
         WorkManager.getInstance(requireContext()).enqueue(new OneTimeWorkRequest.Builder(NotificationWorker.class).build());
-        Toast.makeText(getContext(), "¡Activado! Enviando prueba...", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getContext(), "¡Notificaciones Activadas!", Toast.LENGTH_SHORT).show();
 
         PeriodicWorkRequest diario = new PeriodicWorkRequest.Builder(NotificationWorker.class, 24, TimeUnit.HOURS).build();
         WorkManager.getInstance(requireContext()).enqueueUniquePeriodicWork("AvisoDiario", ExistingPeriodicWorkPolicy.UPDATE, diario);
@@ -104,7 +104,7 @@ public class SettingsFragment extends Fragment {
     private void desactivarNotificaciones() {
         preferences.setNotifications(false);
         WorkManager.getInstance(requireContext()).cancelUniqueWork("AvisoDiario");
-        Toast.makeText(getContext(), "Avisos desactivados", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getContext(), "Notificaciones desactivados", Toast.LENGTH_SHORT).show();
     }
 
     @Override
