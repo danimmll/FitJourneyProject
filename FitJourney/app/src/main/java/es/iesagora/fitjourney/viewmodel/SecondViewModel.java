@@ -5,6 +5,7 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import es.iesagora.fitjourney.data.model.Exercise;
@@ -13,30 +14,53 @@ import es.iesagora.fitjourney.data.repositories.ExerciseRepository;
 
 public class SecondViewModel extends AndroidViewModel {
 
-    private final ExerciseRepository exerciseRepository;
+    private final ExerciseRepository repository;
 
     public MutableLiveData<Resource<List<Exercise>>> exercises = new MutableLiveData<>();
     public final MutableLiveData<Exercise> exerciseSelected = new MutableLiveData<>();
 
-    private boolean loading = false;
+
+    private List<Exercise> fullExerciseList = new ArrayList<>();
 
     public SecondViewModel(@NonNull Application application) {
         super(application);
-        exerciseRepository = new ExerciseRepository(application);
+        repository = new ExerciseRepository(application.getApplicationContext());
+        loadExercises();
     }
 
     public void loadExercises() {
-        if (loading) {
-            return;
-        }
-        loading = true;
+        exercises.setValue(Resource.loading());
 
-        exerciseRepository.getExercises(result -> {
-            exercises.setValue(result);
-            if (result.status != Resource.Status.LOADING) {
-                loading = false;
+        repository.getExercises(result -> {
+            if (result.status == Resource.Status.SUCCESS && result.data != null) {
+                fullExerciseList = new ArrayList<>(result.data);
+                exercises.setValue(result);
+            } else {
+                exercises.setValue(result);
             }
         });
+    }
+
+    public void searchExercises(String query) {
+        if (query == null || query.trim().isEmpty()) {
+            exercises.setValue(Resource.success(new ArrayList<>(fullExerciseList)));
+            return;
+        }
+
+        List<Exercise> filteredList = new ArrayList<>();
+        String filterPattern = query.toLowerCase().trim();
+
+        for (Exercise item : fullExerciseList) {
+            if (item.getName().toLowerCase().contains(filterPattern)) {
+                filteredList.add(item);
+            }
+        }
+
+        if (filteredList.isEmpty()) {
+            exercises.setValue(Resource.success(new ArrayList<>()));
+        } else {
+            exercises.setValue(Resource.success(filteredList));
+        }
     }
 
     public void selectExercise(Exercise exercise) {

@@ -40,7 +40,7 @@ public class ExercisesFragment extends Fragment {
         viewModel = new ViewModelProvider(requireActivity()).get(SecondViewModel.class);
 
         setupRecyclerView();
-        viewModel.loadExercises();
+        
         viewModel.exercises.observe(getViewLifecycleOwner(), resource -> {
             if (resource != null) {
                 switch (resource.status) {
@@ -71,6 +71,19 @@ public class ExercisesFragment extends Fragment {
                         Toast.makeText(getContext(), resource.message, Toast.LENGTH_LONG).show();
                         break;
                 }
+            }
+        });
+
+        binding.svExercises.setOnQueryTextListener(new androidx.appcompat.widget.SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String exerciseName) {
+                viewModel.searchExercises(exerciseName);
+                return true;
             }
         });
     }
