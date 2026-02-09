@@ -185,7 +185,7 @@ app.put('/exercises/:id', authenticate, async (req, res) => {
     const { name, muscle_group, difficulty, description, image_url } = req.body;
     const { id } = req.params;
 
-    const text = 'UPDATE exercises SET name = $1, muscle_group = $2, difficulty = $3, description = $4, image_url = $5 WHERE id = $6';
+    const text = 'UPDATE exercises SET name = $1, muscle_group = $2, difficulty = $3, description = $4, image_url = $5 WHERE id_exercise = $6';
     const values = [name, muscle_group, difficulty, description, image_url, id];
 
     try {
@@ -206,7 +206,7 @@ app.delete('/exercises/:id', authenticate, async (req, res) => {
     const { id } = req.params;
     
     try {
-        await pool.query('DELETE FROM exercises WHERE id = $1', [id]);
+        await pool.query('DELETE FROM exercises WHERE id_exercise = $1', [id]);
         res.json({ message: 'Ejercicio eliminado' });
     } catch (err) {
         console.error(err);
