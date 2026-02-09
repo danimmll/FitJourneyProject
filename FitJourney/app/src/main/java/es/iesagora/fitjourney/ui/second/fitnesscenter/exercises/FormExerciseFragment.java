@@ -116,13 +116,17 @@ public class FormExerciseFragment extends Fragment {
 
         if (exerciseToEdit == null) {
             viewModel.createExercise(newExercise, () -> {
-                Toast.makeText(getContext(), "Ejercicio creado", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), R.string.exercise_created, Toast.LENGTH_SHORT).show();
                 requireActivity().onBackPressed();
             });
         } else {
             newExercise.setId_exercise(exerciseToEdit.getId_exercise());
+
             viewModel.updateExercise(exerciseToEdit.getId_exercise(), newExercise, () -> {
-                Toast.makeText(getContext(), "Ejercicio actualizado", Toast.LENGTH_SHORT).show();
+
+                viewModel.selectExercise(newExercise);
+
+                Toast.makeText(getContext(), R.string.exercise_updated, Toast.LENGTH_SHORT).show();
                 requireActivity().onBackPressed();
             });
         }

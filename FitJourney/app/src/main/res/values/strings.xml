@@ -93,5 +93,7 @@
     <string name="edit_exercise">Editar Ejercicio</string>
     <string name="update">Editar</string>
     <string name="under_construction">Bajo construccion</string>
+    <string name="exercise_created">Ejercicio creado\n</string>
+    <string name="exercise_updated">Ejercicio actualizado</string>
 
 </resources>

@@ -27,7 +27,7 @@ public class ExercisesFragment extends Fragment {
     private FragmentExercisesBinding binding;
     private SecondViewModel viewModel;
     private ExerciseAdapter adapter;
-    private PreferencesRepository prefs = new PreferencesRepository(requireContext());
+    private PreferencesRepository prefs;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
@@ -40,6 +40,7 @@ public class ExercisesFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         viewModel = new ViewModelProvider(requireActivity()).get(SecondViewModel.class);
+        prefs = new PreferencesRepository(requireContext());
 
         setupRecyclerView();
 
