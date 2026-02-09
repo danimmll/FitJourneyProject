@@ -4,8 +4,8 @@ import com.google.gson.annotations.SerializedName;
 import java.io.Serializable;
 
 public class Exercise implements Serializable {
-    @SerializedName("id_exercise")
-    private int id_exercise;
+    @SerializedName("id")
+    private int id;
     @SerializedName("name")
     private String name;
     @SerializedName("description")
@@ -25,12 +25,12 @@ public class Exercise implements Serializable {
     @SerializedName("video_url")
     private String videoUrl;
 
-    public int getId_exercise() {
-        return id_exercise;
+    public int getId() {
+        return id;
     }
 
-    public void setId_exercise(int id_exercise) {
-        this.id_exercise = id_exercise;
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getName() {

@@ -71,7 +71,7 @@
         app:backgroundTint="@color/mainrosa"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:tint="@color/white"
+        app:tint="@color/text"
         tools:visibility="visible" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

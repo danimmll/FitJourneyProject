@@ -76,7 +76,7 @@ public class ExerciseDetailFragment extends Fragment {
                 .setTitle("¿Eliminar Ejercicio?")
                 .setMessage("Esta acción no se puede deshacer.")
                 .setPositiveButton("Eliminar", (dialog, which) -> {
-                    viewModel.deleteExercise(currentExercise.getId_exercise(), () -> {
+                    viewModel.deleteExercise(currentExercise.getId(), () -> {
                         Toast.makeText(getContext(), "Ejercicio eliminado", Toast.LENGTH_SHORT).show();
                         requireActivity().onBackPressed();
                     });

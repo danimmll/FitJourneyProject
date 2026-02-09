@@ -13,14 +13,15 @@
         android:id="@+id/tvRegister"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="24dp"
         android:fontFamily="sans-serif-black"
         android:shadowColor="@color/sombramainrosa"
         android:shadowRadius="50"
         android:text="@string/register"
         android:textColor="@color/mainrosa"
-        android:textSize="48sp"
+        android:textSize="60sp"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -39,7 +40,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="16dp">
+            android:padding="24dp">
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/tlName"
@@ -57,14 +58,14 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="textPersonName"
-                    android:textColor="@color/white"/>
+                    android:textColor="@color/text"/>
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/tlEmail"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
+                android:layout_marginTop="20dp"
                 android:hint="@string/email"
                 android:textColorHint="@color/inputsregister"
                 app:hintTextColor="@color/inputsregister"
@@ -77,14 +78,14 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="textEmailAddress"
-                    android:textColor="#FFFFFF"/>
+                    android:textColor="@color/text"/>
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/tlPassword"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
+                android:layout_marginTop="20dp"
                 android:hint="@string/password"
                 app:passwordToggleEnabled="true"
                 android:textColorHint="@color/inputsregister"
@@ -100,14 +101,14 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="textPassword"
-                    android:textColor="@color/white"/>
+                    android:textColor="@color/text"/>
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/tlConfirmPassword"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
+                android:layout_marginTop="20dp"
                 android:hint="@string/confirm_password"
                 app:passwordToggleEnabled="true"
                 app:endIconMode="password_toggle"
@@ -123,22 +124,20 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="textPassword"
-                    android:textColor="@color/white"/>
+                    android:textColor="@color/text"/>
             </com.google.android.material.textfield.TextInputLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:baselineAligned="false"
-                android:orientation="horizontal"
-                android:weightSum="2">
+                android:layout_marginTop="20dp"
+                android:orientation="horizontal">
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/tlBirthDate"
-                    android:layout_width="0dp"
+                    android:layout_width="150dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
+                    android:layout_marginStart="20dp"
                     android:hint="@string/birth_date"
                     android:textColorHint="@color/inputsregister"
                     app:boxBackgroundMode="outline"
@@ -153,15 +152,14 @@
                         android:clickable="true"
                         android:focusable="true"
                         android:inputType="none"
-                        android:textColor="@color/white"/>
+                        android:textColor="@color/text" />
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/tlGender"
-                    android:layout_width="0dp"
+                    android:layout_width="150dp"
                     android:layout_height="match_parent"
-                    android:layout_marginStart="12dp"
-                    android:layout_weight="1"
+                    android:layout_marginStart="16dp"
                     android:hint="@string/gender"
                     android:textColorHint="@color/inputsregister"
                     app:boxBackgroundMode="outline"
@@ -178,7 +176,7 @@
                         android:focusable="false"
                         android:inputType="none"
                         android:paddingStart="20dp"
-                        android:textColor="@color/white"
+                        android:textColor="@color/text"
                         tools:ignore="LabelFor,RtlSymmetry" />
                 </com.google.android.material.textfield.TextInputLayout>
 
@@ -187,16 +185,14 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:baselineAligned="false"
-                android:orientation="horizontal"
-                android:weightSum="3">
+                android:layout_marginTop="20dp"
+                android:orientation="horizontal">
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/tLGoal"
-                    android:layout_width="0dp"
+                    android:layout_width="100dp"
                     android:layout_height="match_parent"
-                    android:layout_weight="1"
+                    android:layout_marginEnd="10dp"
                     android:hint="@string/goal"
                     android:textColorHint="@color/inputsregister"
                     app:boxBackgroundMode="outline"
@@ -213,16 +209,15 @@
                         android:focusable="false"
                         android:inputType="none"
                         android:paddingStart="20dp"
-                        android:textColor="@color/white"
+                        android:textColor="@color/text"
                         tools:ignore="LabelFor,RtlSymmetry" />
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/tlHeight"
-                    android:layout_width="0dp"
+                    android:layout_width="100dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_marginStart="12dp"
+                    android:layout_marginStart="16dp"
                     android:hint="@string/height_cm"
                     android:textColorHint="@color/inputsregister"
                     app:boxBackgroundMode="outline"
@@ -235,15 +230,14 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:inputType="number"
-                        android:textColor="@color/white"/>
+                        android:textColor="@color/text" />
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/tlWeight"
-                    android:layout_width="0dp"
+                    android:layout_width="100dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_marginStart="12dp"
+                    android:layout_marginStart="30dp"
                     android:hint="@string/weight_kg"
                     android:textColorHint="@color/inputsregister"
                     app:boxBackgroundMode="outline"
@@ -256,7 +250,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:inputType="numberDecimal"
-                        android:textColor="@color/white"/>
+                        android:textColor="@color/text" />
                 </com.google.android.material.textfield.TextInputLayout>
 
             </LinearLayout>
@@ -264,13 +258,13 @@
             <Button
                 android:id="@+id/btnRegisterSubmit"
                 android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:layout_marginTop="24dp"
+                android:layout_height="60dp"
+                android:layout_marginTop="40dp"
                 android:backgroundTint="@color/mainrosa"
                 android:text="@string/register"
                 android:textAllCaps="false"
-                android:textColor="@color/white"
-                android:textSize="18sp"/>
+                android:textColor="@color/text"
+                android:textSize="20sp"/>
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>

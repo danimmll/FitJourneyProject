@@ -17,7 +17,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/new_exercise"
-            android:textColor="@color/white"
+            android:textColor="@color/text"
             android:textSize="28sp"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
@@ -40,7 +40,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="textCapSentences"
-                android:textColor="@color/white" />
+                android:textColor="@color/text" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
@@ -60,7 +60,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="textCapWords"
-                android:textColor="@color/white" />
+                android:textColor="@color/text" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
@@ -80,7 +80,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="textCapWords"
-                android:textColor="@color/white" />
+                android:textColor="@color/text" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <LinearLayout
@@ -130,7 +130,7 @@
                 android:gravity="top"
                 android:inputType="textMultiLine"
                 android:minLines="4"
-                android:textColor="@color/white" />
+                android:textColor="@color/text" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.button.MaterialButton
@@ -141,7 +141,7 @@
             android:layout_marginBottom="32dp"
             android:backgroundTint="@color/mainrosa"
             android:text="@string/save"
-            android:textColor="@color/white"
+            android:textColor="@color/text"
             android:textSize="16sp"
             android:textStyle="bold"
             app:cornerRadius="12dp"

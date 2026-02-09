@@ -15,7 +15,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/settings"
-        android:textColor="@color/white"
+        android:textColor="@color/text"
         android:textSize="32sp"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
@@ -43,16 +43,10 @@
                 android:layout_height="wrap_content"
                 android:minHeight="48dp"
                 android:text="@string/dark_mode"
-                android:textColor="@color/white"
+                android:textColor="@color/text"
                 android:textSize="18sp"
-                app:thumbTint="@color/white"
+                app:thumbTint="@color/text"
                 app:trackTint="@color/mainazul" />
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginVertical="8dp"
-                android:background="#33FFFFFF" />
 
             <com.google.android.material.materialswitch.MaterialSwitch
                 android:id="@+id/switchNotifications"
@@ -60,9 +54,9 @@
                 android:layout_height="wrap_content"
                 android:minHeight="48dp"
                 android:text="@string/notifications"
-                android:textColor="@color/white"
+                android:textColor="@color/text"
                 android:textSize="18sp"
-                app:thumbTint="@color/white"
+                app:thumbTint="@color/text"
                 app:trackTint="@color/mainazul" />
 
         </LinearLayout>
@@ -75,13 +69,13 @@
         android:layout_marginBottom="32dp"
         android:backgroundTint="@color/mainrosa"
         android:text="@string/LogOut"
-        android:textColor="@color/white"
+        android:textColor="@color/text"
         android:textSize="16sp"
         android:textStyle="bold"
         app:cornerRadius="12dp"
         app:icon="@android:drawable/ic_lock_power_off"
         app:iconGravity="textStart"
-        app:iconTint="@color/white"
+        app:iconTint="@color/text"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />

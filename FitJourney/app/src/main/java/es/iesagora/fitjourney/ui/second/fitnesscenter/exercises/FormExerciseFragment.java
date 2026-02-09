@@ -120,9 +120,9 @@ public class FormExerciseFragment extends Fragment {
                 requireActivity().onBackPressed();
             });
         } else {
-            newExercise.setId_exercise(exerciseToEdit.getId_exercise());
+            newExercise.setId(exerciseToEdit.getId());
 
-            viewModel.updateExercise(exerciseToEdit.getId_exercise(), newExercise, () -> {
+            viewModel.updateExercise(exerciseToEdit.getId(), newExercise, () -> {
 
                 viewModel.selectExercise(newExercise);
 

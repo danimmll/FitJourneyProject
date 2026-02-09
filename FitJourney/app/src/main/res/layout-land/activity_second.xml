@@ -23,7 +23,7 @@
             android:layout_height="?attr/actionBarSize"
             android:background="@color/mainrosa"
             app:titleCentered="true"
-            app:titleTextColor="@android:color/white" />
+            app:titleTextColor="@color/text" />
     </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.fragment.app.FragmentContainerView
@@ -47,6 +47,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
+        app:itemTextColor="@color/text"
         app:menu="@menu/bottom_menu" />
 
     <ProgressBar

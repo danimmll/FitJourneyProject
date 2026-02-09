@@ -58,7 +58,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="textPersonName"
-                    android:textColor="@color/white"/>
+                    android:textColor="@color/text"/>
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
@@ -78,7 +78,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="textEmailAddress"
-                    android:textColor="@color/white"/>
+                    android:textColor="@color/text"/>
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
@@ -101,7 +101,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="textPassword"
-                    android:textColor="@color/white"/>
+                    android:textColor="@color/text"/>
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
@@ -124,7 +124,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="textPassword"
-                    android:textColor="@color/white"/>
+                    android:textColor="@color/text"/>
             </com.google.android.material.textfield.TextInputLayout>
 
             <LinearLayout
@@ -152,7 +152,7 @@
                         android:clickable="true"
                         android:focusable="true"
                         android:inputType="none"
-                        android:textColor="@color/white" />
+                        android:textColor="@color/text" />
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
@@ -176,7 +176,7 @@
                         android:focusable="false"
                         android:inputType="none"
                         android:paddingStart="20dp"
-                        android:textColor="@color/white"
+                        android:textColor="@color/text"
                         tools:ignore="LabelFor,RtlSymmetry" />
                 </com.google.android.material.textfield.TextInputLayout>
 
@@ -209,7 +209,7 @@
                         android:focusable="false"
                         android:inputType="none"
                         android:paddingStart="20dp"
-                        android:textColor="@color/white"
+                        android:textColor="@color/text"
                         tools:ignore="LabelFor,RtlSymmetry" />
                 </com.google.android.material.textfield.TextInputLayout>
 
@@ -230,7 +230,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:inputType="number"
-                        android:textColor="@color/white" />
+                        android:textColor="@color/text" />
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
@@ -250,7 +250,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:inputType="numberDecimal"
-                        android:textColor="@color/white" />
+                        android:textColor="@color/text" />
                 </com.google.android.material.textfield.TextInputLayout>
 
             </LinearLayout>
@@ -263,7 +263,7 @@
                 android:backgroundTint="@color/mainrosa"
                 android:text="@string/register"
                 android:textAllCaps="false"
-                android:textColor="#FFFFFF"
+                android:textColor="@color/text"
                 android:textSize="20sp"/>
 
         </LinearLayout>
