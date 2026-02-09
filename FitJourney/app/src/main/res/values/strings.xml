@@ -92,5 +92,6 @@
     <string name="create">crear</string>
     <string name="edit_exercise">Editar Ejercicio</string>
     <string name="update">Editar</string>
+    <string name="under_construction">Bajo construccion</string>
 
 </resources>
