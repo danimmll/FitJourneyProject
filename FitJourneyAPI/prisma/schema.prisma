@@ -87,6 +87,7 @@ model Workout {
   duration_minutes Int?
   calories_burned  Float?
   notes            String?
+  active           Int      @default(1)
 
   details WorkoutDetail[]
 }
