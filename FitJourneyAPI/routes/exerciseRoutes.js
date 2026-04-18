@@ -8,5 +8,6 @@ router.get('/', authenticateToken, exCtrl.getExercises);
 router.post('/', authenticateToken, isAdmin, exCtrl.createExercise);
 router.put('/:id', authenticateToken, isAdmin, exCtrl.updateExercise);
 router.delete('/:id', authenticateToken, isAdmin, exCtrl.deleteExercise);
+router.get('/:id', authenticateToken, exCtrl.getExerciseById);
 
 module.exports = router;

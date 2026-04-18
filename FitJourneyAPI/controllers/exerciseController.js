@@ -48,4 +48,20 @@ const deleteExercise = async (req, res, next) => {
     }
 };
 
-module.exports = { getExercises, createExercise, updateExercise, deleteExercise };
+const getExerciseById = async (req, res, next) => {
+    const { id } = req.params;
+    try {
+        const exercise = await prisma.exercise.findUnique({
+            where: { id_exercise: parseInt(id) }
+        });
+        
+        if (!exercise || exercise.active === 0) {
+            return res.status(404).json({ error: "Ejercicio no encontrado" });
+        }
+        res.json(exercise);
+    } catch (error) {
+        next(error);
+    }
+};
+
+module.exports = { getExercises, createExercise, updateExercise, deleteExercise, getExerciseById };
