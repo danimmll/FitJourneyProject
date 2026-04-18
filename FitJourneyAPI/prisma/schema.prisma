@@ -1,0 +1,132 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id_user     Int      @id @default(autoincrement())
+  email       String   @unique
+  name        String
+  password    String
+  gender      String?
+  goal        String?
+  height      Float?
+  weight      Float?
+  birth_date  DateTime?
+  photo_url   String?
+  role        String   @default("user")
+  active      Int      @default(1)
+  register_date DateTime @default(now())
+
+  routines    Routine[]
+  workouts    Workout[]
+  favorites   Favorite[]
+  incidencias Incidencia[]
+}
+
+model Exercise {
+  id_exercise  Int      @id @default(autoincrement())
+  name         String
+  muscle_group String
+  difficulty   String
+  description  String
+  image_url    String?
+  video_url    String?
+  equipment    String?
+  creation_date DateTime @default(now())
+  active      Int      @default(1)
+
+  routineExercises RoutineExercise[]
+  workoutDetails   WorkoutDetail[]
+  favorites        Favorite[]
+}
+
+model Routine {
+  id_routine   Int      @id @default(autoincrement())
+  name         String
+  description  String?
+  creation_date DateTime @default(now())
+
+  user     User @relation(fields: [id_user], references: [id_user])
+  id_user  Int
+  active      Int      @default(1)
+
+  exercises RoutineExercise[]
+  workouts  Workout[]
+}
+
+model RoutineExercise {
+  id_routine_exercise Int @id @default(autoincrement())
+
+  routine   Routine @relation(fields: [id_routine], references: [id_routine])
+  id_routine Int
+
+  exercise  Exercise @relation(fields: [id_exercise], references: [id_exercise])
+  id_exercise Int
+
+  target_sets   Int?
+  target_reps   Int?
+  target_weight Float?
+}
+
+model Workout {
+  id_workout Int @id @default(autoincrement())
+
+  user     User @relation(fields: [id_user], references: [id_user])
+  id_user  Int
+
+  routine  Routine @relation(fields: [id_routine], references: [id_routine])
+  id_routine Int
+
+  workout_date     DateTime
+  duration_minutes Int?
+  calories_burned  Float?
+  notes            String?
+
+  details WorkoutDetail[]
+}
+
+model WorkoutDetail {
+  id_detail Int @id @default(autoincrement())
+
+  workout   Workout @relation(fields: [id_workout], references: [id_workout])
+  id_workout Int
+
+  exercise  Exercise @relation(fields: [id_exercise], references: [id_exercise])
+  id_exercise Int
+
+  sets_performed   Int?
+  reps_performed   String?
+  max_weight_used  Float?
+}
+
+model Favorite {
+  id_favorite Int @id @default(autoincrement())
+
+  user     User @relation(fields: [id_user], references: [id_user], onDelete: Cascade)
+  id_user  Int
+
+  exercise Exercise @relation(fields: [id_exercise], references: [id_exercise], onDelete: Cascade)
+  id_exercise Int
+
+  saved_date DateTime @default(now())
+
+  @@unique([id_user, id_exercise])
+}
+
+model Incidencia {
+  id_incidencia Int      @id @default(autoincrement())
+  mensaje       String   
+  endpoint      String? 
+  metodo        String?  
+  
+  user          User?    @relation(fields: [id_user], references: [id_user], onDelete: SetNull)
+  id_user       Int?
+  
+  register_date DateTime @default(now())
+}

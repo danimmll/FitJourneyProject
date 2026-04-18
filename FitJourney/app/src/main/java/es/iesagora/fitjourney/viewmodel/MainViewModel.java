@@ -12,32 +12,24 @@ import es.iesagora.fitjourney.data.remote.AccessResponse;
 import es.iesagora.fitjourney.data.remote.Resource;
 import es.iesagora.fitjourney.data.repositories.PreferencesRepository;
 import es.iesagora.fitjourney.data.repositories.UserRepository;
+import lombok.Getter;
 
 public class MainViewModel extends AndroidViewModel {
 
     private final UserRepository repository;
     private final PreferencesRepository preferencesRepository;
 
+    @Getter
     private final MutableLiveData<Resource<AccessResponse>> loginState = new MutableLiveData<>();
+    @Getter
     private final MutableLiveData<Resource<AccessResponse>> registerState = new MutableLiveData<>();
+    @Getter
     private final MutableLiveData<Resource<User>> userProfileState = new MutableLiveData<>();
 
     public MainViewModel(@NonNull Application application) {
         super(application);
         this.repository = new UserRepository(application);
         this.preferencesRepository = new PreferencesRepository(application);
-    }
-
-    public MutableLiveData<Resource<AccessResponse>> getLoginState() {
-        return loginState;
-    }
-
-    public MutableLiveData<Resource<AccessResponse>> getRegisterState() {
-        return registerState;
-    }
-
-    public MutableLiveData<Resource<User>> getUserProfileState() {
-        return userProfileState;
     }
 
     public void login(String email, String password) {
