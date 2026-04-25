@@ -6,22 +6,27 @@ import android.view.MenuItem;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 import es.iesagora.fitjourney.R;
 import es.iesagora.fitjourney.databinding.ActivitySecondBinding;
+import es.iesagora.fitjourney.viewmodel.SecondViewModel;
 
 public class SecondActivity extends AppCompatActivity {
 
     private ActivitySecondBinding binding;
     private NavController navController;
     private AppBarConfiguration appBarConfiguration;
+    private SecondViewModel viewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        viewModel = new ViewModelProvider(this).get(SecondViewModel.class);
 
         binding = ActivitySecondBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());

@@ -19,6 +19,7 @@ import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 import es.iesagora.fitjourney.R;
+import es.iesagora.fitjourney.data.repositories.PreferencesRepository;
 import es.iesagora.fitjourney.databinding.ActivityMainBinding;
 import es.iesagora.fitjourney.ui.second.SecondActivity;
 import es.iesagora.fitjourney.utils.NotificationWorker;
@@ -35,8 +36,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         viewModel = new ViewModelProvider(this).get(MainViewModel.class);
+        PreferencesRepository prefs = new PreferencesRepository(this);
 
-        AppCompatDelegate.setDefaultNightMode(viewModel.getTheme());
+        AppCompatDelegate.setDefaultNightMode(prefs.getTheme());
 
         PeriodicWorkRequest avisoDiario = new PeriodicWorkRequest.Builder(NotificationWorker.class, 24, TimeUnit.HOURS)
                 .build();
@@ -47,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
                 avisoDiario
         );
 
-        if (viewModel.isUserLoggedIn()) {
+        if (prefs.getToken() != null && !prefs.getToken().isEmpty()) {
             Intent intent = new Intent(this, SecondActivity.class);
             startActivity(intent);
             finish();
