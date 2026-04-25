@@ -1,7 +1,6 @@
 package es.iesagora.fitjourney.data.model;
 
-import com.google.gson.annotations.SerializedName;
-import java.io.Serializable;
+import java.sql.Timestamp;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -12,26 +11,15 @@ import lombok.Setter;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Getter
-@Setter
-public class Exercise implements Serializable {
-    @SerializedName("id_exercise")
-    private int id;
-    @SerializedName("name")
+public class Exercise {
+    private int id_exercise;
     private String name;
-    @SerializedName("description")
-    private String description;
-
-    @SerializedName("muscle_group")
-    private String muscleGroup;
-
-    @SerializedName("equipment")
-    private String equipment;
-    @SerializedName("difficulty")
+    private String muscle_group;
     private String difficulty;
-
-    @SerializedName("image_url")
-    private String imageUrl;
-
-
+    private String description;
+    private String image_url;
+    private String video_url;
+    private String equipment;
+    private String creation_date;
+    private int active;
 }
