@@ -41,6 +41,15 @@ public interface AppApi {
     @GET("exercises/{id}")
     Call<Exercise> getExerciseById(@Path("id") int id);
 
+    @POST("exercises")
+    Call<Exercise> createExercise(@Body Exercise exercise);
+
+    @PUT("exercises/{id}")
+    Call<Void> updateExercise(@Path("id") int id, @Body Exercise exercise);
+
+    @DELETE("exercises/{id}")
+    Call<Void> deleteExercise(@Path("id") int id);
+
     @GET("favorites")
     Call<List<Exercise>> getUserFavorites();
 

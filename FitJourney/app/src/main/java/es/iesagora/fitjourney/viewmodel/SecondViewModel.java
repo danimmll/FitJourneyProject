@@ -5,6 +5,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import java.util.ArrayList;
@@ -17,35 +18,39 @@ import es.iesagora.fitjourney.data.repositories.ExerciseRepository;
 public class SecondViewModel extends AndroidViewModel {
 
     private final ExerciseRepository repository;
-
-    public MutableLiveData<Resource<List<Exercise>>> exercises = new MutableLiveData<>();
-    public final MutableLiveData<Exercise> exerciseSelected = new MutableLiveData<>();
-
+    private final MutableLiveData<Resource<List<Exercise>>> exercisesLiveData = new MutableLiveData<>();
+    private final MutableLiveData<Exercise> exerciseSelected = new MutableLiveData<>();
+    private final MutableLiveData<Resource<Exercise>> singleExerciseLiveData = new MutableLiveData<>();
 
     private List<Exercise> fullExerciseList = new ArrayList<>();
 
     public SecondViewModel(@NonNull Application application) {
         super(application);
         repository = new ExerciseRepository(application.getApplicationContext());
-        loadExercises();
+        fetchExercises();
     }
 
-    public void loadExercises() {
-        exercises.setValue(Resource.loading());
+
+    public LiveData<Resource<List<Exercise>>> getExercises() {
+        return exercisesLiveData;
+    }
+
+    public void fetchExercises() {
+        exercisesLiveData.setValue(Resource.loading());
 
         repository.getExercises(result -> {
             if (result.status == Resource.Status.SUCCESS && result.data != null) {
                 fullExerciseList = new ArrayList<>(result.data);
-                exercises.setValue(result);
+                exercisesLiveData.setValue(result);
             } else {
-                exercises.setValue(result);
+                exercisesLiveData.setValue(result);
             }
         });
     }
 
     public void searchExercises(String query) {
         if (query == null || query.trim().isEmpty()) {
-            exercises.setValue(Resource.success(new ArrayList<>(fullExerciseList)));
+            exercisesLiveData.setValue(Resource.success(new ArrayList<>(fullExerciseList)));
             return;
         }
 
@@ -58,21 +63,33 @@ public class SecondViewModel extends AndroidViewModel {
             }
         }
 
-        if (filteredList.isEmpty()) {
-            exercises.setValue(Resource.success(new ArrayList<>()));
-        } else {
-            exercises.setValue(Resource.success(filteredList));
-        }
+        exercisesLiveData.setValue(Resource.success(filteredList));
     }
+
 
     public void selectExercise(Exercise exercise) {
         exerciseSelected.setValue(exercise);
     }
 
+    public LiveData<Exercise> getSelectedExercise() {
+        return exerciseSelected;
+    }
+
+    public void fetchExerciseById(int id) {
+        singleExerciseLiveData.setValue(Resource.loading());
+        repository.getExerciseById(id, result -> {
+            singleExerciseLiveData.setValue(result);
+        });
+    }
+
+    public LiveData<Resource<Exercise>> getSingleExercise() {
+        return singleExerciseLiveData;
+    }
+
     public void deleteExercise(int id, Runnable onSuccess) {
         repository.deleteExercise(id, result -> {
             if (result.status == Resource.Status.SUCCESS) {
-                loadExercises();
+                fetchExercises();
                 onSuccess.run();
             } else if (result.status == Resource.Status.ERROR) {
                 String msg = result.message != null ? result.message : "Error al eliminar";
@@ -84,7 +101,7 @@ public class SecondViewModel extends AndroidViewModel {
     public void createExercise(Exercise exercise, Runnable onSuccess) {
         repository.createExercise(exercise, result -> {
             if (result.status == Resource.Status.SUCCESS) {
-                loadExercises();
+                fetchExercises();
                 onSuccess.run();
             }
         });
@@ -93,7 +110,7 @@ public class SecondViewModel extends AndroidViewModel {
     public void updateExercise(int id, Exercise exercise, Runnable onSuccess) {
         repository.updateExercise(id, exercise, result -> {
             if (result.status == Resource.Status.SUCCESS) {
-                loadExercises();
+                fetchExercises();
                 onSuccess.run();
             }
         });

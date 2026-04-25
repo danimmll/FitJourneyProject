@@ -19,8 +19,14 @@ public class ExerciseRepository {
         this.api = RetrofitClient.getInstance(context);
     }
 
+    // --- INTERFACES DE CALLBACK ---
+
     public interface ExerciseCallBack {
         void onResult(Resource<List<Exercise>> result);
+    }
+
+    public interface SingleExerciseCallback {
+        void onResult(Resource<Exercise> result);
     }
 
     public interface ActionCallback {
@@ -40,13 +46,33 @@ public class ExerciseRepository {
                 if (response.isSuccessful() && response.body() != null) {
                     callBack.onResult(Resource.success(response.body()));
                 } else {
-                    callBack.onResult(Resource.error("Error del servidor: " + response.message()));
+                    callBack.onResult(Resource.error("Error del servidor: " + response.code()));
                 }
             }
 
             @Override
             public void onFailure(@NonNull Call<List<Exercise>> call, @NonNull Throwable t) {
                 callBack.onResult(Resource.error("Error de conexión: " + t.getMessage()));
+            }
+        });
+    }
+
+    public void getExerciseById(int id, SingleExerciseCallback callback) {
+        callback.onResult(Resource.loading());
+
+        api.getExerciseById(id).enqueue(new Callback<Exercise>() {
+            @Override
+            public void onResponse(@NonNull Call<Exercise> call, @NonNull Response<Exercise> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    callback.onResult(Resource.success(response.body()));
+                } else {
+                    callback.onResult(Resource.error("No se pudo cargar el detalle del ejercicio"));
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<Exercise> call, @NonNull Throwable t) {
+                callback.onResult(Resource.error("Error de conexión: " + t.getMessage()));
             }
         });
     }

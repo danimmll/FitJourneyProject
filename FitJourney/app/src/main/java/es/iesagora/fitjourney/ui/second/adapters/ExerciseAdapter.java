@@ -2,7 +2,6 @@ package es.iesagora.fitjourney.ui.second.adapters;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.os.Bundle;
 import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -29,7 +28,7 @@ public class ExerciseAdapter extends RecyclerView.Adapter<ExerciseAdapter.Exerci
 
     private List<Exercise> exercises;
     private Context context;
-    private  SecondViewModel viewModel;
+    private SecondViewModel viewModel;
 
     public ExerciseAdapter(Context context, ViewModel viewModel) {
         this.context = context;
@@ -56,9 +55,10 @@ public class ExerciseAdapter extends RecyclerView.Adapter<ExerciseAdapter.Exerci
         Exercise exercise = exercises.get(position);
 
         holder.tvName.setText(exercise.getName());
-        holder.tvMuscle.setText(exercise.getMuscleGroup());
         holder.tvDifficulty.setText(exercise.getDifficulty());
-        String imageUrl = exercise.getImageUrl();
+
+        holder.tvMuscle.setText(exercise.getMuscle_group());
+        String imageUrl = exercise.getImage_url();
 
         if (imageUrl != null && !imageUrl.isEmpty()) {
 
@@ -69,7 +69,7 @@ public class ExerciseAdapter extends RecyclerView.Adapter<ExerciseAdapter.Exerci
                     Glide.with(holder.itemView.getContext())
                             .asBitmap()
                             .load(imageBytes)
-                            .placeholder(R.drawable.ic_launcher_background)
+                            .placeholder(R.drawable.img_construccion)
                             .error(android.R.drawable.ic_menu_report_image)
                             .centerCrop()
                             .into(holder.ivImage);
@@ -82,13 +82,13 @@ public class ExerciseAdapter extends RecyclerView.Adapter<ExerciseAdapter.Exerci
                 Glide.with(holder.itemView.getContext())
                         .load(imageUrl)
                         .transition(DrawableTransitionOptions.withCrossFade())
-                        .placeholder(R.drawable.ic_launcher_background)
+                        .placeholder(R.drawable.img_construccion)
                         .error(android.R.drawable.ic_menu_report_image)
                         .centerCrop()
                         .into(holder.ivImage);
             }
         } else {
-            holder.ivImage.setImageResource(R.drawable.ic_launcher_background);
+            holder.ivImage.setImageResource(R.drawable.img_construccion);
         }
 
         holder.itemView.setOnClickListener(v -> {
