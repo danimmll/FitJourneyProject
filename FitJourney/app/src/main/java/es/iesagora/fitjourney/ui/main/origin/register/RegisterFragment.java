@@ -163,16 +163,26 @@ public class RegisterFragment extends Fragment {
             String pass = binding.etPassword.getText().toString().trim();
             String gender = binding.actvGender.getText().toString().trim();
             String goal = binding.actvGoal.getText().toString().trim();
-            int height = Integer.parseInt(binding.etHeight.getText().toString().trim());
-            float weight = Float.parseFloat(binding.etWeight.getText().toString().trim());
+            double height = Double.parseDouble(binding.etHeight.getText().toString().trim());
+            double weight = Double.parseDouble(binding.etWeight.getText().toString().trim());
 
             String birthDate = formatToDatabaseDate(binding.etBirthDate.getText().toString().trim());
 
-            User newUser = new User(UUID.randomUUID().toString(), name, email, pass, birthDate, gender, goal, height, weight);
+            User newUser = new User();
+            newUser.setName(name);
+            newUser.setEmail(email);
+            newUser.setPassword(pass);
+            newUser.setBirth_date(birthDate);
+            newUser.setGender(gender);
+            newUser.setGoal(goal);
+            newUser.setHeight(height);
+            newUser.setWeight(weight);
+
             viewModel.register(newUser);
 
         } catch (Exception e) {
-            Toast.makeText(requireContext(), getString(R.string.error_processing_data), Toast.LENGTH_SHORT).show();
+            android.util.Log.e("RegisterFragment", "Error al preparar los datos de registro: ", e);
+            Toast.makeText(requireContext(), getString(R.string.error_processing_data) + ": " + e.getMessage(), Toast.LENGTH_LONG).show();
         }
     }
 

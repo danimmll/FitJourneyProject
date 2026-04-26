@@ -24,7 +24,7 @@ const createWorkout = async (req, res, next) => {
             }
         });
 
-        res.status(201).json({ message: "¡Entrenamiento registrado!", workout });
+        res.status(201).json({ message: "¡Entrenamiento registrado con éxito!", workout });
     } catch (error) {
         next(error);
     }
@@ -33,11 +33,22 @@ const createWorkout = async (req, res, next) => {
 const getWorkoutHistory = async (req, res, next) => {
     try {
         const history = await prisma.workout.findMany({
-            where: { id_user: req.user.id, active: 1 },
-            orderBy: { workout_date: 'desc' },
+            where: { 
+                id_user: req.user.id, 
+                active: 1 
+            },
+            orderBy: { 
+                workout_date: 'desc' 
+            },
             include: {
-                routine: { select: { name: true } },
-                details: { include: { exercise: { select: { name: true, image_url: true } } } }
+                routine: { 
+                    select: { name: true } 
+                },
+                details: { 
+                    include: { 
+                        exercise: { select: { name: true, image_url: true } } 
+                    } 
+                }
             }
         });
         res.json(history);
@@ -49,16 +60,22 @@ const getWorkoutHistory = async (req, res, next) => {
 const deleteWorkout = async (req, res, next) => {
     const { id } = req.params;
     try {
-        const workout = await prisma.workout.findUnique({ where: { id_workout: parseInt(id) } });
+        const workoutId = parseInt(id, 10);
+
+        const workout = await prisma.workout.findUnique({ 
+            where: { id_workout: workoutId } 
+        });
+
         if (!workout || workout.id_user !== req.user.id) {
-            return res.status(403).json({ error: "No tienes permiso" });
+            return res.status(403).json({ error: "No tienes permiso para eliminar este entrenamiento o no existe" });
         }
 
         await prisma.workout.update({
-            where: { id_workout: parseInt(id) },
+            where: { id_workout: workoutId },
             data: { active: 0 }
         });
-        res.json({ message: "Entrenamiento eliminado" });
+
+        res.json({ message: "Entrenamiento eliminado correctamente del historial" });
     } catch (error) {
         next(error);
     }
@@ -67,17 +84,24 @@ const deleteWorkout = async (req, res, next) => {
 const getWorkoutById = async (req, res, next) => {
     const { id } = req.params;
     try {
+        const workoutId = parseInt(id, 10);
+
         const workout = await prisma.workout.findUnique({
-            where: { id_workout: parseInt(id) },
+            where: { id_workout: workoutId },
             include: {
                 routine: { select: { name: true } },
-                details: { include: { exercise: { select: { name: true, image_url: true } } } }
+                details: { 
+                    include: { 
+                        exercise: { select: { name: true, image_url: true } } 
+                    } 
+                }
             }
         });
 
         if (!workout || workout.active === 0 || workout.id_user !== req.user.id) {
             return res.status(404).json({ error: "Entrenamiento no encontrado o acceso denegado" });
         }
+
         res.json(workout);
     } catch (error) {
         next(error);
