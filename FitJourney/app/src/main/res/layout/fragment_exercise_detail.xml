@@ -10,57 +10,71 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingBottom="32dp">
+        android:paddingBottom="40dp">
 
-        <ImageView
-            android:id="@+id/ivDetailImage"
-            android:layout_width="match_parent"
-            android:layout_height="280dp"
-            android:contentDescription="@string/exercise_image"
-            android:scaleType="centerCrop"
-            android:src="@drawable/ic_launcher_background"
+        <FrameLayout
+            android:id="@+id/frameHero"
+            android:layout_width="0dp"
+            android:layout_height="300dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent">
 
+            <ImageView
+                android:id="@+id/ivDetailImage"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:contentDescription="@string/exercise_image"
+                android:scaleType="centerCrop"
+                android:src="@drawable/ic_launcher_background" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/gradient_hero" />
+
+        </FrameLayout>
 
         <TextView
             android:id="@+id/tvDetailName"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="24dp"
-            android:layout_marginTop="24dp"
+            android:layout_marginBottom="16dp"
             android:fontFamily="sans-serif-black"
-            android:text="@string/exercise_name"
             android:textColor="@color/text"
-            android:textSize="26sp"
+            android:textSize="28sp"
+            android:textAllCaps="true"
+            android:lineSpacingExtra="2dp"
+            app:layout_constraintBottom_toBottomOf="@id/frameHero"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/ivDetailImage"
-            tools:text="Press de Banca" />
+            tools:text="Barbell Bench Press" />
 
         <LinearLayout
             android:id="@+id/linearLayoutTags"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="24dp"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="20dp"
             android:orientation="horizontal"
-            app:layout_constraintTop_toBottomOf="@id/tvDetailName">
+            android:gap="10dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/frameHero">
 
             <TextView
                 android:id="@+id/tvDetailMuscle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="12dp"
                 android:background="@drawable/rounded"
                 android:backgroundTint="@color/mainrosa"
                 android:paddingHorizontal="16dp"
                 android:paddingVertical="8dp"
-                android:text="@string/muscle"
                 android:textColor="@color/text"
-                android:textSize="14sp"
+                android:textSize="12sp"
                 android:textStyle="bold"
+                android:textAllCaps="true"
+                android:letterSpacing="0.08"
                 tools:text="Pecho" />
 
             <TextView
@@ -71,81 +85,100 @@
                 android:backgroundTint="@color/mainazul"
                 android:paddingHorizontal="16dp"
                 android:paddingVertical="8dp"
-                android:text="@string/difficulty"
                 android:textColor="@color/text"
-                android:textSize="14sp"
+                android:textSize="12sp"
                 android:textStyle="bold"
-                tools:text="Intermedio" />
+                android:textAllCaps="true"
+                android:letterSpacing="0.08"
+                tools:text="Avanzado" />
+
         </LinearLayout>
+
+        <View
+            android:id="@+id/dividerInstructions"
+            android:layout_width="0dp"
+            android:layout_height="2dp"
+            android:layout_marginHorizontal="24dp"
+            android:layout_marginTop="24dp"
+            android:background="@color/mainrosa"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/linearLayoutTags" />
 
         <TextView
             android:id="@+id/tvLabelInstructions"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:fontFamily="sans-serif-medium"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="16dp"
+            android:drawablePadding="8dp"
+            android:fontFamily="sans-serif-black"
+            android:letterSpacing="0.1"
             android:text="@string/instructions"
+            android:textAllCaps="true"
             android:textColor="@color/mainrosa"
-            android:textSize="20sp"
-            app:layout_constraintStart_toStartOf="@id/tvDetailName"
-            app:layout_constraintTop_toBottomOf="@id/linearLayoutTags" />
+            android:textSize="16sp"
+            android:drawableStart="@android:drawable/ic_menu_sort_by_size"
+            app:drawableTint="@color/mainrosa"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/dividerInstructions" />
 
-        <TextView
-            android:id="@+id/tvDetailInstructions"
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvInstructions"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:lineSpacingExtra="6dp"
-            android:text="@string/steps"
-            android:textColor="@color/text"
-            android:textSize="16sp"
-            app:layout_constraintEnd_toEndOf="@id/tvDetailName"
-            app:layout_constraintStart_toStartOf="@id/tvDetailName"
+            android:layout_marginHorizontal="24dp"
+            android:layout_marginTop="16dp"
+            android:nestedScrollingEnabled="false"
+            android:clipToPadding="false"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tvLabelInstructions"
-            tools:text="Túmbate en un banco plano..." />
+            tools:listitem="@layout/viewholder_instruction" />
 
         <LinearLayout
             android:id="@+id/adminPanel"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="24dp"
             android:layout_marginTop="32dp"
+            android:gap="12dp"
             android:orientation="horizontal"
             android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tvDetailInstructions">
+            app:layout_constraintTop_toBottomOf="@id/rvInstructions"
+            tools:visibility="visible">
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnEdit"
                 android:layout_width="0dp"
-                android:layout_height="60dp"
-                android:layout_marginEnd="8dp"
+                android:layout_height="56dp"
                 android:layout_weight="1"
                 android:backgroundTint="@color/mainazul"
                 android:text="@string/edit"
                 android:textColor="@color/text"
                 android:textStyle="bold"
+                android:textAllCaps="true"
                 app:cornerRadius="12dp"
                 app:icon="@android:drawable/ic_menu_edit"
                 app:iconGravity="textStart"
-                app:iconTint="@color/white" />
+                app:iconTint="@color/text" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnDelete"
                 android:layout_width="0dp"
-                android:layout_height="60dp"
-                android:layout_marginStart="8dp"
+                android:layout_height="56dp"
                 android:layout_weight="1"
-                android:backgroundTint="#D32F2F"
+                android:backgroundTint="#C62828"
                 android:text="@string/delete"
                 android:textColor="@color/text"
                 android:textStyle="bold"
+                android:textAllCaps="true"
                 app:cornerRadius="12dp"
                 app:icon="@android:drawable/ic_menu_delete"
                 app:iconGravity="textStart"
-                app:iconTint="@color/white" />
+                app:iconTint="@color/text" />
 
         </LinearLayout>
 

@@ -3,9 +3,9 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/exercisesLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/exercisesLayout"
     android:background="@color/fondo"
     tools:context=".ui.second.fitnesscenter.exercises.ExercisesFragment">
 
@@ -13,14 +13,40 @@
         android:id="@+id/svExercises"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_margin="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginTop="16dp"
         android:background="@drawable/rounded"
-        app:queryHint="Buscar ejercicio"
         app:iconifiedByDefault="false"
         app:queryBackground="@android:color/transparent"
-        app:layout_constraintTop_toTopOf="parent"
+        app:queryHint="Buscar ejercicio"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <HorizontalScrollView
+        android:id="@+id/hsvCategories"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:scrollbars="none"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/svExercises">
+
+        <LinearLayout
+            android:id="@+id/llCategories"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:paddingTop="4dp"
+            android:paddingBottom="4dp"
+            android:gravity="center_vertical"
+            android:gap="8dp" />
+
+    </HorizontalScrollView>
 
     <ProgressBar
         android:id="@+id/progressBar"
@@ -39,12 +65,14 @@
         android:layout_height="0dp"
         android:layout_marginTop="8dp"
         android:clipToPadding="false"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
         android:paddingTop="8dp"
-        android:paddingBottom="100dp"
+        android:paddingBottom="24dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/svExercises"
+        app:layout_constraintTop_toBottomOf="@id/hsvCategories"
         tools:listitem="@layout/viewholder_exercise" />
 
     <TextView
@@ -58,20 +86,21 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/svExercises" />
+        app:layout_constraintTop_toBottomOf="@id/hsvCategories" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabAddExercise"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="24dp"
+        android:layout_marginEnd="24dp"
+        android:layout_marginBottom="24dp"
         android:contentDescription="@string/add_button"
         android:src="@android:drawable/ic_input_add"
         android:visibility="gone"
         app:backgroundTint="@color/mainrosa"
+        app:tint="@color/text"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:tint="@color/text"
         tools:visibility="visible" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

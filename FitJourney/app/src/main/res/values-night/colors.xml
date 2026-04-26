@@ -9,4 +9,7 @@
     <color name="sombramainazul">#00796B</color>
     <color name="sombramainrosa">#9B0CBF</color>
     <color name="error">#FF0000</color>
+    <color name="surface">#1E1E1E</color>
+    <color name="stroke">#141414</color>
+    <color name="textSecondary">#AAAAAA</color>
 </resources>

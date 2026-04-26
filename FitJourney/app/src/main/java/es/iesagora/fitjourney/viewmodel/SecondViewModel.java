@@ -12,20 +12,24 @@ import java.util.ArrayList;
 import java.util.List;
 
 import es.iesagora.fitjourney.data.model.Exercise;
+import es.iesagora.fitjourney.data.model.Workout;
 import es.iesagora.fitjourney.data.remote.AccessResponse;
 import es.iesagora.fitjourney.data.remote.Resource;
 import es.iesagora.fitjourney.data.repositories.ExerciseRepository;
 import es.iesagora.fitjourney.data.repositories.UserRepository;
+import es.iesagora.fitjourney.data.repositories.WorkoutRepository; // <-- Importante
 
 public class SecondViewModel extends AndroidViewModel {
 
     private final ExerciseRepository repository;
     private final UserRepository userRepository;
+    private final WorkoutRepository workoutRepository; // <-- Nuevo repositorio
 
     private final MutableLiveData<Resource<List<Exercise>>> exercisesLiveData = new MutableLiveData<>();
     private final MutableLiveData<Exercise> exerciseSelected = new MutableLiveData<>();
     private final MutableLiveData<Resource<Exercise>> singleExerciseLiveData = new MutableLiveData<>();
     private final MutableLiveData<Resource<AccessResponse>> profileLiveData = new MutableLiveData<>();
+    private final MutableLiveData<Resource<List<Workout>>> workoutHistoryLiveData = new MutableLiveData<>();
 
     private List<Exercise> fullExerciseList = new ArrayList<>();
 
@@ -33,8 +37,10 @@ public class SecondViewModel extends AndroidViewModel {
         super(application);
         repository = new ExerciseRepository(application.getApplicationContext());
         userRepository = new UserRepository(application.getApplicationContext());
+        workoutRepository = new WorkoutRepository(application.getApplicationContext()); // <-- Inicializamos
         fetchExercises();
     }
+
 
     public LiveData<Resource<List<Exercise>>> getExercises() {
         return exercisesLiveData;
@@ -120,6 +126,7 @@ public class SecondViewModel extends AndroidViewModel {
         });
     }
 
+
     public LiveData<Resource<AccessResponse>> getProfile() {
         return profileLiveData;
     }
@@ -128,6 +135,18 @@ public class SecondViewModel extends AndroidViewModel {
         profileLiveData.setValue(Resource.loading());
         userRepository.getUser(token, result -> {
             profileLiveData.setValue(result);
+        });
+    }
+
+
+    public LiveData<Resource<List<Workout>>> getWorkoutHistory() {
+        return workoutHistoryLiveData;
+    }
+
+    public void fetchWorkoutHistory() {
+        workoutHistoryLiveData.setValue(Resource.loading());
+        workoutRepository.getWorkoutHistory(result -> {
+            workoutHistoryLiveData.setValue(result);
         });
     }
 }

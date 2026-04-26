@@ -1,7 +1,6 @@
 package es.iesagora.fitjourney.ui.second.settings;
 
 import android.Manifest;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -26,7 +25,6 @@ import java.util.concurrent.TimeUnit;
 
 import es.iesagora.fitjourney.data.repositories.PreferencesRepository;
 import es.iesagora.fitjourney.databinding.FragmentSettingsBinding;
-import es.iesagora.fitjourney.ui.main.MainActivity;
 import es.iesagora.fitjourney.utils.NotificationWorker;
 
 public class SettingsFragment extends Fragment {
@@ -40,8 +38,7 @@ public class SettingsFragment extends Fragment {
                     activarNotificaciones();
                 } else {
                     binding.switchNotifications.setChecked(false);
-                    Toast.makeText(getContext(), "Permiso necesario para avisos",
-                            Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "Permiso necesario para avisos", Toast.LENGTH_SHORT).show();
                 }
             });
 
@@ -56,13 +53,20 @@ public class SettingsFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         preferences = new PreferencesRepository(requireContext());
 
+        setupThemeSwitch();
+        setupNotificationSwitch();
+    }
+
+    private void setupThemeSwitch() {
         binding.switchDarkMode.setChecked(preferences.getTheme() == AppCompatDelegate.MODE_NIGHT_YES);
         binding.switchDarkMode.setOnCheckedChangeListener((v, isChecked) -> {
             int mode = isChecked ? AppCompatDelegate.MODE_NIGHT_YES : AppCompatDelegate.MODE_NIGHT_NO;
             preferences.setTheme(mode);
             AppCompatDelegate.setDefaultNightMode(mode);
         });
+    }
 
+    private void setupNotificationSwitch() {
         binding.switchNotifications.setChecked(preferences.getNotifications());
         binding.switchNotifications.setOnCheckedChangeListener((v, isChecked) -> {
             if (isChecked) {
@@ -70,12 +74,6 @@ public class SettingsFragment extends Fragment {
             } else {
                 desactivarNotificaciones();
             }
-        });
-
-        binding.btnLogout.setOnClickListener(v -> {
-            preferences.clearSession();
-            startActivity(new Intent(getActivity(), MainActivity.class)
-                    .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK));
         });
     }
 
@@ -104,7 +102,7 @@ public class SettingsFragment extends Fragment {
     private void desactivarNotificaciones() {
         preferences.setNotifications(false);
         WorkManager.getInstance(requireContext()).cancelUniqueWork("AvisoDiario");
-        Toast.makeText(getContext(), "Notificaciones desactivados", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getContext(), "Notificaciones desactivadas", Toast.LENGTH_SHORT).show();
     }
 
     @Override

@@ -3,24 +3,72 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/exercisesLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/exercisesLayout"
     android:background="@color/fondo"
     tools:context=".ui.second.fitnesscenter.exercises.ExercisesFragment">
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideTopBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.40218878" />
 
     <androidx.appcompat.widget.SearchView
         android:id="@+id/svExercises"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_margin="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="8dp"
         android:background="@drawable/rounded"
-        app:queryHint="Buscar ejercicio"
         app:iconifiedByDefault="false"
         app:queryBackground="@android:color/transparent"
-        app:layout_constraintTop_toTopOf="parent"
+        app:queryHint="Buscar ejercicio"
+        app:layout_constraintEnd_toStartOf="@id/guideTopBar"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <HorizontalScrollView
+        android:id="@+id/hsvCategories"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="16dp"
+        android:scrollbars="none"
+        app:layout_constraintBottom_toBottomOf="@id/svExercises"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/guideTopBar"
+        app:layout_constraintTop_toTopOf="@id/svExercises">
+
+        <LinearLayout
+            android:id="@+id/llCategories"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:paddingStart="4dp"
+            android:paddingEnd="4dp"
+            android:gravity="center_vertical" />
+
+    </HorizontalScrollView>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvExercises"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="12dp"
+        android:clipToPadding="false"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="24dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/svExercises"
+        tools:listitem="@layout/viewholder_exercise" />
 
     <ProgressBar
         android:id="@+id/progressBar"
@@ -28,24 +76,10 @@
         android:layout_height="wrap_content"
         android:indeterminateTint="@color/mainazul"
         android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toBottomOf="@id/rvExercises"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvExercises"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginTop="8dp"
-        android:clipToPadding="false"
-        android:paddingTop="8dp"
-        android:paddingBottom="100dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/svExercises"
-        tools:listitem="@layout/viewholder_exercise" />
+        app:layout_constraintTop_toTopOf="@id/rvExercises" />
 
     <TextView
         android:id="@+id/tvError"
@@ -55,23 +89,24 @@
         android:textColor="@color/error"
         android:textSize="18sp"
         android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toBottomOf="@id/rvExercises"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/svExercises" />
+        app:layout_constraintTop_toTopOf="@id/rvExercises" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabAddExercise"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="24dp"
+        android:layout_marginEnd="24dp"
+        android:layout_marginBottom="24dp"
         android:contentDescription="@string/add_button"
         android:src="@android:drawable/ic_input_add"
         android:visibility="gone"
         app:backgroundTint="@color/mainrosa"
+        app:tint="@color/text"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:tint="@color/text"
         tools:visibility="visible" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,153 +1,170 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/fondo"
-    android:fillViewport="true">
+    android:background="@color/fondo">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingBottom="32dp">
+    <FrameLayout
+        android:id="@+id/frameHero"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/guidelineCenter"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
             android:id="@+id/ivDetailImage"
             android:layout_width="match_parent"
-            android:layout_height="280dp"
+            android:layout_height="match_parent"
             android:contentDescription="@string/exercise_image"
             android:scaleType="centerCrop"
-            android:src="@drawable/ic_launcher_background"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:src="@drawable/ic_launcher_background" />
 
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/gradient_hero" />
 
         <TextView
             android:id="@+id/tvDetailName"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="24dp"
-            android:layout_marginTop="24dp"
+            android:layout_gravity="bottom"
+            android:layout_margin="24dp"
             android:fontFamily="sans-serif-black"
-            android:text="@string/exercise_name"
+            android:lineSpacingExtra="2dp"
+            android:textAllCaps="true"
             android:textColor="@color/text"
-            android:textSize="26sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/ivDetailImage"
-            tools:text="Press de Banca" />
+            android:textSize="24sp"
+            tools:text="Barbell Bench Press" />
+    </FrameLayout>
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guidelineCenter"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.4" />
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/guidelineCenter"
+        app:layout_constraintTop_toTopOf="parent">
 
         <LinearLayout
-            android:id="@+id/linearLayoutTags"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="24dp"
-            android:layout_marginTop="16dp"
-            android:orientation="horizontal"
-            app:layout_constraintTop_toBottomOf="@id/tvDetailName">
+            android:orientation="vertical"
+            android:padding="24dp">
 
-            <TextView
-                android:id="@+id/tvDetailMuscle"
+            <LinearLayout
+                android:id="@+id/linearLayoutTags"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="12dp"
-                android:background="@drawable/rounded"
-                android:backgroundTint="@color/mainrosa"
-                android:paddingHorizontal="16dp"
-                android:paddingVertical="8dp"
-                android:text="@string/muscle"
-                android:textColor="@color/text"
-                android:textSize="14sp"
-                android:textStyle="bold"
-                tools:text="Pecho" />
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/tvDetailMuscle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/rounded"
+                    android:backgroundTint="@color/mainrosa"
+                    android:letterSpacing="0.08"
+                    android:paddingHorizontal="12dp"
+                    android:paddingVertical="6dp"
+                    android:textAllCaps="true"
+                    android:textColor="@color/text"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    tools:text="Pecho" />
+
+                <TextView
+                    android:id="@+id/tvDetailDifficulty"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:background="@drawable/rounded"
+                    android:backgroundTint="@color/mainazul"
+                    android:letterSpacing="0.08"
+                    android:paddingHorizontal="12dp"
+                    android:paddingVertical="6dp"
+                    android:textAllCaps="true"
+                    android:textColor="@color/text"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    tools:text="Avanzado" />
+            </LinearLayout>
 
             <TextView
-                android:id="@+id/tvDetailDifficulty"
+                android:id="@+id/tvLabelInstructions"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@drawable/rounded"
-                android:backgroundTint="@color/mainazul"
-                android:paddingHorizontal="16dp"
-                android:paddingVertical="8dp"
-                android:text="@string/difficulty"
-                android:textColor="@color/text"
-                android:textSize="14sp"
-                android:textStyle="bold"
-                tools:text="Intermedio" />
-        </LinearLayout>
+                android:layout_marginTop="24dp"
+                android:drawablePadding="8dp"
+                android:fontFamily="sans-serif-black"
+                android:letterSpacing="0.1"
+                android:text="@string/instructions"
+                android:textAllCaps="true"
+                android:textColor="@color/mainrosa"
+                android:textSize="16sp"
+                android:drawableStart="@android:drawable/ic_menu_sort_by_size"
+                app:drawableTint="@color/mainrosa" />
 
-        <TextView
-            android:id="@+id/tvLabelInstructions"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:fontFamily="sans-serif-medium"
-            android:text="@string/instructions"
-            android:textColor="@color/mainrosa"
-            android:textSize="20sp"
-            app:layout_constraintStart_toStartOf="@id/tvDetailName"
-            app:layout_constraintTop_toBottomOf="@id/linearLayoutTags" />
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvInstructions"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:nestedScrollingEnabled="false"
+                tools:listitem="@layout/viewholder_instruction" />
 
-        <TextView
-            android:id="@+id/tvDetailInstructions"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:lineSpacingExtra="6dp"
-            android:text="@string/steps"
-            android:textColor="@color/text"
-            android:textSize="16sp"
-            app:layout_constraintEnd_toEndOf="@id/tvDetailName"
-            app:layout_constraintStart_toStartOf="@id/tvDetailName"
-            app:layout_constraintTop_toBottomOf="@id/tvLabelInstructions"
-            tools:text="Túmbate en un banco plano..." />
+            <LinearLayout
+                android:id="@+id/adminPanel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp"
+                android:orientation="horizontal"
+                android:visibility="gone"
+                tools:visibility="visible">
 
-        <LinearLayout
-            android:id="@+id/adminPanel"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="24dp"
-            android:layout_marginTop="32dp"
-            android:orientation="horizontal"
-            android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tvDetailInstructions">
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnEdit"
+                    android:layout_width="0dp"
+                    android:layout_height="50dp"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="6dp"
+                    android:backgroundTint="@color/mainazul"
+                    android:text="@string/edit"
+                    android:textColor="@color/text"
+                    android:textStyle="bold"
+                    app:cornerRadius="12dp"
+                    app:icon="@android:drawable/ic_menu_edit"
+                    app:iconTint="@color/text" />
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnEdit"
-                android:layout_width="0dp"
-                android:layout_height="60dp"
-                android:layout_marginEnd="8dp"
-                android:layout_weight="1"
-                android:backgroundTint="@color/mainazul"
-                android:text="@string/edit"
-                android:textColor="@color/text"
-                android:textStyle="bold"
-                app:cornerRadius="12dp"
-                app:icon="@android:drawable/ic_menu_edit"
-                app:iconGravity="textStart"
-                app:iconTint="@color/white" />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnDelete"
-                android:layout_width="0dp"
-                android:layout_height="60dp"
-                android:layout_marginStart="8dp"
-                android:layout_weight="1"
-                android:backgroundTint="#D32F2F"
-                android:text="@string/delete"
-                android:textColor="@color/text"
-                android:textStyle="bold"
-                app:cornerRadius="12dp"
-                app:icon="@android:drawable/ic_menu_delete"
-                app:iconGravity="textStart"
-                app:iconTint="@color/white" />
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnDelete"
+                    android:layout_width="0dp"
+                    android:layout_height="50dp"
+                    android:layout_weight="1"
+                    android:layout_marginStart="6dp"
+                    android:backgroundTint="#C62828"
+                    android:text="@string/delete"
+                    android:textColor="@color/text"
+                    android:textStyle="bold"
+                    app:cornerRadius="12dp"
+                    app:icon="@android:drawable/ic_menu_delete"
+                    app:iconTint="@color/text" />
+            </LinearLayout>
 
         </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
-</androidx.core.widget.NestedScrollView>
+</androidx.constraintlayout.widget.ConstraintLayout>
