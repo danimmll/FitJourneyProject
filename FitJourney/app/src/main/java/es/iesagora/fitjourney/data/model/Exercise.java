@@ -1,5 +1,6 @@
 package es.iesagora.fitjourney.data.model;
 
+import java.io.Serializable;
 import java.sql.Timestamp;
 
 import lombok.AllArgsConstructor;
@@ -11,7 +12,7 @@ import lombok.Setter;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Exercise {
+public class Exercise implements Serializable {
     private int id_exercise;
     private String name;
     private String muscle_group;

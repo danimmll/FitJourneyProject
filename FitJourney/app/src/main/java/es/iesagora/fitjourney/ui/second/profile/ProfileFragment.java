@@ -1,16 +1,13 @@
 package es.iesagora.fitjourney.ui.second.profile;
 
-import android.app.Activity;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
+import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -33,17 +30,6 @@ public class ProfileFragment extends Fragment {
     private PreferencesRepository prefs;
     private User currentUser;
 
-    private final ActivityResultLauncher<Intent> imagePickerLauncher = registerForActivityResult(
-            new ActivityResultContracts.StartActivityForResult(),
-            result -> {
-                if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
-                    Uri imageUri = result.getData().getData();
-                    Glide.with(this).load(imageUri).circleCrop().into(binding.ivProfilePhoto);
-                    Toast.makeText(getContext(), "Foto actualizada visualmente", Toast.LENGTH_SHORT).show();
-                }
-            }
-    );
-
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentProfileBinding.inflate(inflater, container, false);
@@ -57,6 +43,9 @@ public class ProfileFragment extends Fragment {
         viewModel = new ViewModelProvider(requireActivity()).get(SecondViewModel.class);
         prefs = new PreferencesRepository(requireContext());
 
+        setupAdminFab();
+        setupButtons();
+
         String token = prefs.getToken();
         if (token != null) {
             viewModel.fetchProfile(token);
@@ -68,62 +57,69 @@ public class ProfileFragment extends Fragment {
             switch (resource.status) {
                 case LOADING:
                     binding.progressBar.setVisibility(View.VISIBLE);
-                    binding.scrollViewProfile.setVisibility(View.GONE);
+                    binding.scrollViewProfile.setAlpha(0.5f);
                     break;
-
                 case SUCCESS:
                     binding.progressBar.setVisibility(View.GONE);
-                    binding.scrollViewProfile.setVisibility(View.VISIBLE);
+                    binding.scrollViewProfile.setAlpha(1f);
 
                     if (resource.data != null && resource.data.getUser() != null) {
                         currentUser = resource.data.getUser();
-
-                        binding.tvProfileName.setText(currentUser.getName());
-                        binding.tvProfileEmail.setText(currentUser.getEmail());
-
-                        String peso = (currentUser.getWeight() != null) ? currentUser.getWeight() + " kg" : "-- kg";
-                        String altura = (currentUser.getHeight() != null) ? currentUser.getHeight() + " cm" : "-- cm";
-                        String meta = (currentUser.getGoal() != null) ? currentUser.getGoal() : "No definida";
-
-                        binding.tvProfileWeight.setText(peso);
-                        binding.tvProfileHeight.setText(altura);
-                        binding.tvProfileGoal.setText(meta);
-
-                        loadProfileImage(currentUser);
-
-                        if ("admin".equalsIgnoreCase(currentUser.getRole())) {
-                            binding.fabAdminUsers.setVisibility(View.VISIBLE);
-                        } else {
-                            binding.fabAdminUsers.setVisibility(View.GONE);
-                        }
+                        fillUserData(currentUser);
                     }
                     break;
-
                 case ERROR:
                     binding.progressBar.setVisibility(View.GONE);
-                    binding.scrollViewProfile.setVisibility(View.VISIBLE);
-                    Toast.makeText(getContext(), "Error al cargar datos: " + resource.message, Toast.LENGTH_SHORT).show();
+                    binding.scrollViewProfile.setAlpha(1f);
+                    Toast.makeText(requireContext(), "Error al cargar perfil: " + resource.message, Toast.LENGTH_SHORT).show();
                     break;
             }
         });
+    }
 
+    private void fillUserData(User user) {
+        binding.tvProfileName.setText(user.getName());
+        binding.tvProfileEmail.setText(user.getEmail());
 
-        binding.ivProfilePhoto.setOnClickListener(v -> {
-            Intent intent = new Intent(Intent.ACTION_PICK);
-            intent.setType("image/*");
-            imagePickerLauncher.launch(intent);
-        });
+        String weight = user.getWeight() != null ? user.getWeight() + " kg" : "-- kg";
+        String height = user.getHeight() != null ? user.getHeight() + " cm" : "-- cm";
+        binding.tvProfileWeight.setText(weight);
+        binding.tvProfileHeight.setText(height);
 
-        // Click en Editar Perfil -> Navegar a la pantalla de edición (la crearemos luego)
+        if (user.getGoal() != null && !user.getGoal().isEmpty()) {
+            String goal = user.getGoal().substring(0, 1).toUpperCase() + user.getGoal().substring(1).toLowerCase();
+            binding.tvProfileGoal.setText(goal);
+        } else {
+            binding.tvProfileGoal.setText("No definido");
+        }
+
+        String photoUrl = user.getPhoto_url();
+        if (photoUrl != null && !photoUrl.isEmpty()) {
+            if (photoUrl.length() > 200 || !photoUrl.startsWith("http")) {
+                try {
+                    byte[] imageBytes = Base64.decode(photoUrl, Base64.DEFAULT);
+                    Glide.with(this).asBitmap().load(imageBytes).circleCrop().into(binding.ivProfilePhoto);
+                } catch (Exception e) {
+                    Glide.with(this).load("https://api.dicebear.com/7.x/initials/png?seed=" + user.getName()).circleCrop().into(binding.ivProfilePhoto);
+                }
+            } else {
+                Glide.with(this).load(photoUrl).circleCrop().into(binding.ivProfilePhoto);
+            }
+        } else {
+            Glide.with(this).load("https://api.dicebear.com/7.x/initials/png?seed=" + user.getName()).circleCrop().into(binding.ivProfilePhoto);
+        }
+    }
+
+    private void setupButtons() {
+        // --- BOTÓN EDITAR PERFIL ---
         binding.btnEditProfile.setOnClickListener(v -> {
-            // Por ahora solo mostramos un aviso, luego configuraremos la navegación
-            Toast.makeText(getContext(), "Yendo a editar perfil...", Toast.LENGTH_SHORT).show();
-            // Navigation.findNavController(v).navigate(R.id.editProfileFragment);
-        });
-
-        binding.fabAdminUsers.setOnClickListener(v -> {
-            Toast.makeText(getContext(), "Accediendo al Panel de Control de Usuarios...", Toast.LENGTH_SHORT).show();
-            // TODO: Navegar al fragmento de gestión de usuarios
+            if (currentUser != null) {
+                // TODO: Navegar a EditProfileFragment pasándole el objeto currentUser en el Bundle
+                // Bundle bundle = new Bundle();
+                // bundle.putSerializable("user_data", currentUser);
+                // Navigation.findNavController(v).navigate(R.id.action_profile_to_editProfile, bundle);
+                Toast.makeText(getContext(), "Pantalla de Editar Perfil en construcción 🛠️", Toast.LENGTH_SHORT).show();
+            }
         });
 
         binding.btnLogout.setOnClickListener(v -> {
@@ -131,22 +127,18 @@ public class ProfileFragment extends Fragment {
             Intent intent = new Intent(requireActivity(), MainActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
-            requireActivity().finish();
         });
     }
 
-    private void loadProfileImage(User user) {
-        String photoUrl = user.getPhoto_url();
-
-        if (photoUrl == null || photoUrl.isEmpty()) {
-            photoUrl = "https://api.dicebear.com/7.x/initials/png?seed=" + user.getName();
+    private void setupAdminFab() {
+        if ("admin".equalsIgnoreCase(prefs.getRole())) {
+            binding.fabAdminUsers.setVisibility(View.VISIBLE);
+            binding.fabAdminUsers.setOnClickListener(v -> {
+                Toast.makeText(getContext(), "Panel de Administrador en construcción 🛠️", Toast.LENGTH_SHORT).show();
+            });
+        } else {
+            binding.fabAdminUsers.setVisibility(View.GONE);
         }
-
-        Glide.with(this)
-                .load(photoUrl)
-                .placeholder(R.drawable.img_construccion)
-                .error(R.drawable.ic_profile)
-                .into(binding.ivProfilePhoto);
     }
 
     @Override

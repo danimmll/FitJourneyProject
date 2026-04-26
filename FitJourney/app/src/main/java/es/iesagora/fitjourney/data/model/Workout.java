@@ -1,5 +1,6 @@
 package es.iesagora.fitjourney.data.model;
 
+import java.io.Serializable;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -8,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Workout {
+public class Workout implements Serializable {
     private int id_workout;
     private int id_user;
     private int id_routine;

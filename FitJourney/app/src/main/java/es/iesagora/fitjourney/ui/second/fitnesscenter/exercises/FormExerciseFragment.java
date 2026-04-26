@@ -80,12 +80,13 @@ public class FormExerciseFragment extends Fragment {
         binding.btnSave.setText(R.string.update);
 
         binding.etName.setText(exerciseToEdit.getName());
-        binding.etMuscle.setText(exerciseToEdit.getMuscleGroup());
+
+        binding.etMuscle.setText(exerciseToEdit.getMuscle_group());
         binding.etDifficulty.setText(exerciseToEdit.getDifficulty());
         binding.etDescription.setText(exerciseToEdit.getDescription());
 
-        if (exerciseToEdit.getImageUrl() != null && !exerciseToEdit.getImageUrl().isEmpty()) {
-            currentImageBase64 = exerciseToEdit.getImageUrl();
+        if (exerciseToEdit.getImage_url() != null && !exerciseToEdit.getImage_url().isEmpty()) {
+            currentImageBase64 = exerciseToEdit.getImage_url();
 
             if (currentImageBase64.length() > 200) {
                 Bitmap bmp = ImageUtils.base64ToBitmap(currentImageBase64);
@@ -109,10 +110,11 @@ public class FormExerciseFragment extends Fragment {
 
         Exercise newExercise = new Exercise();
         newExercise.setName(name);
-        newExercise.setMuscleGroup(muscle);
         newExercise.setDifficulty(difficulty);
         newExercise.setDescription(description);
-        newExercise.setImageUrl(currentImageBase64);
+
+        newExercise.setMuscle_group(muscle);
+        newExercise.setImage_url(currentImageBase64);
 
         if (exerciseToEdit == null) {
             viewModel.createExercise(newExercise, () -> {
@@ -120,9 +122,9 @@ public class FormExerciseFragment extends Fragment {
                 requireActivity().onBackPressed();
             });
         } else {
-            newExercise.setId(exerciseToEdit.getId());
+            newExercise.setId_exercise(exerciseToEdit.getId_exercise());
 
-            viewModel.updateExercise(exerciseToEdit.getId(), newExercise, () -> {
+            viewModel.updateExercise(exerciseToEdit.getId_exercise(), newExercise, () -> {
 
                 viewModel.selectExercise(newExercise);
 

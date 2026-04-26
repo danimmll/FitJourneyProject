@@ -43,8 +43,7 @@
             android:paddingEnd="16dp"
             android:paddingTop="4dp"
             android:paddingBottom="4dp"
-            android:gravity="center_vertical"
-            android:gap="8dp" />
+            android:gravity="center_vertical"/>
 
     </HorizontalScrollView>
 
