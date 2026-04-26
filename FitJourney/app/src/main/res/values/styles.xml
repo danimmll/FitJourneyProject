@@ -7,4 +7,10 @@
         <item name="android:textColorPrimary">@color/white</item>
         <item name="android:background">@color/black</item>
     </style>
+
+    <style name="CircleProfileImage" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item>
+    </style>
+
 </resources>

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/loginLayout"
@@ -8,102 +9,213 @@
     android:background="@color/fondo"
     tools:context=".ui.main.origin.login.LoginFragment">
 
-    <TextView
-        android:id="@+id/tvLogin"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:fontFamily="sans-serif-black"
-        android:shadowColor="@color/sombramainazul"
-        android:shadowRadius="50"
-        android:text="@string/login"
-        android:textColor="@color/mainazul"
-        android:textSize="60sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.497"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.060000002" />
-
-    <LinearLayout
-        android:id="@+id/formRegister"
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="24dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.391">
+        android:layout_height="match_parent"
+        android:fillViewport="true">
 
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/tlEmail"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:hint="@string/email"
-            android:textColorHint="@color/inputslogin"
-            app:boxBackgroundMode="outline"
-            app:boxStrokeColor="@color/inputslogin"
-            app:boxStrokeWidth="2dp"
-            app:hintTextColor="@color/inputslogin">
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:padding="24dp"
+            android:gravity="center"
+            android:baselineAligned="false"
+            android:weightSum="2">
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etEmail"
-                android:layout_width="match_parent"
+            <LinearLayout
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:inputType="textEmailAddress"
-                android:textColor="@color/text" />
-        </com.google.android.material.textfield.TextInputLayout>
+                android:layout_weight="1"
+                android:layout_marginEnd="16dp"
+                android:orientation="vertical"
+                android:gravity="center">
 
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/tlPassword"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:hint="@string/password"
-            android:textColorHint="@color/inputslogin"
-            app:boxBackgroundMode="outline"
-            app:boxStrokeColor="@color/inputslogin"
-            app:boxStrokeWidth="2dp"
-            app:endIconMode="password_toggle"
-            app:endIconTint="@color/inputslogin"
-            app:hintTextColor="@color/inputslogin"
-            app:passwordToggleEnabled="true">
+                <LinearLayout
+                    android:id="@+id/brandLayout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="24dp">
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etPassword"
-                android:layout_width="match_parent"
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="⚡"
+                        android:textSize="32sp"
+                        android:textColor="@color/mainazul"
+                        android:layout_marginEnd="8dp"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="FIT JOURNEY"
+                        android:textColor="@color/mainazul"
+                        android:textSize="26sp"
+                        android:textStyle="bold"
+                        android:letterSpacing="0.15"
+                        android:shadowColor="@color/sombramainazul"
+                        android:shadowRadius="10" />
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="INICIAR SESIÓN"
+                    android:textColor="@color/mainazul"
+                    android:textSize="28sp"
+                    android:textStyle="bold"
+                    android:fontFamily="sans-serif-black"
+                    android:shadowColor="@color/sombramainazul"
+                    android:shadowRadius="12" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Entra en la zona. Tu entreno te espera."
+                    android:textColor="#888888"
+                    android:textSize="14sp"
+                    android:gravity="center" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:inputType="textPassword"
-                android:textColor="@color/white" />
-        </com.google.android.material.textfield.TextInputLayout>
+                android:layout_weight="1"
+                android:layout_marginStart="16dp"
+                android:orientation="vertical">
 
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/loginCard"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:cardBackgroundColor="#F7F7F7"
+                    app:cardCornerRadius="20dp"
+                    app:cardElevation="4dp"
+                    app:strokeColor="@color/mainazul"
+                    app:strokeWidth="1dp">
 
-        <Button
-            android:id="@+id/btnLoginSubmit"
-            android:layout_width="match_parent"
-            android:layout_height="60dp"
-            android:layout_marginTop="40dp"
-            android:backgroundTint="@color/mainazul"
-            android:text="@string/login"
-            android:textAllCaps="false"
-            android:textColor="@color/text"
-            android:textSize="20sp" />
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="24dp">
 
-    </LinearLayout>
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="4dp"
+                            android:text="CORREO ELECTRÓNICO"
+                            android:textColor="@color/mainazul"
+                            android:textSize="11sp"
+                            android:letterSpacing="0.1" />
 
-    <ProgressBar
-        android:id="@+id/progressBar"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:id="@+id/tlEmail"
+                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="16dp"
+                            app:hintEnabled="false"
+                            app:startIconDrawable="@android:drawable/ic_dialog_email"
+                            app:startIconTint="@color/mainazul"
+                            app:boxCornerRadiusTopStart="12dp"
+                            app:boxCornerRadiusTopEnd="12dp"
+                            app:boxCornerRadiusBottomStart="12dp"
+                            app:boxCornerRadiusBottomEnd="12dp"
+                            app:boxStrokeColor="@color/mainazul"
+                            app:boxBackgroundColor="@color/white">
 
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/etEmail"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:hint="usuario@fitjourney.com"
+                                android:inputType="textEmailAddress"
+                                android:textColor="@color/text"
+                                android:textColorHint="#AAAAAA" />
+                        </com.google.android.material.textfield.TextInputLayout>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="4dp"
+                            android:text="CONTRASEÑA"
+                            android:textColor="@color/mainazul"
+                            android:textSize="11sp"
+                            android:letterSpacing="0.1" />
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:id="@+id/tlPassword"
+                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="24dp"
+                            app:hintEnabled="false"
+                            app:startIconDrawable="@android:drawable/ic_lock_idle_lock"
+                            app:startIconTint="@color/mainazul"
+                            app:endIconMode="password_toggle"
+                            app:endIconTint="@color/mainazul"
+                            app:boxCornerRadiusTopStart="12dp"
+                            app:boxCornerRadiusTopEnd="12dp"
+                            app:boxCornerRadiusBottomStart="12dp"
+                            app:boxCornerRadiusBottomEnd="12dp"
+                            app:boxStrokeColor="@color/mainazul"
+                            app:boxBackgroundColor="@color/white">
+
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/etPassword"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:hint="••••••••"
+                                android:inputType="textPassword"
+                                android:textColor="@color/text"
+                                android:textColorHint="#AAAAAA" />
+                        </com.google.android.material.textfield.TextInputLayout>
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnLoginSubmit"
+                            android:layout_width="match_parent"
+                            android:layout_height="58dp"
+                            android:text="INICIAR SESIÓN →"
+                            android:textColor="@color/white"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            android:letterSpacing="0.05"
+                            app:backgroundTint="@color/mainazul"
+                            app:cornerRadius="14dp" />
+
+                        <ProgressBar
+                            android:id="@+id/progressBar"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:layout_gravity="center"
+                            android:layout_marginTop="8dp"
+                            android:visibility="gone"
+                            android:indeterminateTint="@color/mainazul" />
+
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <TextView
+                    android:id="@+id/tvGoToRegister"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:gravity="center"
+                    android:padding="8dp"
+                    android:text="¿No tienes cuenta? Regístrate"
+                    android:textColor="@color/mainazul"
+                    android:textStyle="bold"
+                    android:textSize="15sp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:background="?attr/selectableItemBackground" />
+
+            </LinearLayout>
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -12,24 +12,29 @@ import java.util.ArrayList;
 import java.util.List;
 
 import es.iesagora.fitjourney.data.model.Exercise;
+import es.iesagora.fitjourney.data.remote.AccessResponse;
 import es.iesagora.fitjourney.data.remote.Resource;
 import es.iesagora.fitjourney.data.repositories.ExerciseRepository;
+import es.iesagora.fitjourney.data.repositories.UserRepository;
 
 public class SecondViewModel extends AndroidViewModel {
 
     private final ExerciseRepository repository;
+    private final UserRepository userRepository;
+
     private final MutableLiveData<Resource<List<Exercise>>> exercisesLiveData = new MutableLiveData<>();
     private final MutableLiveData<Exercise> exerciseSelected = new MutableLiveData<>();
     private final MutableLiveData<Resource<Exercise>> singleExerciseLiveData = new MutableLiveData<>();
+    private final MutableLiveData<Resource<AccessResponse>> profileLiveData = new MutableLiveData<>();
 
     private List<Exercise> fullExerciseList = new ArrayList<>();
 
     public SecondViewModel(@NonNull Application application) {
         super(application);
         repository = new ExerciseRepository(application.getApplicationContext());
+        userRepository = new UserRepository(application.getApplicationContext());
         fetchExercises();
     }
-
 
     public LiveData<Resource<List<Exercise>>> getExercises() {
         return exercisesLiveData;
@@ -65,7 +70,6 @@ public class SecondViewModel extends AndroidViewModel {
 
         exercisesLiveData.setValue(Resource.success(filteredList));
     }
-
 
     public void selectExercise(Exercise exercise) {
         exerciseSelected.setValue(exercise);
@@ -113,6 +117,17 @@ public class SecondViewModel extends AndroidViewModel {
                 fetchExercises();
                 onSuccess.run();
             }
+        });
+    }
+
+    public LiveData<Resource<AccessResponse>> getProfile() {
+        return profileLiveData;
+    }
+
+    public void fetchProfile(String token) {
+        profileLiveData.setValue(Resource.loading());
+        userRepository.getUser(token, result -> {
+            profileLiveData.setValue(result);
         });
     }
 }

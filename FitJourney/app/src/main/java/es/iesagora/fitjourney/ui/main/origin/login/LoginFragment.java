@@ -15,6 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import es.iesagora.fitjourney.R;
 import es.iesagora.fitjourney.databinding.FragmentLoginBinding;
 import es.iesagora.fitjourney.ui.second.SecondActivity;
 import es.iesagora.fitjourney.viewmodel.MainViewModel;
@@ -53,9 +54,11 @@ public class LoginFragment extends Fragment {
             switch (resource.status) {
                 case LOADING:
                     binding.btnLoginSubmit.setEnabled(false);
+                    binding.progressBar.setVisibility(View.VISIBLE);
                     break;
                 case SUCCESS:
                     binding.btnLoginSubmit.setEnabled(true);
+                    binding.progressBar.setVisibility(View.GONE);
 
                     Toast.makeText(requireContext(), "¡BIENVENIDO!", Toast.LENGTH_SHORT).show();
 
@@ -66,6 +69,7 @@ public class LoginFragment extends Fragment {
                     break;
                 case ERROR:
                     binding.btnLoginSubmit.setEnabled(true);
+                    binding.progressBar.setVisibility(View.GONE);
                     Toast.makeText(requireContext(), "Error: " + resource.message, Toast.LENGTH_SHORT).show();
                     break;
             }
@@ -78,6 +82,10 @@ public class LoginFragment extends Fragment {
             if (checkData(email, password)) {
                 viewModel.login(email, password);
             }
+        });
+
+        binding.tvGoToRegister.setOnClickListener(v -> {
+            navController.navigate(R.id.registerFragment);
         });
     }
 

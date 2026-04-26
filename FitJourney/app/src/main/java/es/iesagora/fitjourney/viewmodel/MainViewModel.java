@@ -54,6 +54,34 @@ public class MainViewModel extends AndroidViewModel {
         });
     }
 
+    // --- NUEVOS MÉTODOS PARA REACTIVAR Y BORRAR CUENTA ---
+
+    public void reactivate(String email, String password) {
+        registerState.postValue(Resource.loading());
+
+        repository.reactivateAccount(email, password, result -> {
+            if (result.status == Resource.Status.SUCCESS && result.data != null) {
+                saveSession(result.data);
+            }
+            registerState.postValue(result);
+        });
+    }
+
+    public void deletePhysical(String email, String password) {
+        registerState.postValue(Resource.loading());
+
+        repository.deleteAccountPhysical(email, password, result -> {
+            if (result.status == Resource.Status.SUCCESS) {
+                // Forzamos un estado de error controlado para que muestre el Toast y no navegue
+                registerState.postValue(Resource.error("Cuenta eliminada definitivamente. Ya puedes registrarte de nuevo."));
+            } else {
+                registerState.postValue(Resource.error("Error al borrar: " + result.message));
+            }
+        });
+    }
+
+    // ------------------------------------------------------
+
     public void getProfile(String token) {
         repository.getUser(token, result -> {
             if (result.status == Resource.Status.SUCCESS && result.data != null) {
@@ -72,13 +100,14 @@ public class MainViewModel extends AndroidViewModel {
         }
         if (data.getUser() != null) {
             preferencesRepository.setRole(data.getUser().getRole());
-            preferencesRepository.setUserId(data.getUser().getIdUser());
+            preferencesRepository.setUserId(String.valueOf(data.getUser().getId_user()));
         }
     }
 
     public String getToken() {
         return preferencesRepository.getToken();
     }
+
     public void logout() {
         preferencesRepository.clearSession();
     }
@@ -103,6 +132,7 @@ public class MainViewModel extends AndroidViewModel {
     public void setNotifications(boolean enabled) {
         preferencesRepository.setNotifications(enabled);
     }
+
     public boolean getNotifications() {
         return preferencesRepository.getNotifications();
     }

@@ -21,4 +21,7 @@ public class User {
     private String role;
     private int active;
     private String register_date;
+
+    public User(String idUser, String name, String email, String pass, String birthDate, String gender, String goal, int height, float weight) {
+    }
 }

@@ -16,7 +16,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import java.util.ArrayList;
 
 import es.iesagora.fitjourney.R;
-import es.iesagora.fitjourney.data.model.Exercise;
 import es.iesagora.fitjourney.data.repositories.PreferencesRepository;
 import es.iesagora.fitjourney.databinding.FragmentExercisesBinding;
 import es.iesagora.fitjourney.ui.second.adapters.ExerciseAdapter;
@@ -39,12 +38,13 @@ public class ExercisesFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
         viewModel = new ViewModelProvider(requireActivity()).get(SecondViewModel.class);
         prefs = new PreferencesRepository(requireContext());
 
         setupRecyclerView();
 
-        viewModel.exercises.observe(getViewLifecycleOwner(), resource -> {
+        viewModel.getExercises().observe(getViewLifecycleOwner(), resource -> {
             if (resource != null) {
                 switch (resource.status) {
                     case LOADING:
@@ -59,15 +59,21 @@ public class ExercisesFragment extends Fragment {
                         if (resource.data != null && !resource.data.isEmpty()) {
                             binding.rvExercises.setVisibility(View.VISIBLE);
                             binding.tvError.setVisibility(View.GONE);
-
                             adapter.setExercises(resource.data);
                         } else {
                             binding.tvError.setText(R.string.no_exercises_aviable);
                             binding.tvError.setVisibility(View.VISIBLE);
                             binding.rvExercises.setVisibility(View.GONE);
-
                             adapter.setExercises(new ArrayList<>());
                         }
+                        break;
+
+                    case ERROR:
+                        binding.progressBar.setVisibility(View.GONE);
+                        binding.rvExercises.setVisibility(View.GONE);
+                        binding.tvError.setText("Error al conectar con el servidor.");
+                        binding.tvError.setVisibility(View.VISIBLE);
+                        Toast.makeText(getContext(), resource.message, Toast.LENGTH_SHORT).show();
                         break;
                 }
             }
@@ -87,10 +93,8 @@ public class ExercisesFragment extends Fragment {
         });
 
         String role = prefs.getRole();
-
         if ("admin".equalsIgnoreCase(role)) {
             binding.fabAddExercise.setVisibility(View.VISIBLE);
-
             binding.fabAddExercise.setOnClickListener(v -> {
                 Navigation.findNavController(v).navigate(R.id.formExerciseFragment);
             });
@@ -98,12 +102,14 @@ public class ExercisesFragment extends Fragment {
             binding.fabAddExercise.setVisibility(View.GONE);
         }
 
-
+        if (viewModel.getExercises().getValue() == null) {
+            viewModel.fetchExercises();
+        }
     }
 
     private void setupRecyclerView() {
         binding.rvExercises.setLayoutManager(new LinearLayoutManager(getContext()));
-        adapter = new ExerciseAdapter(requireContext(),viewModel);
+        adapter = new ExerciseAdapter(requireContext(), viewModel);
         binding.rvExercises.setAdapter(adapter);
     }
 
