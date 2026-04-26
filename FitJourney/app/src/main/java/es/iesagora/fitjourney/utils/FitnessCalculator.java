@@ -26,19 +26,37 @@ public class FitnessCalculator {
         return weightKg / (heightM * heightM);
     }
 
-    public static float calculateBodyFat(float bmi, int age, String gender) {
+    public static float calculateBodyFat(float bmi, int age, String gender, String goal) {
         boolean isMale = "masculino".equalsIgnoreCase(gender) || "male".equalsIgnoreCase(gender) || "hombre".equalsIgnoreCase(gender);
         float bodyFat = isMale ? (1.39f * bmi) + (0.16f * age) - 19.34f
                 : (1.39f * bmi) + (0.16f * age) - 9f;
-        return Math.max(bodyFat, 3f);
+
+        if (goal != null) {
+            String g = goal.toLowerCase();
+            if (g.contains("músculo") || g.contains("muscle") || g.contains("fuerza") || g.contains("strength") || g.contains("masa") || g.contains("muscular")) {
+                bodyFat -= (isMale ? 6.5f : 4.5f);
+            }
+        }
+
+        return Math.max(bodyFat, isMale ? 4f : 12f);
     }
 
     public static float calculateLeanMass(float weightKg, float bodyFatPercentage) {
         return weightKg * (1f - (bodyFatPercentage / 100f));
     }
 
-    public static String getBMICategory(float bmi) {
+    public static String getBMICategory(float bmi, String goal) {
         if (bmi < 18.5) return "Bajo peso";
+
+        if (goal != null) {
+            String g = goal.toLowerCase();
+            if (g.contains("músculo") || g.contains("muscle") || g.contains("fuerza") || g.contains("strength") || g.contains("masa") || g.contains("muscular")) {
+                if (bmi < 27.5) return "✓ Atlético / Musculado";
+                if (bmi < 32) return "Sobrepeso (Volumen)";
+                return "Obesidad";
+            }
+        }
+
         if (bmi < 25) return "✓ Normal";
         if (bmi < 30) return "Sobrepeso";
         return "Obesidad";

@@ -4,9 +4,12 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
@@ -33,6 +36,7 @@ public class HomeFragment extends Fragment {
     private FragmentHomeBinding binding;
     private SecondViewModel viewModel;
     private PreferencesRepository prefs;
+    private User currentUser;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -58,13 +62,15 @@ public class HomeFragment extends Fragment {
 
         viewModel.getProfile().observe(getViewLifecycleOwner(), resource -> {
             if (resource != null && resource.data != null && resource.data.getUser() != null) {
-                populatePhysicalData(resource.data.getUser());
+                currentUser = resource.data.getUser();
+                populatePhysicalData(currentUser);
             }
         });
 
         viewModel.getWorkoutHistory().observe(getViewLifecycleOwner(), resource -> {
             if (resource != null && resource.data != null) {
                 calculateStreakAndStats(resource.data);
+                calculateWeeklyActivity(resource.data);
             }
         });
     }
@@ -76,7 +82,6 @@ public class HomeFragment extends Fragment {
 
     private void setupNavigationButtons() {
         View.OnClickListener goToFitnessCenter = v -> Navigation.findNavController(v).navigate(R.id.fitnessCenterFragment);
-
         binding.btnTrainNow.setOnClickListener(goToFitnessCenter);
         binding.btnCardio.setOnClickListener(goToFitnessCenter);
         binding.btnStrength.setOnClickListener(goToFitnessCenter);
@@ -93,9 +98,11 @@ public class HomeFragment extends Fragment {
             int edad = FitnessCalculator.calculateAge(user.getBirth_date());
 
             float imc = FitnessCalculator.calculateBMI(peso, alturaCm);
-            float porcentajeGrasa = FitnessCalculator.calculateBodyFat(imc, edad, user.getGender());
+
+            float porcentajeGrasa = FitnessCalculator.calculateBodyFat(imc, edad, user.getGender(), user.getGoal());
+
             float masaMagra = FitnessCalculator.calculateLeanMass(peso, porcentajeGrasa);
-            String categoriaImc = FitnessCalculator.getBMICategory(imc);
+            String categoriaImc = FitnessCalculator.getBMICategory(imc, user.getGoal());
 
             binding.tvBMI.setText(String.format(Locale.US, "%.1f", imc));
             binding.tvBMICategory.setText(categoriaImc);
@@ -116,12 +123,16 @@ public class HomeFragment extends Fragment {
             binding.tvStreakTitle.setText("🔥  0 Días de Racha");
             binding.tvStreakMessage.setText("Aún no has registrado entrenamientos. ¡Empieza hoy!");
             binding.tvPeakCal.setText("0 kcal");
+            binding.tvTodayCalories.setText("0 kcal");
             return;
         }
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        String hoyStr = sdf.format(new Date());
+
         List<Date> workoutDates = new ArrayList<>();
         double maxCalories = 0.0;
+        float caloriasHoy = 0.0f;
 
         for (Workout w : history) {
             if (w.getCalories_burned() != null && w.getCalories_burned() > maxCalories) {
@@ -131,6 +142,11 @@ public class HomeFragment extends Fragment {
             try {
                 if (w.getWorkout_date() != null) {
                     String dateStr = w.getWorkout_date().length() >= 10 ? w.getWorkout_date().substring(0, 10) : w.getWorkout_date();
+
+                    if (dateStr.equals(hoyStr) && w.getCalories_burned() != null) {
+                        caloriasHoy += w.getCalories_burned();
+                    }
+
                     Date d = sdf.parse(dateStr);
                     if (d != null && !workoutDates.contains(d)) workoutDates.add(d);
                 }
@@ -138,6 +154,7 @@ public class HomeFragment extends Fragment {
         }
 
         binding.tvPeakCal.setText(String.format(Locale.US, "%.0f kcal", maxCalories));
+        binding.tvTodayCalories.setText(String.format(Locale.US, "%.0f kcal", caloriasHoy));
 
         Collections.sort(workoutDates, Collections.reverseOrder());
         if (workoutDates.isEmpty()) return;
@@ -149,7 +166,6 @@ public class HomeFragment extends Fragment {
         long daysSinceLastWorkout = TimeUnit.DAYS.convert(diffInMillis, TimeUnit.MILLISECONDS);
 
         int streak = 0;
-
         if (daysSinceLastWorkout == 0) {
             binding.tvStreakMessage.setText("¡Entrenaste hoy! Sigue así 🔥");
             streak = 1;
@@ -175,8 +191,55 @@ public class HomeFragment extends Fragment {
                 }
             }
         }
-
         binding.tvStreakTitle.setText("🔥  " + streak + " Días de Racha");
+    }
+
+    private void calculateWeeklyActivity(List<Workout> history) {
+        View[] bars = {binding.bar1, binding.bar2, binding.bar3, binding.bar4, binding.bar5, binding.bar6, binding.bar7};
+        TextView[] texts = {binding.tvDay1, binding.tvDay2, binding.tvDay3, binding.tvDay4, binding.tvDay5, binding.tvDay6, binding.tvDay7};
+
+        String[] nombresDias = {"D", "L", "M", "X", "J", "V", "S"};
+        Calendar cal = Calendar.getInstance();
+        int diaSemanaHoy = cal.get(Calendar.DAY_OF_WEEK) - 1;
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        int colorRosa = ContextCompat.getColor(requireContext(), R.color.mainrosa);
+        int colorStroke = ContextCompat.getColor(requireContext(), R.color.stroke);
+        int colorText = ContextCompat.getColor(requireContext(), R.color.text);
+
+        float density = getResources().getDisplayMetrics().density;
+
+        for (int i = 6; i >= 0; i--) {
+            int currentDayIndex = (diaSemanaHoy - (6 - i)) % 7;
+            if (currentDayIndex < 0) currentDayIndex += 7;
+
+            texts[i].setText(nombresDias[currentDayIndex]);
+
+            String targetDate = sdf.format(cal.getTime());
+            boolean entrenoEseDia = false;
+            if (history != null) {
+                for (Workout w : history) {
+                    if (w.getWorkout_date() != null && w.getWorkout_date().startsWith(targetDate)) {
+                        entrenoEseDia = true;
+                        break;
+                    }
+                }
+            }
+
+            LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) bars[i].getLayoutParams();
+            if (entrenoEseDia) {
+                params.height = (int) (40 * density);
+                bars[i].setBackgroundColor(colorRosa);
+                if (i != 6) texts[i].setTextColor(colorRosa);
+            } else {
+                params.height = (int) (10 * density);
+                bars[i].setBackgroundColor(colorStroke);
+                if (i != 6) texts[i].setTextColor(colorText);
+            }
+            bars[i].setLayoutParams(params);
+
+            cal.add(Calendar.DAY_OF_YEAR, -1);
+        }
     }
 
     @Override

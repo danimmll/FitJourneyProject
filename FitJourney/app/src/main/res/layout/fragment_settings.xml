@@ -86,7 +86,7 @@
                 </LinearLayout>
 
                 <com.google.android.material.materialswitch.MaterialSwitch
-                    android:id="@+id/switchTheme"
+                    android:id="@+id/switchDarkMode"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     app:trackTint="@color/mainazul" />

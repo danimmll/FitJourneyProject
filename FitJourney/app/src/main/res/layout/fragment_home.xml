@@ -351,13 +351,13 @@
                         android:orientation="horizontal"
                         android:gravity="bottom"
                         android:layout_marginTop="10dp">
-                        <View android:layout_width="0dp" android:layout_height="40dp" android:layout_weight="1" android:background="@color/mainrosa" android:layout_marginEnd="2dp"/>
-                        <View android:layout_width="0dp" android:layout_height="25dp" android:layout_weight="1" android:background="@color/mainrosa" android:layout_marginEnd="2dp"/>
-                        <View android:layout_width="0dp" android:layout_height="35dp" android:layout_weight="1" android:background="@color/mainrosa" android:layout_marginEnd="2dp"/>
-                        <View android:layout_width="0dp" android:layout_height="50dp" android:layout_weight="1" android:background="@color/mainrosa" android:layout_marginEnd="2dp"/>
-                        <View android:layout_width="0dp" android:layout_height="15dp" android:layout_weight="1" android:background="#DDDDDD" android:layout_marginEnd="2dp"/>
-                        <View android:layout_width="0dp" android:layout_height="10dp" android:layout_weight="1" android:background="#DDDDDD" android:layout_marginEnd="2dp"/>
-                        <View android:layout_width="0dp" android:layout_height="10dp" android:layout_weight="1" android:background="#DDDDDD" />
+                        <View android:id="@+id/bar1" android:layout_width="0dp" android:layout_height="10dp" android:layout_weight="1" android:background="@color/stroke" android:layout_marginEnd="2dp"/>
+                        <View android:id="@+id/bar2" android:layout_width="0dp" android:layout_height="10dp" android:layout_weight="1" android:background="@color/stroke" android:layout_marginEnd="2dp"/>
+                        <View android:id="@+id/bar3" android:layout_width="0dp" android:layout_height="10dp" android:layout_weight="1" android:background="@color/stroke" android:layout_marginEnd="2dp"/>
+                        <View android:id="@+id/bar4" android:layout_width="0dp" android:layout_height="10dp" android:layout_weight="1" android:background="@color/stroke" android:layout_marginEnd="2dp"/>
+                        <View android:id="@+id/bar5" android:layout_width="0dp" android:layout_height="10dp" android:layout_weight="1" android:background="@color/stroke" android:layout_marginEnd="2dp"/>
+                        <View android:id="@+id/bar6" android:layout_width="0dp" android:layout_height="10dp" android:layout_weight="1" android:background="@color/stroke" android:layout_marginEnd="2dp"/>
+                        <View android:id="@+id/bar7" android:layout_width="0dp" android:layout_height="10dp" android:layout_weight="1" android:background="@color/stroke" />
                     </LinearLayout>
 
                     <LinearLayout
@@ -365,13 +365,13 @@
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
                         android:layout_marginTop="2dp">
-                        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="L" android:textSize="8sp" android:gravity="center" android:textColor="@color/mainrosa"/>
-                        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="M" android:textSize="8sp" android:gravity="center" android:textColor="@color/mainrosa"/>
-                        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="X" android:textSize="8sp" android:gravity="center" android:textColor="@color/mainrosa"/>
-                        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="J" android:textSize="8sp" android:gravity="center" android:textColor="@color/mainrosa"/>
-                        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="V" android:textSize="8sp" android:gravity="center" android:textColor="#AAAAAA"/>
-                        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="S" android:textSize="8sp" android:gravity="center" android:textColor="#AAAAAA"/>
-                        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="D" android:textSize="8sp" android:gravity="center" android:textColor="#AAAAAA"/>
+                        <TextView android:id="@+id/tvDay1" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="-" android:textSize="8sp" android:gravity="center" android:textColor="@color/textSecondary"/>
+                        <TextView android:id="@+id/tvDay2" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="-" android:textSize="8sp" android:gravity="center" android:textColor="@color/textSecondary"/>
+                        <TextView android:id="@+id/tvDay3" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="-" android:textSize="8sp" android:gravity="center" android:textColor="@color/textSecondary"/>
+                        <TextView android:id="@+id/tvDay4" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="-" android:textSize="8sp" android:gravity="center" android:textColor="@color/textSecondary"/>
+                        <TextView android:id="@+id/tvDay5" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="-" android:textSize="8sp" android:gravity="center" android:textColor="@color/textSecondary"/>
+                        <TextView android:id="@+id/tvDay6" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="-" android:textSize="8sp" android:gravity="center" android:textColor="@color/textSecondary"/>
+                        <TextView android:id="@+id/tvDay7" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="-" android:textSize="8sp" android:gravity="center" android:textColor="@color/mainrosa" android:textStyle="bold"/>
                     </LinearLayout>
 
                 </LinearLayout>
@@ -515,7 +515,7 @@
                                 android:id="@+id/tvPeakCal"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="870 kcal"
+                                android:text="0 kcal"
                                 android:textColor="@color/white"
                                 android:textSize="12sp"
                                 android:textStyle="bold" />
@@ -523,11 +523,31 @@
                     </com.google.android.material.card.MaterialCardView>
                 </LinearLayout>
 
-                <View
-                    android:id="@+id/caloriesChart"
+                <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="120dp"
-                    android:background="@color/fondo" />
+                    android:layout_height="100dp"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:background="@drawable/rounded"
+                    android:backgroundTint="?attr/colorSurface">
+
+                    <TextView
+                        android:id="@+id/tvTodayCalories"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0 kcal"
+                        android:textSize="48sp"
+                        android:textColor="@color/mainazul"
+                        android:fontFamily="sans-serif-black" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="quemadas hoy"
+                        android:textSize="14sp"
+                        android:textColor="@color/textSecondary"
+                        android:textStyle="bold" />
+                </LinearLayout>
 
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>

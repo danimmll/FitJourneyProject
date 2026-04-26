@@ -38,7 +38,7 @@ public class ExercisesFragment extends Fragment {
     private List<Exercise> allExercises = new ArrayList<>();
     private String currentQuery = "";
     private String selectedDifficulty = "Todos";
-    private final String[] difficulties = {"Todos", "Principiante", "Intermedio", "Difícil"};
+    private final String[] difficulties = {"Todos", "Principiante", "Intermedio", "Experto"};
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -163,11 +163,15 @@ public class ExercisesFragment extends Fragment {
 
             boolean matchesDifficulty = selectedDifficulty.equals("Todos");
             if (!matchesDifficulty && ex.getDifficulty() != null) {
-                String exDiff = String.valueOf(ex.getDifficulty()).toLowerCase();
+                String exDiff = ex.getDifficulty().trim();
 
-                if (selectedDifficulty.equals("Principiante") && (exDiff.contains("principiante") || exDiff.equals("1"))) matchesDifficulty = true;
-                if (selectedDifficulty.equals("Intermedio") && (exDiff.contains("intermedio") || exDiff.equals("2"))) matchesDifficulty = true;
-                if (selectedDifficulty.equals("Difícil") && (exDiff.contains("difícil") || exDiff.contains("dificil") || exDiff.contains("avanzado") || exDiff.equals("3"))) matchesDifficulty = true;
+                if (selectedDifficulty.equalsIgnoreCase("Principiante") && (exDiff.equalsIgnoreCase("Principiante") || exDiff.equals("1"))) {
+                    matchesDifficulty = true;
+                } else if (selectedDifficulty.equalsIgnoreCase("Intermedio") && (exDiff.equalsIgnoreCase("Intermedio") || exDiff.equals("2"))) {
+                    matchesDifficulty = true;
+                } else if (selectedDifficulty.equalsIgnoreCase("Experto") && (exDiff.equalsIgnoreCase("Experto") || exDiff.equals("3"))) {
+                    matchesDifficulty = true;
+                }
             }
 
             if (matchesSearch && matchesDifficulty) {

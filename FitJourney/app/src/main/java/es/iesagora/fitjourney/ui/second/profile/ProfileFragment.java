@@ -94,19 +94,23 @@ public class ProfileFragment extends Fragment {
         }
 
         String photoUrl = user.getPhoto_url();
+        String dicebearAvatar = "https://api.dicebear.com/7.x/avataaars/png?seed=" + user.getName() + "&backgroundColor=b6e3f4,c0aede,d1d4f9";
+
         if (photoUrl != null && !photoUrl.isEmpty()) {
             if (photoUrl.length() > 200 || !photoUrl.startsWith("http")) {
+                // Si la imagen es Base64
                 try {
                     byte[] imageBytes = Base64.decode(photoUrl, Base64.DEFAULT);
                     Glide.with(this).asBitmap().load(imageBytes).circleCrop().into(binding.ivProfilePhoto);
                 } catch (Exception e) {
-                    Glide.with(this).load("https://api.dicebear.com/7.x/initials/png?seed=" + user.getName()).circleCrop().into(binding.ivProfilePhoto);
+                    Glide.with(this).load(dicebearAvatar).circleCrop().into(binding.ivProfilePhoto);
                 }
             } else {
+                // Si es URL normal
                 Glide.with(this).load(photoUrl).circleCrop().into(binding.ivProfilePhoto);
             }
         } else {
-            Glide.with(this).load("https://api.dicebear.com/7.x/initials/png?seed=" + user.getName()).circleCrop().into(binding.ivProfilePhoto);
+            Glide.with(this).load(dicebearAvatar).circleCrop().into(binding.ivProfilePhoto);
         }
     }
 
