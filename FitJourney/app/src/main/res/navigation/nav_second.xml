@@ -30,7 +30,11 @@
         android:id="@+id/profileFragment"
         android:name="es.iesagora.fitjourney.ui.second.profile.ProfileFragment"
         android:label=""
-        tools:layout="@layout/fragment_profile" />
+        tools:layout="@layout/fragment_profile" >
+        <action
+            android:id="@+id/action_profileFragment_to_editProfileFragment"
+            app:destination="@id/editProfileFragment" />
+    </fragment>
 
     <fragment
         android:id="@+id/fitnessCenterFragment"
@@ -70,6 +74,19 @@
         <argument
             android:name="exercise_data"
             app:argType="es.iesagora.fitjourney.data.model.Exercise"
+            app:nullable="true"
+            android:defaultValue="@null" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/editProfileFragment"
+        android:name="es.iesagora.fitjourney.ui.second.profile.EditProfileFragment"
+        android:label="Editar Perfil"
+        tools:layout="@layout/fragment_edit_profile">
+
+        <argument
+            android:name="user_data"
+            app:argType="es.iesagora.fitjourney.data.model.User"
             app:nullable="true"
             android:defaultValue="@null" />
     </fragment>

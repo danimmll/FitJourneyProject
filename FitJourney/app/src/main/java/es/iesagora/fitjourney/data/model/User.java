@@ -26,4 +26,12 @@ public class User implements Serializable {
 
     public User(String idUser, String name, String email, String pass, String birthDate, String gender, String goal, int height, float weight) {
     }
+
+    public String getDisplayAvatar() {
+        if (this.photo_url != null && !this.photo_url.trim().isEmpty()) {
+            return this.photo_url;
+        }
+        String safeName = (this.name != null) ? this.name.replace(" ", "%20") : "Usuario";
+        return "https://api.dicebear.com/7.x/avataaars/png?seed=" + safeName + "&backgroundColor=b6e3f4,c0aede,d1d4f9";
+    }
 }

@@ -16,13 +16,16 @@ import es.iesagora.fitjourney.data.model.Workout;
 import es.iesagora.fitjourney.data.remote.AccessResponse;
 import es.iesagora.fitjourney.data.remote.Resource;
 import es.iesagora.fitjourney.data.repositories.ExerciseRepository;
+import es.iesagora.fitjourney.data.repositories.PreferencesRepository;
 import es.iesagora.fitjourney.data.repositories.UserRepository;
-import es.iesagora.fitjourney.data.repositories.WorkoutRepository; // <-- Importante
+import es.iesagora.fitjourney.data.repositories.WorkoutRepository;
 
 public class SecondViewModel extends AndroidViewModel {
 
     private final ExerciseRepository repository;
     private final UserRepository userRepository;
+
+    private final PreferencesRepository preferencesRepository;
     private final WorkoutRepository workoutRepository; // <-- Nuevo repositorio
 
     private final MutableLiveData<Resource<List<Exercise>>> exercisesLiveData = new MutableLiveData<>();
@@ -31,20 +34,31 @@ public class SecondViewModel extends AndroidViewModel {
     private final MutableLiveData<Resource<AccessResponse>> profileLiveData = new MutableLiveData<>();
     private final MutableLiveData<Resource<List<Workout>>> workoutHistoryLiveData = new MutableLiveData<>();
 
+    private final MutableLiveData<Resource<es.iesagora.fitjourney.data.model.User>> updateProfileLiveData = new MutableLiveData<>();
+
+    private final MutableLiveData<Resource<String>> deleteAccountLiveData = new MutableLiveData<>();
+
+    public LiveData<Resource<es.iesagora.fitjourney.data.model.User>> getUpdateProfileStatus() {
+        return updateProfileLiveData;
+    }
+
+    public LiveData<Resource<List<Exercise>>> getExercises() {
+        return exercisesLiveData;
+    }
+
     private List<Exercise> fullExerciseList = new ArrayList<>();
 
     public SecondViewModel(@NonNull Application application) {
         super(application);
         repository = new ExerciseRepository(application.getApplicationContext());
         userRepository = new UserRepository(application.getApplicationContext());
-        workoutRepository = new WorkoutRepository(application.getApplicationContext()); // <-- Inicializamos
+        workoutRepository = new WorkoutRepository(application.getApplicationContext());
+        preferencesRepository = new PreferencesRepository(application.getApplicationContext());
         fetchExercises();
     }
 
 
-    public LiveData<Resource<List<Exercise>>> getExercises() {
-        return exercisesLiveData;
-    }
+
 
     public void fetchExercises() {
         exercisesLiveData.setValue(Resource.loading());
@@ -87,9 +101,7 @@ public class SecondViewModel extends AndroidViewModel {
 
     public void fetchExerciseById(int id) {
         singleExerciseLiveData.setValue(Resource.loading());
-        repository.getExerciseById(id, result -> {
-            singleExerciseLiveData.setValue(result);
-        });
+        repository.getExerciseById(id, singleExerciseLiveData::setValue);
     }
 
     public LiveData<Resource<Exercise>> getSingleExercise() {
@@ -133,9 +145,7 @@ public class SecondViewModel extends AndroidViewModel {
 
     public void fetchProfile(String token) {
         profileLiveData.setValue(Resource.loading());
-        userRepository.getUser(token, result -> {
-            profileLiveData.setValue(result);
-        });
+        userRepository.getUser(token, profileLiveData::setValue);
     }
 
 
@@ -145,8 +155,27 @@ public class SecondViewModel extends AndroidViewModel {
 
     public void fetchWorkoutHistory() {
         workoutHistoryLiveData.setValue(Resource.loading());
-        workoutRepository.getWorkoutHistory(result -> {
-            workoutHistoryLiveData.setValue(result);
+        workoutRepository.getWorkoutHistory(workoutHistoryLiveData::setValue);
+    }
+
+    public void updateProfile(es.iesagora.fitjourney.data.model.User user) {
+        updateProfileLiveData.setValue(Resource.loading());
+        userRepository.updateUserProfile(user, result -> {
+            updateProfileLiveData.setValue(result);
+            if (result.status == Resource.Status.SUCCESS) {
+                fetchProfile(preferencesRepository.getToken());
+            }
         });
     }
+
+    public LiveData<Resource<String>> getDeleteAccountStatus() {
+        return deleteAccountLiveData;
+    }
+
+    public void deleteMyAccount(String email, String password) {
+        deleteAccountLiveData.setValue(Resource.loading());
+        userRepository.deleteAccountPhysical(email, password, deleteAccountLiveData::setValue);
+    }
+
+
 }

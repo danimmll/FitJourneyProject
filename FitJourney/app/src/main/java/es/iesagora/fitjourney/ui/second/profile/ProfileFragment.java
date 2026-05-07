@@ -93,36 +93,26 @@ public class ProfileFragment extends Fragment {
             binding.tvProfileGoal.setText("No definido");
         }
 
-        String photoUrl = user.getPhoto_url();
-        String dicebearAvatar = "https://api.dicebear.com/7.x/avataaars/png?seed=" + user.getName() + "&backgroundColor=b6e3f4,c0aede,d1d4f9";
+        String avatar = user.getDisplayAvatar();
 
-        if (photoUrl != null && !photoUrl.isEmpty()) {
-            if (photoUrl.length() > 200 || !photoUrl.startsWith("http")) {
-                // Si la imagen es Base64
-                try {
-                    byte[] imageBytes = Base64.decode(photoUrl, Base64.DEFAULT);
-                    Glide.with(this).asBitmap().load(imageBytes).circleCrop().into(binding.ivProfilePhoto);
-                } catch (Exception e) {
-                    Glide.with(this).load(dicebearAvatar).circleCrop().into(binding.ivProfilePhoto);
-                }
-            } else {
-                // Si es URL normal
-                Glide.with(this).load(photoUrl).circleCrop().into(binding.ivProfilePhoto);
+        if (avatar.length() > 200 && !avatar.startsWith("http")) {
+            try {
+                byte[] imageBytes = Base64.decode(avatar, Base64.DEFAULT);
+                Glide.with(this).asBitmap().load(imageBytes).circleCrop().into(binding.ivProfilePhoto);
+            } catch (Exception e) {
+                Glide.with(this).load("https://api.dicebear.com/7.x/avataaars/png?seed=Error").circleCrop().into(binding.ivProfilePhoto);
             }
         } else {
-            Glide.with(this).load(dicebearAvatar).circleCrop().into(binding.ivProfilePhoto);
+            Glide.with(this).load(avatar).circleCrop().into(binding.ivProfilePhoto);
         }
     }
 
     private void setupButtons() {
-        // --- BOTÓN EDITAR PERFIL ---
         binding.btnEditProfile.setOnClickListener(v -> {
             if (currentUser != null) {
-                // TODO: Navegar a EditProfileFragment pasándole el objeto currentUser en el Bundle
-                // Bundle bundle = new Bundle();
-                // bundle.putSerializable("user_data", currentUser);
-                // Navigation.findNavController(v).navigate(R.id.action_profile_to_editProfile, bundle);
-                Toast.makeText(getContext(), "Pantalla de Editar Perfil en construcción 🛠️", Toast.LENGTH_SHORT).show();
+                Bundle bundle = new Bundle();
+                bundle.putSerializable("user_data", currentUser);
+                Navigation.findNavController(v).navigate(R.id.action_profileFragment_to_editProfileFragment, bundle);
             }
         });
 
@@ -138,7 +128,7 @@ public class ProfileFragment extends Fragment {
         if ("admin".equalsIgnoreCase(prefs.getRole())) {
             binding.fabAdminUsers.setVisibility(View.VISIBLE);
             binding.fabAdminUsers.setOnClickListener(v -> {
-                Toast.makeText(getContext(), "Panel de Administrador en construcción 🛠️", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "Panel Administrador", Toast.LENGTH_SHORT).show();
             });
         } else {
             binding.fabAdminUsers.setVisibility(View.GONE);
