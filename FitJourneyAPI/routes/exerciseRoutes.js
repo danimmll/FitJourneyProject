@@ -1,6 +1,6 @@
 const express = require('express');
 const { getExercises, createExercise, updateExercise, deleteExercise, getExerciseById } = require('../controllers/exerciseController');
-const { verifyToken, isAdmin } = require('../middlewares/auth');
+const { authenticateToken, isAdmin } = require('../middlewares/auth');
 const router = express.Router();
 
 /**
@@ -24,7 +24,7 @@ const router = express.Router();
  * 401:
  * description: No autorizado (Token faltante o inválido)
  */
-router.get('/', verifyToken, getExercises);
+router.get('/', authenticateToken, getExercises);
 
 /**
  * @swagger
@@ -49,7 +49,7 @@ router.get('/', verifyToken, getExercises);
  * 404:
  * description: Ejercicio no encontrado
  */
-router.get('/:id', verifyToken, getExerciseById);
+router.get('/:id', authenticateToken, getExerciseById);
 
 /**
  * @swagger
@@ -94,7 +94,7 @@ router.get('/:id', verifyToken, getExerciseById);
  * 403:
  * description: Acceso denegado, se requiere rol de Admin
  */
-router.post('/', verifyToken, isAdmin, createExercise);
+router.post('/', authenticateToken, isAdmin, createExercise);
 
 /**
  * @swagger
@@ -131,7 +131,7 @@ router.post('/', verifyToken, isAdmin, createExercise);
  * 403:
  * description: Acceso denegado, se requiere rol de Admin
  */
-router.put('/:id', verifyToken, isAdmin, updateExercise);
+router.put('/:id', authenticateToken, isAdmin, updateExercise);
 
 /**
  * @swagger
@@ -156,6 +156,6 @@ router.put('/:id', verifyToken, isAdmin, updateExercise);
  * 403:
  * description: Acceso denegado, se requiere rol de Admin
  */
-router.delete('/:id', verifyToken, isAdmin, deleteExercise);
+router.delete('/:id', authenticateToken, isAdmin, deleteExercise);
 
 module.exports = router;

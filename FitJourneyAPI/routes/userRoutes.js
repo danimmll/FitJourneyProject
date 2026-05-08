@@ -1,6 +1,6 @@
 const express = require('express');
 const { getAllUsers, getProfile, updateProfile, deleteUser } = require('../controllers/userController');
-const { verifyToken, isAdmin } = require('../middlewares/auth'); // Importamos isAdmin
+const { authenticateToken, isAdmin } = require('../middlewares/auth'); // Importamos isAdmin
 const router = express.Router();
 
 /**
@@ -26,7 +26,7 @@ const router = express.Router();
  * 403:
  * description: No tienes permisos (No eres admin)
  */
-router.get('/', verifyToken, isAdmin, getAllUsers);
+router.get('/', authenticateToken, isAdmin, getAllUsers);
 
 /**
  * @swagger
@@ -44,7 +44,7 @@ router.get('/', verifyToken, isAdmin, getAllUsers);
  * 404:
  * description: Usuario no encontrado
  */
-router.get('/profile', verifyToken, getProfile);
+router.get('/profile', authenticateToken, getProfile);
 
 /**
  * @swagger
@@ -82,7 +82,7 @@ router.get('/profile', verifyToken, getProfile);
  * 401:
  * description: No autorizado
  */
-router.put('/profile', verifyToken, updateProfile);
+router.put('/profile', authenticateToken, updateProfile);
 
 /**
  * @swagger
@@ -107,6 +107,6 @@ router.put('/profile', verifyToken, updateProfile);
  * 403:
  * description: No tienes permiso para borrar esta cuenta
  */
-router.delete('/:id', verifyToken, deleteUser);
+router.delete('/:id', authenticateToken, deleteUser);
 
 module.exports = router;

@@ -1,6 +1,6 @@
 const express = require('express');
 const { register, login, reactivateAccount, deleteAccount } = require('../controllers/authController');
-const { verifyToken, isAdmin } = require('../middlewares/auth'); // Importamos la seguridad
+const { authenticateToken, isAdmin } = require('../middlewares/auth');
 const router = express.Router();
 
 /**
@@ -136,6 +136,6 @@ router.post('/reactivate', reactivateAccount);
  * 403:
  * description: Prohibido (Se requieren permisos de administrador)
  */
-router.post('/delete', verifyToken, isAdmin, deleteAccount);
+router.post('/delete', authenticateToken, isAdmin, deleteAccount);
 
 module.exports = router;
