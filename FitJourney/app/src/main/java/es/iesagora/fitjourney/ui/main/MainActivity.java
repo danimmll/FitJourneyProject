@@ -25,12 +25,37 @@ import es.iesagora.fitjourney.ui.second.SecondActivity;
 import es.iesagora.fitjourney.utils.NotificationWorker;
 import es.iesagora.fitjourney.viewmodel.MainViewModel;
 
+/**
+ * Actividad principal de la aplicación.
+ * Actúa como punto de entrada cuando el usuario no ha iniciado sesión.
+ * Gestiona la navegación inicial (login/registro), aplica el tema guardado
+ * y redirige al usuario a la pantalla principal si ya tiene sesión activa.
+ * También inicializa tareas en segundo plano como notificaciones periódicas.
+ */
 public class MainActivity extends AppCompatActivity {
 
+    // ===================== VARIABLES =====================
+
+    /**
+     * ViewBinding de la actividad principal.
+     */
     private ActivityMainBinding binding;
+
+    /**
+     * Controlador de navegación de Jetpack Navigation.
+     */
     private NavController navController;
+
+    /**
+     * ViewModel principal de autenticación.
+     */
     private MainViewModel viewModel;
 
+    /**
+     * Método principal de creación de la actividad.
+     * Configura tema, navegación, notificaciones y redirección
+     * si el usuario ya tiene sesión iniciada.
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -40,8 +65,12 @@ public class MainActivity extends AppCompatActivity {
 
         AppCompatDelegate.setDefaultNightMode(prefs.getTheme());
 
-        PeriodicWorkRequest avisoDiario = new PeriodicWorkRequest.Builder(NotificationWorker.class, 24, TimeUnit.HOURS)
-                .build();
+        PeriodicWorkRequest avisoDiario =
+                new PeriodicWorkRequest.Builder(
+                        NotificationWorker.class,
+                        24,
+                        TimeUnit.HOURS
+                ).build();
 
         WorkManager.getInstance(this).enqueueUniquePeriodicWork(
                 "AvisoDiario",
@@ -62,19 +91,30 @@ public class MainActivity extends AppCompatActivity {
         binding.progressBar.setVisibility(View.GONE);
         setSupportActionBar(binding.toolbar);
 
-        navController = ((NavHostFragment) Objects.requireNonNull(getSupportFragmentManager()
-                .findFragmentById(R.id.nav_host_fragment))).getNavController();
+        navController = ((NavHostFragment) Objects.requireNonNull(
+                getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment)
+        )).getNavController();
 
-        AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(navController.getGraph()).build();
-        NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
+        AppBarConfiguration appBarConfiguration =
+                new AppBarConfiguration.Builder(navController.getGraph()).build();
+
+        NavigationUI.setupActionBarWithNavController(
+                this,
+                navController,
+                appBarConfiguration
+        );
 
         navController.navigate(R.id.accessFragment);
     }
 
+    /**
+     * Maneja la navegación hacia atrás en la barra superior.
+     */
     @Override
     public boolean onSupportNavigateUp() {
-        return NavigationUI.navigateUp(navController,
-                new AppBarConfiguration.Builder(navController.getGraph()).build())
-                || super.onSupportNavigateUp();
+        return NavigationUI.navigateUp(
+                navController,
+                new AppBarConfiguration.Builder(navController.getGraph()).build()
+        ) || super.onSupportNavigateUp();
     }
 }

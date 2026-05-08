@@ -1,17 +1,27 @@
 package es.iesagora.fitjourney.data.remote;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
+
+/**
+ * Modelo utilizado para enviar las credenciales
+ * de acceso del usuario a la API.
+ * Se utiliza en procesos como login,
+ * reactivación de cuenta o eliminación de cuenta.
+ */
+@Setter
+@Getter
+@AllArgsConstructor
 public class LoginRequest {
+
+    /**
+     * Correo electrónico del usuario.
+     */
     private String email;
+
+    /**
+     * Contraseña del usuario.
+     */
     private String password;
-
-    public LoginRequest(String email, String password) {
-        this.email = email;
-        this.password = password;
-    }
-
-    public String getEmail() { return email; }
-    public void setEmail(String email) { this.email = email; }
-
-    public String getPassword() { return password; }
-    public void setPassword(String password) { this.password = password; }
 }

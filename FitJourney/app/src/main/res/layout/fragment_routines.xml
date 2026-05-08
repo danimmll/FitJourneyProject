@@ -84,37 +84,11 @@
                 app:chipStrokeWidth="0dp" />
 
             <com.google.android.material.chip.Chip
-                android:id="@+id/chipStrength"
+                android:id="@+id/chipPersonal"
                 style="@style/Widget.MaterialComponents.Chip.Choice"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Fuerza"
-                android:textColor="@color/text"
-                android:textSize="13sp"
-                app:chipBackgroundColor="?attr/colorSurface"
-                app:chipStrokeColor="@color/stroke"
-                app:chipStrokeWidth="1dp"
-                app:chipCornerRadius="20dp" />
-
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chipHypert"
-                style="@style/Widget.MaterialComponents.Chip.Choice"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Hipertrofia"
-                android:textColor="@color/text"
-                android:textSize="13sp"
-                app:chipBackgroundColor="?attr/colorSurface"
-                app:chipStrokeColor="@color/stroke"
-                app:chipStrokeWidth="1dp"
-                app:chipCornerRadius="20dp" />
-
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chipCardio"
-                style="@style/Widget.MaterialComponents.Chip.Choice"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Cardio"
+                android:text="Personales"
                 android:textColor="@color/text"
                 android:textSize="13sp"
                 app:chipBackgroundColor="?attr/colorSurface"
@@ -143,7 +117,7 @@
         android:id="@+id/tvEmptyRoutines"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="No tienes rutinas creadas.\n¡Crea una pulsando en + NUEVA!"
+        android:text="No hay rutinas disponibles.\n¡Crea una pulsando en + NUEVA!"
         android:textColor="@color/textSecondary"
         android:textAlignment="center"
         android:visibility="gone"

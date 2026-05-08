@@ -1,5 +1,6 @@
 package es.iesagora.fitjourney.ui.second.fitnesscenter.exercises;
 
+import android.annotation.SuppressLint;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -29,23 +30,69 @@ import es.iesagora.fitjourney.databinding.FragmentExercisesBinding;
 import es.iesagora.fitjourney.ui.second.adapters.ExerciseAdapter;
 import es.iesagora.fitjourney.viewmodel.SecondViewModel;
 
+/**
+ * Fragment encargado de mostrar la lista de ejercicios disponibles en el Fitness Center.
+ *
+ * <p>Este fragment permite al usuario:</p>
+ * <ul>
+ *     <li>Visualizar ejercicios obtenidos desde el ViewModel.</li>
+ *     <li>Filtrar por nombre mediante búsqueda.</li>
+ *     <li>Filtrar por nivel de dificultad (Principiante, Intermedio, Experto).</li>
+ *     <li>Acceder a la creación de ejercicios si el usuario es administrador.</li>
+ * </ul>
+ *
+ * <p>Incluye gestión de estados de carga, error y vacío, así como un sistema de filtros dinámicos.</p>
+ */
 public class ExercisesFragment extends Fragment {
 
+    /** ViewBinding del layout del fragmento */
     private FragmentExercisesBinding binding;
+
+    /** ViewModel compartido que gestiona la carga de ejercicios */
     private SecondViewModel viewModel;
+
+    /** Adaptador del RecyclerView de ejercicios */
     private ExerciseAdapter adapter;
+
+    /** Repositorio de preferencias del usuario */
     private PreferencesRepository prefs;
+
+    /** Lista completa de ejercicios obtenidos desde backend */
     private List<Exercise> allExercises = new ArrayList<>();
+
+    /** Texto actual de búsqueda */
     private String currentQuery = "";
+
+    /** Dificultad seleccionada en los filtros */
     private String selectedDifficulty = "Todos";
+
+    /** Lista de niveles de dificultad disponibles */
     private final String[] difficulties = {"Todos", "Principiante", "Intermedio", "Experto"};
 
+    /**
+     * Infla la vista del fragmento.
+     *
+     * @param inflater inflador del layout
+     * @param container contenedor padre
+     * @param savedInstanceState estado previo del fragmento
+     * @return vista raíz del fragmento
+     */
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentExercisesBinding.inflate(inflater, container, false);
         return binding.getRoot();
     }
 
+    /**
+     * Inicializa la UI, ViewModel, observers y eventos.
+     * Se encarga de:
+     * - Configurar RecyclerView
+     * - Inicializar filtros por categoría
+     * - Observar cambios de ejercicios
+     * - Manejar búsqueda en tiempo real
+     * - Controlar acceso de administrador
+     */
+    @SuppressLint("SetTextI18n")
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -59,6 +106,7 @@ public class ExercisesFragment extends Fragment {
         viewModel.getExercises().observe(getViewLifecycleOwner(), resource -> {
             if (resource != null) {
                 switch (resource.status) {
+
                     case LOADING:
                         binding.progressBar.setVisibility(View.VISIBLE);
                         binding.rvExercises.setVisibility(View.GONE);
@@ -67,6 +115,7 @@ public class ExercisesFragment extends Fragment {
 
                     case SUCCESS:
                         binding.progressBar.setVisibility(View.GONE);
+
                         if (resource.data != null && !resource.data.isEmpty()) {
                             binding.rvExercises.setVisibility(View.VISIBLE);
                             binding.tvError.setVisibility(View.GONE);
@@ -74,6 +123,7 @@ public class ExercisesFragment extends Fragment {
                             if (currentQuery.isEmpty() && selectedDifficulty.equals("Todos")) {
                                 allExercises = new ArrayList<>(resource.data);
                             }
+
                             applyFilters();
                         } else {
                             showEmptyState();
@@ -85,6 +135,7 @@ public class ExercisesFragment extends Fragment {
                         binding.rvExercises.setVisibility(View.GONE);
                         binding.tvError.setText("Error al conectar con el servidor.");
                         binding.tvError.setVisibility(View.VISIBLE);
+
                         Toast.makeText(getContext(), resource.message, Toast.LENGTH_SHORT).show();
                         break;
                 }
@@ -92,8 +143,11 @@ public class ExercisesFragment extends Fragment {
         });
 
         binding.svExercises.setOnQueryTextListener(new androidx.appcompat.widget.SearchView.OnQueryTextListener() {
+
             @Override
-            public boolean onQueryTextSubmit(String query) { return false; }
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
 
             @Override
             public boolean onQueryTextChange(String newText) {
@@ -117,23 +171,34 @@ public class ExercisesFragment extends Fragment {
         }
     }
 
+    /**
+     * Configura los botones de filtros por dificultad.
+     * Cambia estilos dinámicamente según selección.
+     */
     private void setupCategories() {
         binding.llCategories.removeAllViews();
 
         for (String diff : difficulties) {
-            MaterialButton btn = new MaterialButton(requireContext(), null, com.google.android.material.R.attr.materialButtonOutlinedStyle);
+            MaterialButton btn = new MaterialButton(
+                    requireContext(),
+                    null,
+                    com.google.android.material.R.attr.materialButtonOutlinedStyle
+            );
+
             btn.setText(diff);
             btn.setCornerRadius(50);
             btn.setAllCaps(false);
 
             if (diff.equals(selectedDifficulty)) {
-                btn.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.mainrosa)));
+                btn.setBackgroundTintList(ColorStateList.valueOf(
+                        ContextCompat.getColor(requireContext(), R.color.mainrosa)));
                 btn.setTextColor(ContextCompat.getColor(requireContext(), R.color.white));
                 btn.setStrokeWidth(0);
             } else {
                 btn.setBackgroundTintList(ColorStateList.valueOf(Color.TRANSPARENT));
                 btn.setTextColor(ContextCompat.getColor(requireContext(), R.color.text));
-                btn.setStrokeColor(ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.mainrosa)));
+                btn.setStrokeColor(ColorStateList.valueOf(
+                        ContextCompat.getColor(requireContext(), R.color.mainrosa)));
                 btn.setStrokeWidth(3);
             }
 
@@ -154,30 +219,28 @@ public class ExercisesFragment extends Fragment {
         }
     }
 
+    /**
+     * Aplica filtros de búsqueda y dificultad sobre la lista de ejercicios.
+     *
+     * <p>Este método filtra la lista completa de ejercicios aplicando dos criterios:</p>
+     * <ul>
+     *     <li>Filtro por búsqueda de texto en el nombre del ejercicio.</li>
+     *     <li>Filtro por nivel de dificultad seleccionado.</li>
+     * </ul>
+     *
+     * <p>El resultado filtrado se muestra en el RecyclerView.
+     * Si no hay resultados, se muestra un estado vacío.</p>
+     */
     private void applyFilters() {
-        List<Exercise> filteredList = new ArrayList<>();
 
-        for (Exercise ex : allExercises) {
-            boolean matchesSearch = currentQuery.isEmpty() ||
-                    (ex.getName() != null && ex.getName().toLowerCase().contains(currentQuery.toLowerCase()));
-
-            boolean matchesDifficulty = selectedDifficulty.equals("Todos");
-            if (!matchesDifficulty && ex.getDifficulty() != null) {
-                String exDiff = ex.getDifficulty().trim();
-
-                if (selectedDifficulty.equalsIgnoreCase("Principiante") && (exDiff.equalsIgnoreCase("Principiante") || exDiff.equals("1"))) {
-                    matchesDifficulty = true;
-                } else if (selectedDifficulty.equalsIgnoreCase("Intermedio") && (exDiff.equalsIgnoreCase("Intermedio") || exDiff.equals("2"))) {
-                    matchesDifficulty = true;
-                } else if (selectedDifficulty.equalsIgnoreCase("Experto") && (exDiff.equalsIgnoreCase("Experto") || exDiff.equals("3"))) {
-                    matchesDifficulty = true;
-                }
-            }
-
-            if (matchesSearch && matchesDifficulty) {
-                filteredList.add(ex);
-            }
-        }
+        List<Exercise> filteredList = allExercises.stream()
+                .filter(ex ->
+                        currentQuery.isEmpty()
+                                || (ex.getName() != null &&
+                                ex.getName().toLowerCase().contains(currentQuery.toLowerCase()))
+                )
+                .filter(this::isMatchesDifficulty)
+                .collect(java.util.stream.Collectors.toList());
 
         if (filteredList.isEmpty() && !allExercises.isEmpty()) {
             showEmptyState();
@@ -188,6 +251,41 @@ public class ExercisesFragment extends Fragment {
         }
     }
 
+    /**
+     * Comprueba si un ejercicio coincide con la dificultad seleccionada actualmente.
+     *
+     * <p>Este método evalúa el nivel de dificultad del ejercicio frente al filtro activo
+     * del usuario. Soporta valores tanto en texto (Principiante, Intermedio, Experto)
+     * como en formato numérico ("1", "2", "3") provenientes del backend.</p>
+     *
+     * @param ex ejercicio a evaluar
+     * @return {@code true} si el ejercicio coincide con la dificultad seleccionada
+     *         o si el filtro está en "Todos"; {@code false} en caso contrario
+     */
+    private boolean isMatchesDifficulty(Exercise ex) {
+        boolean matchesDifficulty = selectedDifficulty.equals("Todos");
+
+        if (!matchesDifficulty && ex.getDifficulty() != null) {
+            String exDiff = ex.getDifficulty().trim();
+
+            if (selectedDifficulty.equalsIgnoreCase("Principiante")
+                    && (exDiff.equalsIgnoreCase("Principiante") || exDiff.equals("1"))) {
+                matchesDifficulty = true;
+            } else if (selectedDifficulty.equalsIgnoreCase("Intermedio")
+                    && (exDiff.equalsIgnoreCase("Intermedio") || exDiff.equals("2"))) {
+                matchesDifficulty = true;
+            } else if (selectedDifficulty.equalsIgnoreCase("Experto")
+                    && (exDiff.equalsIgnoreCase("Experto") || exDiff.equals("3"))) {
+                matchesDifficulty = true;
+            }
+        }
+        return matchesDifficulty;
+    }
+
+    /**
+     * Muestra estado vacío cuando no hay resultados.
+     */
+    @SuppressLint("SetTextI18n")
     private void showEmptyState() {
         binding.tvError.setText("No se encontraron ejercicios con esos filtros.");
         binding.tvError.setVisibility(View.VISIBLE);
@@ -195,12 +293,18 @@ public class ExercisesFragment extends Fragment {
         adapter.setExercises(new ArrayList<>());
     }
 
+    /**
+     * Configura el RecyclerView de ejercicios.
+     */
     private void setupRecyclerView() {
         binding.rvExercises.setLayoutManager(new LinearLayoutManager(getContext()));
         adapter = new ExerciseAdapter(requireContext(), viewModel);
         binding.rvExercises.setAdapter(adapter);
     }
 
+    /**
+     * Limpia referencias del binding para evitar memory leaks.
+     */
     @Override
     public void onDestroyView() {
         super.onDestroyView();

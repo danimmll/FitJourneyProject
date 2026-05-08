@@ -1,5 +1,6 @@
 package es.iesagora.fitjourney.ui.second.fitnesscenter.routines;
 
+import android.app.AlertDialog;
 import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -22,14 +23,24 @@ import java.util.List;
 
 import es.iesagora.fitjourney.R;
 import es.iesagora.fitjourney.data.model.Routine;
+import es.iesagora.fitjourney.data.remote.Resource;
+import es.iesagora.fitjourney.data.repositories.PreferencesRepository;
 import es.iesagora.fitjourney.databinding.FragmentRoutinesBinding;
+import es.iesagora.fitjourney.ui.second.adapters.RoutineAdapter;
 import es.iesagora.fitjourney.viewmodel.SecondViewModel;
 
+/**
+ * Pantalla que muestra las rutinas disponibles.
+ * Permite al usuario ver todas las rutinas de la app o solo las que ha creado él.
+ * Desde aquí se puede crear una nueva rutina o eliminar las propias.
+ */
 public class RoutinesFragment extends Fragment {
 
     private FragmentRoutinesBinding binding;
     private SecondViewModel viewModel;
+    private RoutineAdapter adapter;
     private List<Routine> allRoutines = new ArrayList<>();
+    private int currentUserId;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -40,20 +51,99 @@ public class RoutinesFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
         viewModel = new ViewModelProvider(requireActivity()).get(SecondViewModel.class);
 
-        setupRecyclerView();
+        // Sacamos el ID y el rol del usuario para saber qué rutinas puede borrar
+        PreferencesRepository prefs = new PreferencesRepository(requireContext());
+        String userIdStr = prefs.getUserId();
+        currentUserId = userIdStr != null ? Integer.parseInt(userIdStr) : -1;
+        boolean isAdmin = "admin".equalsIgnoreCase(prefs.getRole());
+
+        setupRecyclerView(isAdmin);
         setupChips();
 
         binding.btnCreateRoutine.setOnClickListener(v ->
-                Toast.makeText(getContext(), "Crear rutina en desarrollo 🛠️", Toast.LENGTH_SHORT).show()
+                Navigation.findNavController(v).navigate(R.id.action_routinesFragment_to_formRoutineFragment)
         );
+
+        // Pedimos a la API que nos traiga la lista de rutinas
+        viewModel.fetchRoutines();
+
+        setupObservers();
     }
 
-    private void setupRecyclerView() {
+    /**
+     * Se queda "escuchando" a la API para actualizar la pantalla
+     * cuando llegan las rutinas o cuando se borra alguna.
+     */
+    private void setupObservers() {
+        viewModel.getRoutines().observe(getViewLifecycleOwner(), resource -> {
+            if (resource == null) return;
+
+            switch (resource.status) {
+                case LOADING:
+                    binding.progressBar.setVisibility(View.VISIBLE);
+                    break;
+                case SUCCESS:
+                    binding.progressBar.setVisibility(View.GONE);
+                    allRoutines = resource.data != null ? resource.data : new ArrayList<>();
+                    applyFilter();
+                    break;
+                case ERROR:
+                    binding.progressBar.setVisibility(View.GONE);
+                    Toast.makeText(getContext(), "Error: " + resource.message, Toast.LENGTH_SHORT).show();
+                    break;
+            }
+        });
+
+        // Escucha la respuesta al intentar borrar una rutina
+        viewModel.getRoutineActionStatus().observe(getViewLifecycleOwner(), resource -> {
+            if (resource == null) return;
+
+            if (resource.status == Resource.Status.SUCCESS) {
+                if (resource.message != null && resource.message.toLowerCase().contains("eliminada")) {
+                    Toast.makeText(getContext(), "Rutina borrada con éxito", Toast.LENGTH_SHORT).show();
+                    viewModel.getRoutineActionStatus().setValue(null); // Limpiamos el aviso para que no se repita
+                }
+            } else if (resource.status == Resource.Status.ERROR) {
+                Toast.makeText(getContext(), "Error al borrar: " + resource.message, Toast.LENGTH_LONG).show();
+                viewModel.getRoutineActionStatus().setValue(null);
+            }
+        });
+    }
+
+    /**
+     * Prepara la lista visual y define qué pasa al tocar una rutina o al darle a borrar.
+     */
+    private void setupRecyclerView(boolean isAdmin) {
         binding.rvRoutines.setLayoutManager(new LinearLayoutManager(getContext()));
+
+        adapter = new RoutineAdapter(currentUserId, isAdmin, new RoutineAdapter.OnRoutineListener() {
+            @Override
+            public void onRoutineClick(Routine routine) {
+                // TODO: Cuando hagamos la pantalla de detalles (para ver los ejercicios de la rutina), navegaremos desde aquí.
+                Toast.makeText(getContext(), "Cargando: " + routine.getName(), Toast.LENGTH_SHORT).show();
+
+                /*
+                Bundle bundle = new Bundle();
+                bundle.putInt("routine_id", routine.getId_routine());
+                Navigation.findNavController(requireView()).navigate(R.id.action_routines_to_routineDetail, bundle);
+                */
+            }
+
+            @Override
+            public void onDeleteClick(Routine routine) {
+                showDeleteDialog(routine);
+            }
+        });
+
+        binding.rvRoutines.setAdapter(adapter);
     }
 
+    /**
+     * Configura los botones de filtro (Todas / Personales) para que cambien de color al pulsarlos.
+     */
     private void setupChips() {
         int colorRosa = ContextCompat.getColor(requireContext(), R.color.mainrosa);
         int colorSurface = ContextCompat.getColor(requireContext(), R.color.surface);
@@ -71,27 +161,46 @@ public class RoutinesFragment extends Fragment {
         });
     }
 
+    /**
+     * Filtra la lista de rutinas en base a lo que el usuario haya seleccionado.
+     */
     private void applyFilter() {
+        if (allRoutines == null) return;
         List<Routine> filtered = new ArrayList<>();
 
         if (binding.chipAll.isChecked()) {
             filtered.addAll(allRoutines);
-        } else if (binding.chipStrength.isChecked()) {
-            for (Routine r : allRoutines) if ("Fuerza".equalsIgnoreCase(r.getType())) filtered.add(r);
-        } else if (binding.chipHypert.isChecked()) {
-            for (Routine r : allRoutines) if ("Hipertrofia".equalsIgnoreCase(r.getType())) filtered.add(r);
-        } else if (binding.chipCardio.isChecked()) {
-            for (Routine r : allRoutines) if ("Cardio".equalsIgnoreCase(r.getType())) filtered.add(r);
+        } else if (binding.chipPersonal.isChecked()) {
+            // Recorremos la lista y nos quedamos solo con las que creó el usuario logueado
+            for (Routine r : allRoutines) {
+                if (r.getId_user() == currentUserId) {
+                    filtered.add(r);
+                }
+            }
         }
 
-        if (filtered.isEmpty() && !allRoutines.isEmpty()) {
+        adapter.setRoutines(filtered);
+
+        // Si la lista está vacía tras filtrar, mostramos el mensaje de "No hay rutinas"
+        if (filtered.isEmpty()) {
             binding.rvRoutines.setVisibility(View.GONE);
             binding.tvEmptyRoutines.setVisibility(View.VISIBLE);
-            binding.tvEmptyRoutines.setText("No hay rutinas de este tipo.");
-        } else if (!allRoutines.isEmpty()) {
+        } else {
             binding.rvRoutines.setVisibility(View.VISIBLE);
             binding.tvEmptyRoutines.setVisibility(View.GONE);
         }
+    }
+
+    /**
+     * Muestra una advertencia antes de borrar la rutina definitivamente.
+     */
+    private void showDeleteDialog(Routine routine) {
+        new AlertDialog.Builder(requireContext())
+                .setTitle("Borrar Rutina")
+                .setMessage("¿Estás seguro de que quieres eliminar la rutina '" + routine.getName() + "'?\n\nLa rutina y su configuración desaparecerán para siempre.")
+                .setPositiveButton("Borrar para siempre", (dialog, which) -> viewModel.deleteRoutine(routine.getId_routine()))
+                .setNegativeButton("Cancelar", null)
+                .show();
     }
 
     @Override

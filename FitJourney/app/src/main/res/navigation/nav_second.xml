@@ -65,8 +65,8 @@
         android:label=""
         tools:layout="@layout/fragment_routines" >
         <action
-            android:id="@+id/action_routinesFragment_to_formWorkoutFragment"
-            app:destination="@id/formWorkoutFragment" />
+            android:id="@+id/action_routinesFragment_to_formRoutineFragment"
+            app:destination="@id/formRoutineFragment" />
     </fragment>
 
     <fragment
@@ -96,8 +96,13 @@
     </fragment>
     <fragment
         android:id="@+id/formWorkoutFragment"
-        android:name="es.iesagora.fitjourney.FormWorkoutFragment"
+        android:name="es.iesagora.fitjourney.ui.second.fitnesscenter.workouts.FormWorkoutFragment"
         android:label="fragment_form_workout"
         tools:layout="@layout/fragment_form_workout" />
+    <fragment
+        android:id="@+id/formRoutineFragment"
+        android:name="es.iesagora.fitjourney.ui.second.fitnesscenter.routines.FormRoutineFragment"
+        android:label="fragment_form_routine"
+        tools:layout="@layout/fragment_form_routine" />
 
 </navigation>

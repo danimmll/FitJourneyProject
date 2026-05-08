@@ -1,5 +1,6 @@
 package es.iesagora.fitjourney.ui.second.home;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -31,19 +32,72 @@ import es.iesagora.fitjourney.databinding.FragmentHomeBinding;
 import es.iesagora.fitjourney.utils.FitnessCalculator;
 import es.iesagora.fitjourney.viewmodel.SecondViewModel;
 
+/**
+ * Fragment principal (Home) de la sección secundaria de la aplicación.
+ * Este fragmento actúa como panel principal del usuario autenticado, mostrando
+ * información general de su estado físico, progreso y actividad reciente.
+ * Responsabilidades principales:
+ * - Mostrar saludo personalizado y fecha actual.
+ * - Cargar datos del usuario desde el ViewModel.
+ * - Calcular métricas físicas (IMC, grasa corporal, masa magra, etc.).
+ * - Mostrar estadísticas de entrenamientos (calorías, racha, actividad semanal).
+ * - Permitir navegación rápida a secciones de entrenamiento.
+ * Este fragmento depende del {@link SecondViewModel} para obtener datos del usuario
+ * y del historial de entrenamientos, así como de {@link PreferencesRepository}
+ * para recuperar la sesión actual.
+ */
 public class HomeFragment extends Fragment {
 
+    /**
+     * ViewBinding del layout del HomeFragment.
+     * Permite acceder de forma segura a las vistas sin usar findViewById.
+     */
     private FragmentHomeBinding binding;
+
+    /**
+     * ViewModel compartido de la sección secundaria.
+     * Gestiona la obtención de perfil y datos de entrenamientos.
+     */
     private SecondViewModel viewModel;
+
+    /**
+     * Repositorio de preferencias locales.
+     * Se utiliza para recuperar el token de sesión del usuario.
+     */
     private PreferencesRepository prefs;
+
+    /**
+     * Usuario actualmente cargado en la pantalla Home.
+     * Se utiliza para calcular métricas físicas y personalizar la UI.
+     */
     private User currentUser;
 
+    /**
+     * Infla la vista del fragmento Home.
+     *
+     * @param inflater objeto para inflar layouts XML
+     * @param container contenedor padre
+     * @param savedInstanceState estado previo del fragmento
+     * @return vista raíz del fragmento
+     */
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentHomeBinding.inflate(inflater, container, false);
         return binding.getRoot();
     }
 
+    /**
+     * Inicializa la interfaz del HomeFragment.
+     * Aquí se:
+     * - Inicializa ViewModel y repositorio de preferencias.
+     * - Configura header con fecha actual.
+     * - Configura botones de navegación rápida.
+     * - Carga datos del usuario y entrenamientos.
+     * - Observa cambios en perfil e historial.
+     *
+     * @param view vista raíz del fragmento
+     * @param savedInstanceState estado previo
+     */
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -75,21 +129,40 @@ public class HomeFragment extends Fragment {
         });
     }
 
+    /**
+     * Configura el encabezado del Home con la fecha actual formateada.
+     */
     private void setupHeader() {
         SimpleDateFormat sdf = new SimpleDateFormat("d 'DE' MMMM, yyyy", new Locale("es", "ES"));
         binding.tvDate.setText(sdf.format(new Date()).toUpperCase());
     }
 
+    /**
+     * Configura botones de navegación rápida hacia el centro de entrenamiento.
+     * Todos los botones redirigen al mismo fragmento de fitness.
+     */
     private void setupNavigationButtons() {
-        View.OnClickListener goToFitnessCenter = v -> Navigation.findNavController(v).navigate(R.id.fitnessCenterFragment);
+        View.OnClickListener goToFitnessCenter =
+                v -> Navigation.findNavController(v).navigate(R.id.fitnessCenterFragment);
+
         binding.btnTrainNow.setOnClickListener(goToFitnessCenter);
         binding.btnCardio.setOnClickListener(goToFitnessCenter);
         binding.btnStrength.setOnClickListener(goToFitnessCenter);
         binding.btnStretching.setOnClickListener(goToFitnessCenter);
     }
 
+    /**
+     * Muestra los datos físicos del usuario (IMC, grasa corporal, masa magra, etc.).
+     * Utiliza {@link FitnessCalculator} para realizar los cálculos.
+     *
+     * @param user usuario autenticado
+     */
+    @SuppressLint("SetTextI18n")
     private void populatePhysicalData(User user) {
-        String firstName = user.getName().contains(" ") ? user.getName().split(" ")[0] : user.getName();
+        String firstName = user.getName().contains(" ")
+                ? user.getName().split(" ")[0]
+                : user.getName();
+
         binding.tvGreeting.setText("Hola, " + firstName + " 👋");
 
         try {
@@ -99,7 +172,8 @@ public class HomeFragment extends Fragment {
 
             float imc = FitnessCalculator.calculateBMI(peso, alturaCm);
 
-            float porcentajeGrasa = FitnessCalculator.calculateBodyFat(imc, edad, user.getGender(), user.getGoal());
+            float porcentajeGrasa =
+                    FitnessCalculator.calculateBodyFat(imc, edad, user.getGender(), user.getGoal());
 
             float masaMagra = FitnessCalculator.calculateLeanMass(peso, porcentajeGrasa);
             String categoriaImc = FitnessCalculator.getBMICategory(imc, user.getGoal());
@@ -118,6 +192,16 @@ public class HomeFragment extends Fragment {
         }
     }
 
+    /**
+     * Calcula la racha de entrenamientos y estadísticas generales.
+     * Se analiza:
+     * - Calorías máximas registradas.
+     * - Calorías del día actual.
+     * - Días consecutivos de entrenamiento (streak).
+     *
+     * @param history lista de entrenamientos del usuario
+     */
+    @SuppressLint("SetTextI18n")
     private void calculateStreakAndStats(List<Workout> history) {
         if (history == null || history.isEmpty()) {
             binding.tvStreakTitle.setText("🔥  0 Días de Racha");
@@ -135,13 +219,16 @@ public class HomeFragment extends Fragment {
         float caloriasHoy = 0.0f;
 
         for (Workout w : history) {
+
             if (w.getCalories_burned() != null && w.getCalories_burned() > maxCalories) {
                 maxCalories = w.getCalories_burned();
             }
 
             try {
                 if (w.getWorkout_date() != null) {
-                    String dateStr = w.getWorkout_date().length() >= 10 ? w.getWorkout_date().substring(0, 10) : w.getWorkout_date();
+                    String dateStr = w.getWorkout_date().length() >= 10
+                            ? w.getWorkout_date().substring(0, 10)
+                            : w.getWorkout_date();
 
                     if (dateStr.equals(hoyStr) && w.getCalories_burned() != null) {
                         caloriasHoy += w.getCalories_burned();
@@ -156,16 +243,21 @@ public class HomeFragment extends Fragment {
         binding.tvPeakCal.setText(String.format(Locale.US, "%.0f kcal", maxCalories));
         binding.tvTodayCalories.setText(String.format(Locale.US, "%.0f kcal", caloriasHoy));
 
-        Collections.sort(workoutDates, Collections.reverseOrder());
+        workoutDates.sort(Collections.reverseOrder());
         if (workoutDates.isEmpty()) return;
 
         Calendar todayCal = Calendar.getInstance();
-        todayCal.set(Calendar.HOUR_OF_DAY, 0); todayCal.set(Calendar.MINUTE, 0); todayCal.set(Calendar.SECOND, 0); todayCal.set(Calendar.MILLISECOND, 0);
+        todayCal.set(Calendar.HOUR_OF_DAY, 0);
+        todayCal.set(Calendar.MINUTE, 0);
+        todayCal.set(Calendar.SECOND, 0);
+        todayCal.set(Calendar.MILLISECOND, 0);
 
         long diffInMillis = todayCal.getTime().getTime() - workoutDates.get(0).getTime();
-        long daysSinceLastWorkout = TimeUnit.DAYS.convert(diffInMillis, TimeUnit.MILLISECONDS);
+        long daysSinceLastWorkout =
+                TimeUnit.DAYS.convert(diffInMillis, TimeUnit.MILLISECONDS);
 
         int streak = 0;
+
         if (daysSinceLastWorkout == 0) {
             binding.tvStreakMessage.setText("¡Entrenaste hoy! Sigue así 🔥");
             streak = 1;
@@ -177,7 +269,6 @@ public class HomeFragment extends Fragment {
             streak = 1;
         } else {
             binding.tvStreakMessage.setText("Has perdido la racha. ¡Es hora de volver a empezar!");
-            streak = 0;
         }
 
         if (streak > 0) {
@@ -191,18 +282,34 @@ public class HomeFragment extends Fragment {
                 }
             }
         }
+
         binding.tvStreakTitle.setText("🔥  " + streak + " Días de Racha");
     }
 
+    /**
+     * Calcula y dibuja la actividad semanal del usuario en forma de barras.
+     * Cada día muestra si hubo entrenamiento o no,
+     * ajustando altura y color de la barra correspondiente.
+     *
+     * @param history historial de entrenamientos
+     */
     private void calculateWeeklyActivity(List<Workout> history) {
-        View[] bars = {binding.bar1, binding.bar2, binding.bar3, binding.bar4, binding.bar5, binding.bar6, binding.bar7};
-        TextView[] texts = {binding.tvDay1, binding.tvDay2, binding.tvDay3, binding.tvDay4, binding.tvDay5, binding.tvDay6, binding.tvDay7};
+        View[] bars = {
+                binding.bar1, binding.bar2, binding.bar3,
+                binding.bar4, binding.bar5, binding.bar6, binding.bar7
+        };
+
+        TextView[] texts = {
+                binding.tvDay1, binding.tvDay2, binding.tvDay3,
+                binding.tvDay4, binding.tvDay5, binding.tvDay6, binding.tvDay7
+        };
 
         String[] nombresDias = {"D", "L", "M", "X", "J", "V", "S"};
         Calendar cal = Calendar.getInstance();
         int diaSemanaHoy = cal.get(Calendar.DAY_OF_WEEK) - 1;
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+
         int colorRosa = ContextCompat.getColor(requireContext(), R.color.mainrosa);
         int colorStroke = ContextCompat.getColor(requireContext(), R.color.stroke);
         int colorText = ContextCompat.getColor(requireContext(), R.color.text);
@@ -210,6 +317,7 @@ public class HomeFragment extends Fragment {
         float density = getResources().getDisplayMetrics().density;
 
         for (int i = 6; i >= 0; i--) {
+
             int currentDayIndex = (diaSemanaHoy - (6 - i)) % 7;
             if (currentDayIndex < 0) currentDayIndex += 7;
 
@@ -217,16 +325,20 @@ public class HomeFragment extends Fragment {
 
             String targetDate = sdf.format(cal.getTime());
             boolean entrenoEseDia = false;
+
             if (history != null) {
                 for (Workout w : history) {
-                    if (w.getWorkout_date() != null && w.getWorkout_date().startsWith(targetDate)) {
+                    if (w.getWorkout_date() != null &&
+                            w.getWorkout_date().startsWith(targetDate)) {
                         entrenoEseDia = true;
                         break;
                     }
                 }
             }
 
-            LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) bars[i].getLayoutParams();
+            LinearLayout.LayoutParams params =
+                    (LinearLayout.LayoutParams) bars[i].getLayoutParams();
+
             if (entrenoEseDia) {
                 params.height = (int) (40 * density);
                 bars[i].setBackgroundColor(colorRosa);
@@ -236,12 +348,15 @@ public class HomeFragment extends Fragment {
                 bars[i].setBackgroundColor(colorStroke);
                 if (i != 6) texts[i].setTextColor(colorText);
             }
-            bars[i].setLayoutParams(params);
 
+            bars[i].setLayoutParams(params);
             cal.add(Calendar.DAY_OF_YEAR, -1);
         }
     }
 
+    /**
+     * Libera recursos del ViewBinding para evitar fugas de memoria.
+     */
     @Override
     public void onDestroyView() {
         super.onDestroyView();
