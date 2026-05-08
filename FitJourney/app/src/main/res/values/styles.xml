@@ -13,4 +13,9 @@
         <item name="cornerSize">50%</item>
     </style>
 
+    <style name="RoundedCornersImage">
+        <item name="cornerSize">16dp</item>
+        <item name="cornerFamily">rounded</item>
+    </style>
+
 </resources>
