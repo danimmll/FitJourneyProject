@@ -9,18 +9,18 @@ datasource db {
 }
 
 model User {
-  id_user     Int      @id @default(autoincrement())
-  email       String   @unique
-  name        String
-  password    String
-  gender      String?
-  goal        String?
-  height      Float?
-  weight      Float?
-  birth_date  DateTime?
-  photo_url   String?
-  role        String   @default("user")
-  active      Int      @default(1)
+  id_user      Int      @id @default(autoincrement())
+  email        String   @unique
+  name         String
+  password     String
+  gender       String?
+  goal         String?
+  height       Float?
+  weight       Float?
+  birth_date   DateTime?
+  photo_url    String?
+  role         String   @default("user")
+  active       Int      @default(1)
   register_date DateTime @default(now())
 
   routines    Routine[]
@@ -39,7 +39,7 @@ model Exercise {
   video_url    String?
   equipment    String?
   creation_date DateTime @default(now())
-  active      Int      @default(1)
+  active       Int      @default(1)
 
   routineExercises RoutineExercise[]
   workoutDetails   WorkoutDetail[]
@@ -50,11 +50,12 @@ model Routine {
   id_routine   Int      @id @default(autoincrement())
   name         String
   description  String?
+  photo_url    String?
   creation_date DateTime @default(now())
 
   user     User @relation(fields: [id_user], references: [id_user])
   id_user  Int
-  active      Int      @default(1)
+  active       Int      @default(1)
 
   exercises RoutineExercise[]
   workouts  Workout[]
@@ -63,10 +64,10 @@ model Routine {
 model RoutineExercise {
   id_routine_exercise Int @id @default(autoincrement())
 
-  routine   Routine @relation(fields: [id_routine], references: [id_routine])
+  routine   Routine @relation(fields: [id_routine], references: [id_routine], onDelete: Cascade)
   id_routine Int
 
-  exercise  Exercise @relation(fields: [id_exercise], references: [id_exercise])
+  exercise  Exercise @relation(fields: [id_exercise], references: [id_exercise], onDelete: Cascade)
   id_exercise Int
 
   target_sets   Int?
@@ -77,11 +78,11 @@ model RoutineExercise {
 model Workout {
   id_workout Int @id @default(autoincrement())
 
-  user     User @relation(fields: [id_user], references: [id_user])
+  user     User @relation(fields: [id_user], references: [id_user], onDelete: Cascade)
   id_user  Int
 
-  routine  Routine @relation(fields: [id_routine], references: [id_routine])
-  id_routine Int
+  routine  Routine? @relation(fields: [id_routine], references: [id_routine], onDelete: SetNull)
+  id_routine Int?
 
   workout_date     DateTime
   duration_minutes Int?
@@ -95,10 +96,10 @@ model Workout {
 model WorkoutDetail {
   id_detail Int @id @default(autoincrement())
 
-  workout   Workout @relation(fields: [id_workout], references: [id_workout])
+  workout   Workout @relation(fields: [id_workout], references: [id_workout], onDelete: Cascade)
   id_workout Int
 
-  exercise  Exercise @relation(fields: [id_exercise], references: [id_exercise])
+  exercise  Exercise @relation(fields: [id_exercise], references: [id_exercise], onDelete: Cascade)
   id_exercise Int
 
   sets_performed   Int?

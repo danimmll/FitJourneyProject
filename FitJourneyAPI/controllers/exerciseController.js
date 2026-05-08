@@ -38,11 +38,11 @@ const updateExercise = async (req, res, next) => {
 const deleteExercise = async (req, res, next) => {
     const { id } = req.params;
     try {
-        await prisma.exercise.update({
-            where: { id_exercise: parseInt(id) },
-            data: { active: 0 } 
+        // Borrado físico real
+        await prisma.exercise.delete({
+            where: { id_exercise: parseInt(id) }
         });
-        res.json({ message: "Ejercicio desactivado correctamente" });
+        res.json({ message: "Ejercicio eliminado físicamente de la base de datos" });
     } catch (error) {
         next(error);
     }

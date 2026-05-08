@@ -14,12 +14,12 @@ const createWorkout = async (req, res, next) => {
                 calories_burned,
                 notes,
                 details: {
-                    create: details.map(d => ({
+                    create: details && details.length > 0 ? details.map(d => ({
                         id_exercise: d.id_exercise,
                         sets_performed: d.sets_performed,
                         reps_performed: d.reps_performed,
                         max_weight_used: d.max_weight_used
-                    }))
+                    })) : []
                 }
             }
         });
@@ -70,12 +70,12 @@ const deleteWorkout = async (req, res, next) => {
             return res.status(403).json({ error: "No tienes permiso para eliminar este entrenamiento o no existe" });
         }
 
-        await prisma.workout.update({
-            where: { id_workout: workoutId },
-            data: { active: 0 }
+        // Borrado físico real
+        await prisma.workout.delete({
+            where: { id_workout: workoutId }
         });
 
-        res.json({ message: "Entrenamiento eliminado correctamente del historial" });
+        res.json({ message: "Entrenamiento eliminado físicamente del historial" });
     } catch (error) {
         next(error);
     }

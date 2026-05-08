@@ -77,8 +77,21 @@ const reactivateAccount = async (req, res, next) => {
         const validPassword = await bcrypt.compare(password, user.password);
         if (!validPassword) return res.status(401).json({ error: "Contraseña incorrecta. No puedes reactivar esta cuenta." });
 
+        // Reactivamos usuario
         const reactivatedUser = await prisma.user.update({
             where: { email },
+            data: { active: 1 }
+        });
+
+        // Reactivamos todas sus rutinas
+        await prisma.routine.updateMany({
+            where: { id_user: reactivatedUser.id_user },
+            data: { active: 1 }
+        });
+
+        // Reactivamos todos sus entrenamientos
+        await prisma.workout.updateMany({
+            where: { id_user: reactivatedUser.id_user },
             data: { active: 1 }
         });
 

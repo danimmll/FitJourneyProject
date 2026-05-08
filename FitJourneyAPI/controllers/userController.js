@@ -43,11 +43,25 @@ const updateProfile = async (req, res, next) => {
 const deleteUser = async (req, res, next) => {
     const { id } = req.params;
     try {
+        // Desactivar usuario
         await prisma.user.update({
             where: { id_user: parseInt(id) },
             data: { active: 0 }
         });
-        res.json({ message: "Usuario desactivado correctamente" });
+
+        // Desactivar Rutinas
+        await prisma.routine.updateMany({
+            where: { id_user: parseInt(id) },
+            data: { active: 0 }
+        });
+
+        // Desactivar Entrenamientos
+        await prisma.workout.updateMany({
+            where: { id_user: parseInt(id) },
+            data: { active: 0 }
+        });
+
+        res.json({ message: "Usuario y sus datos relacionados han sido desactivados correctamente" });
     } catch (error) {
         next(error);
     }

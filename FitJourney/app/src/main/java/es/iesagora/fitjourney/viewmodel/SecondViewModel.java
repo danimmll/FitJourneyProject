@@ -12,11 +12,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import es.iesagora.fitjourney.data.model.Exercise;
+import es.iesagora.fitjourney.data.model.Routine;
 import es.iesagora.fitjourney.data.model.Workout;
 import es.iesagora.fitjourney.data.remote.AccessResponse;
 import es.iesagora.fitjourney.data.remote.Resource;
 import es.iesagora.fitjourney.data.repositories.ExerciseRepository;
 import es.iesagora.fitjourney.data.repositories.PreferencesRepository;
+import es.iesagora.fitjourney.data.repositories.RoutineRepository;
 import es.iesagora.fitjourney.data.repositories.UserRepository;
 import es.iesagora.fitjourney.data.repositories.WorkoutRepository;
 
@@ -38,6 +40,10 @@ public class SecondViewModel extends AndroidViewModel {
 
     private final MutableLiveData<Resource<String>> deleteAccountLiveData = new MutableLiveData<>();
 
+    private final RoutineRepository routineRepository;
+    private final MutableLiveData<Resource<List<Routine>>> routinesLiveData = new MutableLiveData<>();
+    private final MutableLiveData<Resource<String>> routineActionLiveData = new MutableLiveData<>();
+
     public LiveData<Resource<es.iesagora.fitjourney.data.model.User>> getUpdateProfileStatus() {
         return updateProfileLiveData;
     }
@@ -54,6 +60,7 @@ public class SecondViewModel extends AndroidViewModel {
         userRepository = new UserRepository(application.getApplicationContext());
         workoutRepository = new WorkoutRepository(application.getApplicationContext());
         preferencesRepository = new PreferencesRepository(application.getApplicationContext());
+        routineRepository = new RoutineRepository(application.getApplicationContext());
         fetchExercises();
     }
 
@@ -175,6 +182,39 @@ public class SecondViewModel extends AndroidViewModel {
     public void deleteMyAccount(String email, String password) {
         deleteAccountLiveData.setValue(Resource.loading());
         userRepository.deleteAccountPhysical(email, password, deleteAccountLiveData::setValue);
+    }
+
+    public LiveData<Resource<List<Routine>>> getRoutines() {
+        return routinesLiveData;
+    }
+
+    public LiveData<Resource<String>> getRoutineActionStatus() {
+        return routineActionLiveData;
+    }
+
+    public void fetchRoutines() {
+        routinesLiveData.setValue(Resource.loading());
+        routineRepository.getRoutines(result -> routinesLiveData.setValue(result));
+    }
+
+    public void createRoutine(Routine routine) {
+        routineActionLiveData.setValue(Resource.loading());
+        routineRepository.createRoutine(routine, result -> {
+            routineActionLiveData.setValue(result);
+            if (result.status == Resource.Status.SUCCESS) {
+                fetchRoutines();
+            }
+        });
+    }
+
+    public void deleteRoutine(int id) {
+        routineActionLiveData.setValue(Resource.loading());
+        routineRepository.deleteRoutine(id, result -> {
+            routineActionLiveData.setValue(result);
+            if (result.status == Resource.Status.SUCCESS) {
+                fetchRoutines();
+            }
+        });
     }
 
 
