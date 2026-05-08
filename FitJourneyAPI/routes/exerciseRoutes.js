@@ -6,7 +6,7 @@ const router = express.Router();
 /**
  * @swagger
  * tags:
- * name: Ejercicios
+ * - name: Ejercicios
  * description: Catálogo global de ejercicios
  */
 
@@ -22,7 +22,7 @@ const router = express.Router();
  * 200:
  * description: Lista de ejercicios obtenida con éxito
  * 401:
- * description: No autorizado (Token faltante o inválido)
+ * description: No autorizado
  */
 router.get('/', authenticateToken, getExercises);
 
@@ -129,7 +129,7 @@ router.post('/', authenticateToken, isAdmin, createExercise);
  * 401:
  * description: No autorizado
  * 403:
- * description: Acceso denegado, se requiere rol de Admin
+ * description: Acceso denegado
  */
 router.put('/:id', authenticateToken, isAdmin, updateExercise);
 
@@ -154,7 +154,7 @@ router.put('/:id', authenticateToken, isAdmin, updateExercise);
  * 401:
  * description: No autorizado
  * 403:
- * description: Acceso denegado, se requiere rol de Admin
+ * description: Acceso denegado
  */
 router.delete('/:id', authenticateToken, isAdmin, deleteExercise);
 

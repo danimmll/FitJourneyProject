@@ -6,7 +6,7 @@ const router = express.Router();
 /**
  * @swagger
  * tags:
- * name: Autenticación
+ * - name: Autenticacion
  * description: Endpoints para el registro y acceso de usuarios
  */
 
@@ -15,7 +15,7 @@ const router = express.Router();
  * /api/auth/register:
  * post:
  * summary: Registra un nuevo usuario
- * tags: [Autenticación]
+ * tags: [Autenticacion]
  * security: []
  * requestBody:
  * required: true
@@ -50,7 +50,7 @@ router.post('/register', register);
  * /api/auth/login:
  * post:
  * summary: Inicia sesión en la aplicación
- * tags: [Autenticación]
+ * tags: [Autenticacion]
  * security: []
  * requestBody:
  * required: true
@@ -81,7 +81,7 @@ router.post('/login', login);
  * /api/auth/reactivate:
  * post:
  * summary: Reactiva una cuenta previamente borrada
- * tags: [Autenticación]
+ * tags: [Autenticacion]
  * security: []
  * requestBody:
  * required: true
@@ -112,8 +112,8 @@ router.post('/reactivate', reactivateAccount);
  * /api/auth/delete:
  * post:
  * summary: (Admin) Borrado Físico Permanente de un usuario
- * description: Elimina definitivamente a un usuario de la base de datos por su email. Requiere token de Administrador.
- * tags: [Autenticación]
+ * description: Elimina definitivamente a un usuario de la base de datos por su email.
+ * tags: [Autenticacion]
  * security:
  * - bearerAuth: []
  * requestBody:
@@ -130,11 +130,11 @@ router.post('/reactivate', reactivateAccount);
  * example: "usuario_a_eliminar@test.com"
  * responses:
  * 200:
- * description: Usuario eliminado físicamente de la base de datos
+ * description: Usuario eliminado físicamente
  * 401:
- * description: No autorizado (Token faltante o inválido)
+ * description: No autorizado
  * 403:
- * description: Prohibido (Se requieren permisos de administrador)
+ * description: Prohibido
  */
 router.post('/delete', authenticateToken, isAdmin, deleteAccount);
 

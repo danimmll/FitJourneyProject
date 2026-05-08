@@ -1,12 +1,12 @@
 const express = require('express');
 const { getAllUsers, getProfile, updateProfile, deleteUser } = require('../controllers/userController');
-const { authenticateToken, isAdmin } = require('../middlewares/auth'); // Importamos isAdmin
+const { authenticateToken, isAdmin } = require('../middlewares/auth');
 const router = express.Router();
 
 /**
  * @swagger
  * tags:
- * name: Usuarios
+ * - name: Usuarios
  * description: Endpoints para la gestión de perfiles de usuario
  */
 
@@ -22,7 +22,7 @@ const router = express.Router();
  * 200:
  * description: Lista de usuarios obtenida con éxito
  * 401:
- * description: No autorizado (Token faltante o inválido)
+ * description: No autorizado
  * 403:
  * description: No tienes permisos (No eres admin)
  */
