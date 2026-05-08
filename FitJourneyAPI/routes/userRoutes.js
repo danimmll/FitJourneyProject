@@ -7,24 +7,24 @@ const router = express.Router();
  * @swagger
  * tags:
  * - name: Usuarios
- * description: Endpoints para la gestión de perfiles de usuario
+ * description: Controladores para la arquitectura y mutación de perfiles demográficos
  */
 
 /**
  * @swagger
  * /api/users:
  * get:
- * summary: Obtiene la lista de todos los usuarios (Solo Admin)
+ * summary: Expone el catálogo absoluto de usuarios (Superposición jerárquica)
  * tags: [Usuarios]
  * security:
  * - bearerAuth: []
  * responses:
  * 200:
- * description: Lista de usuarios obtenida con éxito
+ * description: Carga de directorio generada exitosamente
  * 401:
- * description: No autorizado
+ * description: Certificado de autenticación ausente o mutado
  * 403:
- * description: No tienes permisos (No eres admin)
+ * description: Interceptado por política restrictiva (No administrador)
  */
 router.get('/', authenticateToken, isAdmin, getAllUsers);
 
@@ -32,17 +32,17 @@ router.get('/', authenticateToken, isAdmin, getAllUsers);
  * @swagger
  * /api/users/profile:
  * get:
- * summary: Obtiene el perfil del usuario autenticado
+ * summary: Carga en memoria el registro demográfico de la sesión en curso
  * tags: [Usuarios]
  * security:
  * - bearerAuth: []
  * responses:
  * 200:
- * description: Perfil del usuario obtenido con éxito
+ * description: Nodo de perfil extraído con precisión
  * 401:
- * description: No autorizado
+ * description: Denegación en capa de seguridad
  * 404:
- * description: Usuario no encontrado
+ * description: Identificador de objeto ausente en la capa de datos
  */
 router.get('/profile', authenticateToken, getProfile);
 
@@ -50,7 +50,7 @@ router.get('/profile', authenticateToken, getProfile);
  * @swagger
  * /api/users/profile:
  * put:
- * summary: Actualiza el perfil del usuario autenticado
+ * summary: Procesa transacciones de sobrescritura sobre atributos del perfil propio
  * tags: [Usuarios]
  * security:
  * - bearerAuth: []
@@ -78,9 +78,9 @@ router.get('/profile', authenticateToken, getProfile);
  * example: "Ganar masa muscular"
  * responses:
  * 200:
- * description: Perfil actualizado correctamente
+ * description: Modificación de los vértices ejecutada
  * 401:
- * description: No autorizado
+ * description: Sesión criptográfica no constatada
  */
 router.put('/profile', authenticateToken, updateProfile);
 
@@ -88,7 +88,7 @@ router.put('/profile', authenticateToken, updateProfile);
  * @swagger
  * /api/users/{id}:
  * delete:
- * summary: Desactiva un usuario (Borrado Lógico)
+ * summary: Ejecuta rutina de borrado lógico preservando integridad referencial
  * tags: [Usuarios]
  * security:
  * - bearerAuth: []
@@ -98,14 +98,14 @@ router.put('/profile', authenticateToken, updateProfile);
  * required: true
  * schema:
  * type: integer
- * description: ID del usuario a desactivar
+ * description: Clave primaria (PK) correspondiente al modelo de usuario
  * responses:
  * 200:
- * description: Usuario desactivado correctamente
+ * description: Cambio de bandera a estado inactivo verificado
  * 401:
- * description: No autorizado
+ * description: Capa de autorización vulnerada
  * 403:
- * description: No tienes permiso para borrar esta cuenta
+ * description: Conflicto de propiedades; el token no pertenece a la fila afectada
  */
 router.delete('/:id', authenticateToken, deleteUser);
 

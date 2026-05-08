@@ -7,22 +7,22 @@ const router = express.Router();
  * @swagger
  * tags:
  * - name: Favoritos
- * description: Gestión de ejercicios favoritos del usuario
+ * description: Procesamiento dinámico para matrices de vinculación rápida entre usuarios y ejercicios
  */
 
 /**
  * @swagger
  * /api/favorites:
  * get:
- * summary: Obtiene la lista de ejercicios marcados como favoritos por el usuario
+ * summary: Recompila y sirve la vista normalizada de las uniones favoritas
  * tags: [Favoritos]
  * security:
  * - bearerAuth: []
  * responses:
  * 200:
- * description: Lista de favoritos obtenida con éxito
+ * description: Vector de favoritos instanciado con su metadato correspondiente
  * 401:
- * description: No autorizado
+ * description: Sesión desconocida
  */
 router.get('/', authenticateToken, getUserFavorites);
 
@@ -30,7 +30,7 @@ router.get('/', authenticateToken, getUserFavorites);
  * @swagger
  * /api/favorites:
  * post:
- * summary: Marca o desmarca un ejercicio como favorito (Toggle)
+ * summary: Operador mutacional conmutativo (Toggle Insert/Delete)
  * tags: [Favoritos]
  * security:
  * - bearerAuth: []
@@ -48,11 +48,11 @@ router.get('/', authenticateToken, getUserFavorites);
  * example: 1
  * responses:
  * 200:
- * description: Estado de favorito actualizado (Añadido o Eliminado)
+ * description: Operación lógica conmutada (Creación si inexistente, Desvinculación si latente)
  * 401:
- * description: No autorizado
+ * description: Validación JWT bloqueó la capa conmutativa
  * 404:
- * description: Ejercicio no encontrado
+ * description: Imposible generar enlace externo, índice no rastreable
  */
 router.post('/', authenticateToken, toggleFavorite);
 

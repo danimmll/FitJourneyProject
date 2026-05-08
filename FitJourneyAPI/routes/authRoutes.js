@@ -7,14 +7,14 @@ const router = express.Router();
  * @swagger
  * tags:
  * - name: Autenticacion
- * description: Endpoints para el registro y acceso de usuarios
+ * description: Endpoints para el registro y control de acceso del sistema
  */
 
 /**
  * @swagger
  * /api/auth/register:
  * post:
- * summary: Registra un nuevo usuario
+ * summary: Registra un nuevo usuario en la base de datos
  * tags: [Autenticacion]
  * security: []
  * requestBody:
@@ -39,9 +39,9 @@ const router = express.Router();
  * example: "secreta123"
  * responses:
  * 201:
- * description: Usuario registrado con éxito
+ * description: El registro del usuario se completó con éxito
  * 400:
- * description: Error de validación (ej. email ya existe)
+ * description: Infracción de validación (por ejemplo, el correo ya existe)
  */
 router.post('/register', register);
 
@@ -49,7 +49,7 @@ router.post('/register', register);
  * @swagger
  * /api/auth/login:
  * post:
- * summary: Inicia sesión en la aplicación
+ * summary: Autentica un usuario y genera credenciales efímeras
  * tags: [Autenticacion]
  * security: []
  * requestBody:
@@ -70,9 +70,9 @@ router.post('/register', register);
  * example: "123456"
  * responses:
  * 200:
- * description: Login exitoso, devuelve el Token JWT y los datos del usuario
+ * description: Transacción de login aprobada, adjunta payload JWT
  * 401:
- * description: Credenciales inválidas
+ * description: Se han denegado las credenciales por ser inválidas
  */
 router.post('/login', login);
 
@@ -80,7 +80,7 @@ router.post('/login', login);
  * @swagger
  * /api/auth/reactivate:
  * post:
- * summary: Reactiva una cuenta previamente borrada
+ * summary: Reactiva entidades de usuario previamente marcadas para borrado lógico
  * tags: [Autenticacion]
  * security: []
  * requestBody:
@@ -101,9 +101,9 @@ router.post('/login', login);
  * example: "123456"
  * responses:
  * 200:
- * description: Cuenta reactivada, devuelve el Token JWT
+ * description: Restauración de estado completada, se entrega JWT
  * 400:
- * description: Cuenta no válida para reactivación
+ * description: Estado de cuenta incompatible con los criterios de reactivación
  */
 router.post('/reactivate', reactivateAccount);
 
@@ -111,8 +111,8 @@ router.post('/reactivate', reactivateAccount);
  * @swagger
  * /api/auth/delete:
  * post:
- * summary: (Admin) Borrado Físico Permanente de un usuario
- * description: Elimina definitivamente a un usuario de la base de datos por su email.
+ * summary: (Restringido) Purga definitiva de registros en la base de datos
+ * description: Permite eliminar permanentemente a un usuario. La transacción está sujeta a verificación de tokens de Administrador.
  * tags: [Autenticacion]
  * security:
  * - bearerAuth: []
@@ -130,11 +130,11 @@ router.post('/reactivate', reactivateAccount);
  * example: "usuario_a_eliminar@test.com"
  * responses:
  * 200:
- * description: Usuario eliminado físicamente
+ * description: Destrucción del nodo de usuario concluida sin anomalías
  * 401:
- * description: No autorizado
+ * description: Violación de interceptor por token JWT inexistente o comprometido
  * 403:
- * description: Prohibido
+ * description: Permisos insuficientes en jerarquía de Control de Acceso Basado en Roles (RBAC)
  */
 router.post('/delete', authenticateToken, isAdmin, deleteAccount);
 

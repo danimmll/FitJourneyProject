@@ -7,22 +7,22 @@ const router = express.Router();
  * @swagger
  * tags:
  * - name: Rutinas
- * description: Gestión de rutinas de entrenamiento y sus ejercicios
+ * description: Compendio de lógicas relativas a matrices de entrenamiento compuestas
  */
 
 /**
  * @swagger
  * /api/routines:
  * get:
- * summary: Obtiene todas las rutinas activas (Públicas y del usuario actual)
+ * summary: Consulta agnóstica de rutinas vigentes ligadas al nodo activo
  * tags: [Rutinas]
  * security:
  * - bearerAuth: []
  * responses:
  * 200:
- * description: Lista de rutinas obtenida con éxito
+ * description: Bloque iterable de rutinas compilado y devuelto
  * 401:
- * description: No autorizado
+ * description: Rechazo por ausencia del estándar Bearer
  */
 router.get('/', authenticateToken, getUserRoutines);
 
@@ -30,7 +30,7 @@ router.get('/', authenticateToken, getUserRoutines);
  * @swagger
  * /api/routines/{id}:
  * get:
- * summary: Obtiene los detalles de una rutina por su ID (incluye ejercicios)
+ * summary: Despliega una lectura detallada incluyendo uniones con ejercicios hijos
  * tags: [Rutinas]
  * security:
  * - bearerAuth: []
@@ -40,14 +40,14 @@ router.get('/', authenticateToken, getUserRoutines);
  * required: true
  * schema:
  * type: integer
- * description: ID de la rutina
+ * description: UUID o Serial de la Rutina
  * responses:
  * 200:
- * description: Detalles de la rutina y sus ejercicios
+ * description: Respuesta híbrida que une rutinas con catálogo mediante INNER JOIN
  * 401:
- * description: No autorizado
+ * description: Flujo bloqueado en el preprocesamiento de request
  * 404:
- * description: Rutina no encontrada
+ * description: Carga arrojó un set de resultados vacío
  */
 router.get('/:id', authenticateToken, getRoutineById);
 
@@ -55,7 +55,7 @@ router.get('/:id', authenticateToken, getRoutineById);
  * @swagger
  * /api/routines:
  * post:
- * summary: Crea una nueva rutina
+ * summary: Instancia transaccionalmente una agrupación de bloques de ejercicio
  * tags: [Rutinas]
  * security:
  * - bearerAuth: []
@@ -73,7 +73,7 @@ router.get('/:id', authenticateToken, getRoutineById);
  * example: "Día de Pecho"
  * description:
  * type: string
- * example: "Rutina enfocada en hipertrofia pectoral"
+ * example: "Diseño para sobrecarga progresiva miofibrilar"
  * photo_url:
  * type: string
  * example: "https://midominio.com/pecho.jpg"
@@ -96,9 +96,9 @@ router.get('/:id', authenticateToken, getRoutineById);
  * example: 60.5
  * responses:
  * 201:
- * description: Rutina creada con éxito
+ * description: Transacción de alta concurrencia finalizada existosamente
  * 401:
- * description: No autorizado
+ * description: Parámetros del token insuficientes
  */
 router.post('/', authenticateToken, createRoutine);
 
@@ -106,7 +106,7 @@ router.post('/', authenticateToken, createRoutine);
  * @swagger
  * /api/routines/{id}:
  * delete:
- * summary: Elimina físicamente una rutina (Solo el creador o Admin)
+ * summary: Impulsa una orden de limpieza perenne (Validación de autoría forzada)
  * tags: [Rutinas]
  * security:
  * - bearerAuth: []
@@ -116,14 +116,14 @@ router.post('/', authenticateToken, createRoutine);
  * required: true
  * schema:
  * type: integer
- * description: ID de la rutina a borrar
+ * description: Referencia absoluta del set de datos
  * responses:
  * 200:
- * description: Rutina eliminada de la base de datos
+ * description: Objeto en cascada y modelo primordial han sido borrados
  * 401:
- * description: No autorizado
+ * description: Sin firma de validación perimetral
  * 403:
- * description: No tienes permiso para borrar esta rutina
+ * description: Disonancia de propiedad; el usuario en el token no es dueño del recurso
  */
 router.delete('/:id', authenticateToken, deleteRoutine);
 

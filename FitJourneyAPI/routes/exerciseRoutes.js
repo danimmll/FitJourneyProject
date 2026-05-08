@@ -7,22 +7,22 @@ const router = express.Router();
  * @swagger
  * tags:
  * - name: Ejercicios
- * description: Catálogo global de ejercicios
+ * description: Módulo gestor del inventario estático de modalidades de entrenamiento
  */
 
 /**
  * @swagger
  * /api/exercises:
  * get:
- * summary: Obtiene todos los ejercicios disponibles
+ * summary: Proyecta la tabla general de ejercicios del sistema
  * tags: [Ejercicios]
  * security:
  * - bearerAuth: []
  * responses:
  * 200:
- * description: Lista de ejercicios obtenida con éxito
+ * description: Array JSON suministrado correctamente
  * 401:
- * description: No autorizado
+ * description: Token en zona de invalidación
  */
 router.get('/', authenticateToken, getExercises);
 
@@ -30,7 +30,7 @@ router.get('/', authenticateToken, getExercises);
  * @swagger
  * /api/exercises/{id}:
  * get:
- * summary: Obtiene los detalles de un ejercicio por su ID
+ * summary: Recupera una manifestación atómica de un ejercicio por PK
  * tags: [Ejercicios]
  * security:
  * - bearerAuth: []
@@ -40,14 +40,14 @@ router.get('/', authenticateToken, getExercises);
  * required: true
  * schema:
  * type: integer
- * description: ID del ejercicio
+ * description: Componente numérico de enrutamiento
  * responses:
  * 200:
- * description: Datos del ejercicio
+ * description: Bloque de metadatos transferido exitosamente
  * 401:
- * description: No autorizado
+ * description: Falla en middleware de validación HTTP
  * 404:
- * description: Ejercicio no encontrado
+ * description: Inexistencia del nodo solicitado en disco
  */
 router.get('/:id', authenticateToken, getExerciseById);
 
@@ -55,7 +55,7 @@ router.get('/:id', authenticateToken, getExerciseById);
  * @swagger
  * /api/exercises:
  * post:
- * summary: Crea un nuevo ejercicio (Solo Admin)
+ * summary: Ensambla y persistencia una nueva taxonomía de ejercicio
  * tags: [Ejercicios]
  * security:
  * - bearerAuth: []
@@ -82,17 +82,17 @@ router.get('/:id', authenticateToken, getExerciseById);
  * example: "Intermedio"
  * description:
  * type: string
- * example: "Baja flexionando las rodillas manteniendo la espalda recta..."
+ * example: "Descienda mediante retroversión de cadera manteniendo la verticalidad espinal..."
  * image_url:
  * type: string
  * example: "https://midominio.com/sentadilla.jpg"
  * responses:
  * 201:
- * description: Ejercicio creado
+ * description: Recurso consolidado en persistencia de datos
  * 401:
- * description: No autorizado
+ * description: Carece de autenticidad base
  * 403:
- * description: Acceso denegado, se requiere rol de Admin
+ * description: Interceptación por evaluación de políticas administrativas
  */
 router.post('/', authenticateToken, isAdmin, createExercise);
 
@@ -100,7 +100,7 @@ router.post('/', authenticateToken, isAdmin, createExercise);
  * @swagger
  * /api/exercises/{id}:
  * put:
- * summary: Actualiza un ejercicio existente (Solo Admin)
+ * summary: Escribe alteraciones parciales en una métrica de ejercicio preexistente
  * tags: [Ejercicios]
  * security:
  * - bearerAuth: []
@@ -110,7 +110,7 @@ router.post('/', authenticateToken, isAdmin, createExercise);
  * required: true
  * schema:
  * type: integer
- * description: ID del ejercicio a actualizar
+ * description: Índice en tabla relacional
  * requestBody:
  * content:
  * application/json:
@@ -122,14 +122,14 @@ router.post('/', authenticateToken, isAdmin, createExercise);
  * example: "Sentadilla Libre Editada"
  * description:
  * type: string
- * example: "Nueva descripción para este ejercicio..."
+ * example: "Instrucciones de reingeniería biomecánica para el módulo..."
  * responses:
  * 200:
- * description: Ejercicio actualizado
+ * description: Metadatos sincronizados correctamente
  * 401:
- * description: No autorizado
+ * description: Rechazo a nivel de encapsulamiento
  * 403:
- * description: Acceso denegado
+ * description: RBAC en conflicto con la regla isAdmin
  */
 router.put('/:id', authenticateToken, isAdmin, updateExercise);
 
@@ -137,7 +137,7 @@ router.put('/:id', authenticateToken, isAdmin, updateExercise);
  * @swagger
  * /api/exercises/{id}:
  * delete:
- * summary: Elimina físicamente un ejercicio (Solo Admin)
+ * summary: Proceso restrictivo de destrucción física del bloque del ejercicio
  * tags: [Ejercicios]
  * security:
  * - bearerAuth: []
@@ -147,14 +147,14 @@ router.put('/:id', authenticateToken, isAdmin, updateExercise);
  * required: true
  * schema:
  * type: integer
- * description: ID del ejercicio a eliminar
+ * description: Target a erradicar de la memoria perenne
  * responses:
  * 200:
- * description: Ejercicio eliminado físicamente de la base de datos
+ * description: Filas dependientes borradas o actualizadas por cascada
  * 401:
- * description: No autorizado
+ * description: Inconsistencia del Header de Autorización
  * 403:
- * description: Acceso denegado
+ * description: Operación prohibida por esquema de roles
  */
 router.delete('/:id', authenticateToken, isAdmin, deleteExercise);
 

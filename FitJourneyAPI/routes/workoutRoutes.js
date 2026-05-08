@@ -8,22 +8,22 @@ const { validateWorkout } = require('../middlewares/validators');
  * @swagger
  * tags:
  * - name: Historial
- * description: Registro y consulta de entrenamientos realizados
+ * description: Operadores dedicados a la telemetría histórica de las iteraciones de usuario
  */
 
 /**
  * @swagger
  * /api/workouts/history:
  * get:
- * summary: Obtiene el historial de entrenamientos del usuario logueado
+ * summary: Provee un registro cronológico descendente de las sesiones consumadas
  * tags: [Historial]
  * security:
  * - bearerAuth: []
  * responses:
  * 200:
- * description: Historial obtenido con éxito
+ * description: Transmisión íntegra de la serie de tiempo telemetrada
  * 401:
- * description: No autorizado
+ * description: Firma de encriptación no homologada
  */
 router.get('/history', authenticateToken, workoutCtrl.getWorkoutHistory);
 
@@ -31,7 +31,7 @@ router.get('/history', authenticateToken, workoutCtrl.getWorkoutHistory);
  * @swagger
  * /api/workouts/{id}:
  * get:
- * summary: Obtiene los detalles de un entrenamiento específico del historial
+ * summary: Focaliza una extracción puntual sobre una ocurrencia de log transaccional
  * tags: [Historial]
  * security:
  * - bearerAuth: []
@@ -41,16 +41,16 @@ router.get('/history', authenticateToken, workoutCtrl.getWorkoutHistory);
  * required: true
  * schema:
  * type: integer
- * description: ID del entrenamiento
+ * description: ID numérico incremental del Log de Actividad
  * responses:
  * 200:
- * description: Datos del entrenamiento
+ * description: Reconstrucción granular de la sesión generada
  * 401:
- * description: No autorizado
+ * description: Carga interrumpida por credencial vacía
  * 403:
- * description: No tienes permiso para ver este entrenamiento
+ * description: Barrera de encapsulamiento; prohibida la lectura a logs foráneos
  * 404:
- * description: Entrenamiento no encontrado
+ * description: Referencia a la entidad nula
  */
 router.get('/:id', authenticateToken, workoutCtrl.getWorkoutById);
 
@@ -58,7 +58,7 @@ router.get('/:id', authenticateToken, workoutCtrl.getWorkoutById);
  * @swagger
  * /api/workouts:
  * post:
- * summary: Registra un nuevo entrenamiento completado
+ * summary: Consolida las métricas finales de una iteración temporal de esfuerzo
  * tags: [Historial]
  * security:
  * - bearerAuth: []
@@ -71,7 +71,7 @@ router.get('/:id', authenticateToken, workoutCtrl.getWorkoutById);
  * properties:
  * id_routine:
  * type: integer
- * description: ID de la rutina (Opcional si es entreno libre)
+ * description: Vínculo referencial a la tabla Rutinas (Nullable para modo libre)
  * example: 10
  * duration_minutes:
  * type: integer
@@ -81,7 +81,7 @@ router.get('/:id', authenticateToken, workoutCtrl.getWorkoutById);
  * example: 450.5
  * notes:
  * type: string
- * example: "Me sentí con mucha energía hoy"
+ * example: "Curva de esfuerzo máxima alcanzada en el tercer cuadrante"
  * details:
  * type: array
  * items:
@@ -101,9 +101,9 @@ router.get('/:id', authenticateToken, workoutCtrl.getWorkoutById);
  * example: 80.5
  * responses:
  * 201:
- * description: Entrenamiento guardado en el historial
+ * description: Log grabado e indexado en capa profunda
  * 401:
- * description: No autorizado
+ * description: Identidad del solicitante es anónima o corrompida
  */
 router.post('/', authenticateToken, validateWorkout, workoutCtrl.createWorkout);
 
@@ -111,7 +111,7 @@ router.post('/', authenticateToken, validateWorkout, workoutCtrl.createWorkout);
  * @swagger
  * /api/workouts/{id}:
  * delete:
- * summary: Elimina físicamente un entrenamiento del historial
+ * summary: Anula transacciones cronológicas consolidadas erróneamente
  * tags: [Historial]
  * security:
  * - bearerAuth: []
@@ -121,14 +121,14 @@ router.post('/', authenticateToken, validateWorkout, workoutCtrl.createWorkout);
  * required: true
  * schema:
  * type: integer
- * description: ID del entrenamiento a borrar
+ * description: Clave de la sesión que requiere anulación
  * responses:
  * 200:
- * description: Entrenamiento eliminado del historial
+ * description: Borrado de histórico verificado con comprobación de cascada
  * 401:
- * description: No autorizado
+ * description: Abortado al no encontrar el token RSA
  * 403:
- * description: No tienes permiso para eliminar este entrenamiento
+ * description: Excepcion arrojada en análisis de propiedad de la fila
  */
 router.delete('/:id', authenticateToken, workoutCtrl.deleteWorkout);
 
