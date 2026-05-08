@@ -1,36 +1,79 @@
-require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+require('dotenv').config();
+
+// Rutas
+const authRoutes = require('./routes/authRoutes');
+const userRoutes = require('./routes/userRoutes');
+const exerciseRoutes = require('./routes/exerciseRoutes');
+const routineRoutes = require('./routes/routineRoutes');
+const workoutRoutes = require('./routes/workoutRoutes');
+const favoriteRoutes = require('./routes/favoriteRoutes');
+
+const errorHandler = require('./middlewares/errorHandler');
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 
-const authRoutes = require('./routes/authRoutes');
-const userRoutes = require('./routes/userRoutes');
-const exerciseRoutes = require('./routes/exerciseRoutes');
-const favoriteRoutes = require('./routes/favoriteRoutes');
-const routineRoutes = require('./routes/routineRoutes');  
-const workoutRoutes = require('./routes/workoutRoutes');  
+const swaggerUi = require('swagger-ui-express');
+const swaggerJsdoc = require('swagger-jsdoc');
 
-app.use('/auth', authRoutes);
-app.use('/users', userRoutes);
-app.use('/exercises', exerciseRoutes);
-app.use('/favorites', favoriteRoutes); 
-app.use('/routines', routineRoutes);   
-app.use('/workouts', workoutRoutes);  
+const swaggerOptions = {
+    definition: {
+        openapi: '3.0.0',
+        info: {
+            title: 'FitJourney API',
+            version: '1.0.0',
+            description: 'Documentación de la API de FitJourney',
+            contact: {
+                name: 'Daniel Martín López'
+            },
+        },
+        servers: [
+            {
+                url: 'http://localhost:3000',
+                description: 'Servidor Local'
+            },
+            {
+                url: 'https://fitjourneyproject.onrender.com',
+                description: 'Servidor Producción (Render)'
+            }
+        ],
+        components: {
+            securitySchemes: {
+                bearerAuth: {
+                    type: 'http',
+                    scheme: 'bearer',
+                    bearerFormat: 'JWT',
+                }
+            }
+        },
+        security: [{
+            bearerAuth: []
+        }]
+    },
+    // Le indicamos que busque la documentación en los comentarios de estos archivos
+    apis: ['./routes/*.js', './controllers/*.js'],
+};
 
-app.get('/', (req, res) => res.send("FitJourney API"));
+const swaggerDocs = swaggerJsdoc(swaggerOptions);
+// Levantamos la interfaz en la ruta /api-docs
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
-app.use((req, res) => {
-    res.status(404).json({ error: "Ruta no encontrada" });
-});
+// Usar las rutas
+app.use('/api/auth', authRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/exercises', exerciseRoutes);
+app.use('/api/routines', routineRoutes);
+app.use('/api/workouts', workoutRoutes);
+app.use('/api/favorites', favoriteRoutes);
 
-const errorHandler = require('./middlewares/errorHandler');
+// Manejo de errores
 app.use(errorHandler);
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, '0.0.0.0', () => {
-    console.log(`Servidor funcionando en el puerto ${PORT}`);
+app.listen(PORT, () => {
+    console.log(`Servidor corriendo en el puerto ${PORT}`);
 });
