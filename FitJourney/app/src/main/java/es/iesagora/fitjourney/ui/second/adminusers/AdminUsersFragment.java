@@ -153,9 +153,8 @@ public class AdminUsersFragment extends Fragment {
      */
     private void navigateToEditUser(User user) {
         Bundle bundle = new Bundle();
-        // Pasamos el correo o ID para que el Fragment de destino sepa a quién cargar
         bundle.putString("userEmail", user.getEmail());
-        bundle.putBoolean("isAdminEdit", true); // Bandera para saber que entra un admin
+        bundle.putBoolean("isAdminEdit", true);
 
         // Navegamos a la pantalla de edición (asegúrate de que R.id.editProfileFragment sea correcto en tu nav_graph)
         Navigation.findNavController(requireView()).navigate(R.id.editProfileFragment, bundle);
