@@ -230,9 +230,7 @@ public class ProfileFragment extends Fragment {
             binding.fabAdminUsers.setVisibility(View.VISIBLE);
 
             binding.fabAdminUsers.setOnClickListener(v ->
-                    Toast.makeText(getContext(),
-                            "Panel Administrador",
-                            Toast.LENGTH_SHORT).show()
+                    Navigation.findNavController(v).navigate(R.id.adminUsersFragment)
             );
         } else {
             binding.fabAdminUsers.setVisibility(View.GONE);

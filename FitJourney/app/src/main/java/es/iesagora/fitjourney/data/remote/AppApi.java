@@ -208,4 +208,22 @@ public interface AppApi {
      */
     @DELETE("workouts/{id}")
     Call<ResponseBody> deleteWorkout(@Path("id") int id);
+
+    /**
+     * Recoge todos los usuarios de la base de datos que esten activos
+     */
+    @GET("users")
+    Call<List<User>> getAllUsers();
+
+    /**
+     * Elimina a un usuario permanentemente desde el panel de administrador.
+     */
+    @DELETE("users/admin/{email}") // Cambia la ruta si tu backend la tiene diferente
+    Call<okhttp3.ResponseBody> deleteUserByAdmin(@Path("email") String email);
+
+    /**
+     * Banea/Suspende a un usuario desde el panel de administrador.
+     */
+    @PUT("users/admin/{email}/ban") // Cambia la ruta si tu backend la tiene diferente
+    Call<okhttp3.ResponseBody> banUser(@Path("email") String email);
 }

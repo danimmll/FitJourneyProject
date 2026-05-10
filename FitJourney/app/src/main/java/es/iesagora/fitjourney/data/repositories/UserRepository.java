@@ -7,6 +7,8 @@ import androidx.annotation.NonNull;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
+import java.util.List;
+
 import es.iesagora.fitjourney.data.model.User;
 import es.iesagora.fitjourney.data.remote.LoginRequest;
 import es.iesagora.fitjourney.data.remote.AccessResponse;
@@ -23,11 +25,17 @@ import retrofit2.Response;
  * Repositorio encargado de gestionar todas las operaciones
  * relacionadas con el usuario.
  * Incluye autenticación, registro, reactivación de cuenta,
- * eliminación, obtención de perfil y actualización de datos.
+ * eliminación, obtención de perfil, actualización de datos
+ * y obtención de la lista de todos los usuarios.
  * Se comunica con la API y devuelve resultados encapsulados
  * en Resource para manejar estados de carga, éxito y error.
  */
 public class UserRepository {
+
+    /*CONSTANTES*/
+    private static final String ERROR_CONEXION = "Error de conexión: ";
+    private static final String MESSAGE_STRING = "message";
+    private static final String ERROR_STRING = "error";
 
     /**
      * Instancia de la API para realizar peticiones.
@@ -65,6 +73,20 @@ public class UserRepository {
      */
     public interface ProfileCallback {
         void onResult(Resource<User> result);
+    }
+
+    /**
+     * Callback para obtener la lista de todos los usuarios.
+     */
+    public interface UserListCallback {
+        void onResult(Resource<List<User>> result);
+    }
+
+    /**
+     * Callback para obtener las acciones de admin.
+     */
+    public interface AdminActionCallback {
+        void onResult(Resource<String> result);
     }
 
     /**
@@ -106,7 +128,7 @@ public class UserRepository {
             public void onFailure(@NonNull Call<AccessResponse> call,
                                   @NonNull Throwable t) {
 
-                callback.onResult(Resource.error("Error de conexión: " + t.getMessage()));
+                callback.onResult(Resource.error(ERROR_CONEXION + t.getMessage()));
             }
         });
     }
@@ -136,7 +158,7 @@ public class UserRepository {
             public void onFailure(@NonNull Call<AccessResponse> call,
                                   @NonNull Throwable t) {
 
-                callback.onResult(Resource.error("Error de conexión: " + t.getMessage()));
+                callback.onResult(Resource.error(ERROR_CONEXION + t.getMessage()));
             }
         });
     }
@@ -166,7 +188,7 @@ public class UserRepository {
             public void onFailure(@NonNull Call<AccessResponse> call,
                                   @NonNull Throwable t) {
 
-                callback.onResult(Resource.error("Error de conexión: " + t.getMessage()));
+                callback.onResult(Resource.error(ERROR_CONEXION + t.getMessage()));
             }
         });
     }
@@ -196,7 +218,7 @@ public class UserRepository {
             public void onFailure(@NonNull Call<ResponseBody> call,
                                   @NonNull Throwable t) {
 
-                callback.onResult(Resource.error("Error de conexión: " + t.getMessage()));
+                callback.onResult(Resource.error(ERROR_CONEXION + t.getMessage()));
             }
         });
     }
@@ -230,7 +252,7 @@ public class UserRepository {
             public void onFailure(@NonNull Call<User> call,
                                   @NonNull Throwable t) {
 
-                callback.onResult(Resource.error("Error de conexión: " + t.getMessage()));
+                callback.onResult(Resource.error(ERROR_CONEXION + t.getMessage()));
             }
         });
     }
@@ -258,6 +280,92 @@ public class UserRepository {
             public void onFailure(@NonNull Call<User> call,
                                   @NonNull Throwable t) {
 
+                callback.onResult(Resource.error(ERROR_CONEXION + t.getMessage()));
+            }
+        });
+    }
+
+    /**
+     * Obtiene todos los usuarios registrados (solo para administradores).
+     *
+     * @param callback Callback con el resultado.
+     */
+    public void getAllUsers(UserListCallback callback) {
+
+        callback.onResult(Resource.loading());
+
+        api.getAllUsers().enqueue(new Callback<>() {
+            @Override
+            public void onResponse(@NonNull Call<List<User>> call,
+                                   @NonNull Response<List<User>> response) {
+
+                if (response.isSuccessful() && response.body() != null) {
+                    callback.onResult(Resource.success(response.body()));
+                } else {
+                    callback.onResult(Resource.error(getError(response)));
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<List<User>> call,
+                                  @NonNull Throwable t) {
+
+                callback.onResult(Resource.error(ERROR_CONEXION + t.getMessage()));
+            }
+        });
+    }
+
+    /**
+     * Elimina físicamente a un usuario de la base de datos (Acción de Administrador).
+     *
+     * @param email    Correo del usuario a eliminar.
+     * @param callback Callback con el resultado de la operación.
+     */
+    public void deleteUserByAdmin(String email, AdminActionCallback callback) {
+        callback.onResult(Resource.loading());
+
+        api.deleteUserByAdmin(email).enqueue(new Callback<>() {
+            @Override
+            public void onResponse(@NonNull Call<ResponseBody> call,
+                                   @NonNull Response<ResponseBody> response) {
+                if (response.isSuccessful()) {
+                    callback.onResult(Resource.success("Usuario eliminado correctamente"));
+                } else {
+                    callback.onResult(Resource.error(getError(response)));
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<ResponseBody> call,
+                                  @NonNull Throwable t) {
+                callback.onResult(Resource.error("Error de conexión: " + t.getMessage()));
+            }
+        });
+    }
+
+    /**
+     * Banea/Suspende la cuenta de un usuario (Acción de Administrador).
+     *
+     * @param email    Correo del usuario a banear.
+     * @param callback Callback con el resultado de la operación.
+     */
+    public void banUser(String email, AdminActionCallback callback) {
+        callback.onResult(Resource.loading());
+
+        api.banUser(email).enqueue(new Callback<>() {
+            @Override
+            public void onResponse(@NonNull Call<ResponseBody> call,
+                                   @NonNull Response<ResponseBody> response) {
+                if (response.isSuccessful()) {
+                    callback.onResult(Resource.success("Usuario baneado correctamente"));
+                } else {
+                    callback.onResult(Resource.error(getError(response)));
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<ResponseBody> call,
+                                  @NonNull Throwable t) {
                 callback.onResult(Resource.error("Error de conexión: " + t.getMessage()));
             }
         });
@@ -274,13 +382,15 @@ public class UserRepository {
                 String json = response.errorBody().string();
                 JsonObject obj = gson.fromJson(json, JsonObject.class);
 
-                if (obj.has("message") && !obj.get("message").isJsonNull()) {
-                    return obj.get("message").getAsString();
-                } else if (obj.has("error") && !obj.get("error").isJsonNull()) {
-                    return obj.get("error").getAsString();
+                if (obj.has(MESSAGE_STRING) && !obj.get(MESSAGE_STRING).isJsonNull()) {
+                    return obj.get(MESSAGE_STRING).getAsString();
+                } else if (obj.has(ERROR_STRING) && !obj.get(ERROR_STRING).isJsonNull()) {
+                    return obj.get(ERROR_STRING).getAsString();
                 }
             }
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+            //EXCEPCION IGNORADA
+        }
 
         int code = response.code();
 
