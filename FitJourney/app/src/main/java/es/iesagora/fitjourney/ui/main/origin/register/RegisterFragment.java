@@ -239,9 +239,7 @@ public class RegisterFragment extends Fragment {
                     Toast.makeText(requireContext(),
                             R.string.registration_completed,
                             Toast.LENGTH_SHORT).show();
-
-                    prefs.setToken(resource.data.getToken());
-
+                    
                     Intent intent = new Intent(requireContext(), SecondActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);

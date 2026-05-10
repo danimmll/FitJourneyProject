@@ -318,13 +318,12 @@ public class UserRepository {
     /**
      * Elimina físicamente a un usuario de la base de datos (Acción de Administrador).
      *
-     * @param email    Correo del usuario a eliminar.
+     * @param userId    Id del usuario a eliminar.
      * @param callback Callback con el resultado de la operación.
      */
-    public void deleteUserByAdmin(String email, AdminActionCallback callback) {
+    public void deleteUserByAdmin(int userId, AdminActionCallback callback) {
         callback.onResult(Resource.loading());
-
-        api.deleteUserByAdmin(email).enqueue(new Callback<>() {
+        api.deleteUserByAdmin(userId).enqueue(new Callback<>() {
             @Override
             public void onResponse(@NonNull Call<ResponseBody> call,
                                    @NonNull Response<ResponseBody> response) {
@@ -334,11 +333,9 @@ public class UserRepository {
                     callback.onResult(Resource.error(getError(response)));
                 }
             }
-
             @Override
-            public void onFailure(@NonNull Call<ResponseBody> call,
-                                  @NonNull Throwable t) {
-                callback.onResult(Resource.error("Error de conexión: " + t.getMessage()));
+            public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable t) {
+                callback.onResult(Resource.error(ERROR_CONEXION + t.getMessage()));
             }
         });
     }
@@ -346,13 +343,12 @@ public class UserRepository {
     /**
      * Banea/Suspende la cuenta de un usuario (Acción de Administrador).
      *
-     * @param email    Correo del usuario a banear.
+     * @param userId    Id del usuario a banear.
      * @param callback Callback con el resultado de la operación.
      */
-    public void banUser(String email, AdminActionCallback callback) {
+    public void banUser(int userId, AdminActionCallback callback) {
         callback.onResult(Resource.loading());
-
-        api.banUser(email).enqueue(new Callback<>() {
+        api.banUser(userId).enqueue(new Callback<>() {
             @Override
             public void onResponse(@NonNull Call<ResponseBody> call,
                                    @NonNull Response<ResponseBody> response) {
@@ -362,11 +358,9 @@ public class UserRepository {
                     callback.onResult(Resource.error(getError(response)));
                 }
             }
-
             @Override
-            public void onFailure(@NonNull Call<ResponseBody> call,
-                                  @NonNull Throwable t) {
-                callback.onResult(Resource.error("Error de conexión: " + t.getMessage()));
+            public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable t) {
+                callback.onResult(Resource.error(ERROR_CONEXION + t.getMessage()));
             }
         });
     }

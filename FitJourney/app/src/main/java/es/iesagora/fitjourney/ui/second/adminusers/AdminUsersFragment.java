@@ -165,7 +165,7 @@ public class AdminUsersFragment extends Fragment {
      */
     private void banUser(User user) {
         // Asumiendo que crearás este método en el ViewModel
-        viewModel.banUser(user.getEmail()).observe(getViewLifecycleOwner(), resource -> {
+        viewModel.banUser(user.getId_user()).observe(getViewLifecycleOwner(), resource -> {
             if (resource != null) {
                 switch (resource.status) {
                     case LOADING:
@@ -201,7 +201,7 @@ public class AdminUsersFragment extends Fragment {
      * Lógica para eliminar la cuenta de un usuario desde la administración.
      */
     private void deleteUser(User user) {
-        viewModel.deleteUserByAdmin(user.getEmail()).observe(getViewLifecycleOwner(), resource -> {
+        viewModel.deleteUserByAdmin(user.getId_user()).observe(getViewLifecycleOwner(), resource -> {
             if (resource != null) {
                 switch (resource.status) {
                     case LOADING:

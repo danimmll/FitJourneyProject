@@ -121,6 +121,13 @@ public class SecondViewModel extends AndroidViewModel {
      */
     private List<Exercise> fullExerciseList = new ArrayList<>();
 
+    private final MutableLiveData<Resource<List<User>>> allUsersLiveData =
+            new MutableLiveData<>();
+    private final MutableLiveData<Resource<String>> deleteUserLiveData =
+            new MutableLiveData<>();
+    private final MutableLiveData<Resource<String>> banUserLiveData =
+            new MutableLiveData<>();
+
     /**
      * Constructor del ViewModel.
      * Inicializa repositorios y carga ejercicios iniciales.
@@ -379,53 +386,21 @@ public class SecondViewModel extends AndroidViewModel {
         routineRepository.getRoutineById(id, singleRoutineLiveData::setValue);
     }
 
-    /**
-     * Obtiene la lista completa de todos los usuarios registrados en la aplicación.
-     * (Acción reservada generalmente para usuarios con rol de administrador).
-     * * El método se comunica con el repositorio y envuelve la respuesta
-     * asíncrona (Callback) en un objeto LiveData. De esta forma, la vista
-     * (Fragment/Activity) puede observar los datos y reaccionar a los
-     * diferentes estados (Cargando, Éxito o Error).
-     *
-     * @return LiveData que contiene un Resource con la lista de usuarios (List<User>).
-     */
     public LiveData<Resource<List<User>>> getAllUsers() {
-        MutableLiveData<Resource<List<User>>> result = new MutableLiveData<>();
-
-        userRepository.getAllUsers(result::setValue);
-
-        return result;
+        allUsersLiveData.setValue(Resource.loading());
+        userRepository.getAllUsers(allUsersLiveData::setValue);
+        return allUsersLiveData;
     }
 
-    /**
-     * Llama al repositorio para eliminar un usuario desde la administración.
-     *
-     * @param email Correo del usuario a eliminar.
-     * @return LiveData con el estado de la operación.
-     */
-    public LiveData<Resource<String>> deleteUserByAdmin(String email) {
-        MutableLiveData<Resource<String>> result = new MutableLiveData<>();
-
-        userRepository.deleteUserByAdmin(email, response -> {
-            result.setValue(response);
-        });
-
-        return result;
+    public LiveData<Resource<String>> deleteUserByAdmin(int userId) {
+        deleteUserLiveData.setValue(Resource.loading());
+        userRepository.deleteUserByAdmin(userId, deleteUserLiveData::setValue);
+        return deleteUserLiveData;
     }
 
-    /**
-     * Llama al repositorio para banear a un usuario desde la administración.
-     *
-     * @param email Correo del usuario a banear.
-     * @return LiveData con el estado de la operación.
-     */
-    public LiveData<Resource<String>> banUser(String email) {
-        MutableLiveData<Resource<String>> result = new MutableLiveData<>();
-
-        userRepository.banUser(email, response -> {
-            result.setValue(response);
-        });
-
-        return result;
+    public LiveData<Resource<String>> banUser(int userId) {
+        banUserLiveData.setValue(Resource.loading());
+        userRepository.banUser(userId, banUserLiveData::setValue);
+        return banUserLiveData;
     }
 }
