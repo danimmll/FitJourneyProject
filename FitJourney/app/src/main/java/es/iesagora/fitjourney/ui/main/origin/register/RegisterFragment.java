@@ -55,12 +55,6 @@ public class RegisterFragment extends Fragment {
     private MainViewModel viewModel;
 
     /**
-     * Repositorio de preferencias locales.
-     * Se utiliza para almacenar datos persistentes como el token del usuario.
-     */
-    private PreferencesRepository prefs;
-
-    /**
      * Clave usada para guardar/restaurar el valor del género durante cambios de configuración.
      */
     private static final String KEY_GENDER = "saved_gender";
@@ -74,6 +68,8 @@ public class RegisterFragment extends Fragment {
      * Clave usada para guardar/restaurar la fecha de nacimiento durante cambios de configuración.
      */
     private static final String KEY_BIRTH = "saved_birth";
+
+    private static final String REQUERIDO_STRING = "Requerido";
 
     /**
      * Infla la vista del fragmento de registro.
@@ -111,7 +107,6 @@ public class RegisterFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         viewModel = new ViewModelProvider(requireActivity()).get(MainViewModel.class);
-        prefs = new PreferencesRepository(requireContext());
 
         setupUI();
 
@@ -239,7 +234,7 @@ public class RegisterFragment extends Fragment {
                     Toast.makeText(requireContext(),
                             R.string.registration_completed,
                             Toast.LENGTH_SHORT).show();
-                    
+
                     Intent intent = new Intent(requireContext(), SecondActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
@@ -351,10 +346,10 @@ public class RegisterFragment extends Fragment {
      */
     private boolean isFormValid() {
         return validateName()
-                & validateEmail()
-                & validatePasswords()
-                & validateDateAndSpinners()
-                & validateBodyMetrics();
+                && validateEmail()
+                && validatePasswords()
+                && validateDateAndSpinners()
+                && validateBodyMetrics();
     }
 
     /**
@@ -416,17 +411,17 @@ public class RegisterFragment extends Fragment {
         boolean valid = true;
 
         if (Objects.requireNonNull(binding.etBirthDate.getText()).toString().trim().isEmpty()) {
-            binding.tlBirthDate.setError("Requerido");
+            binding.tlBirthDate.setError(REQUERIDO_STRING);
             valid = false;
         } else binding.tlBirthDate.setError(null);
 
         if (binding.actvGender.getText().toString().trim().isEmpty()) {
-            binding.tlGender.setError("Requerido");
+            binding.tlGender.setError(REQUERIDO_STRING);
             valid = false;
         } else binding.tlGender.setError(null);
 
         if (binding.actvGoal.getText().toString().trim().isEmpty()) {
-            binding.tLGoal.setError("Requerido");
+            binding.tLGoal.setError(REQUERIDO_STRING);
             valid = false;
         } else binding.tLGoal.setError(null);
 
@@ -450,7 +445,9 @@ public class RegisterFragment extends Fragment {
 
         try {
             float w = Float.parseFloat(Objects.requireNonNull(binding.etWeight.getText()).toString().trim());
-            if (w < 20 || w > 300) throw new Exception();
+            if (w < 20 || w > 300) {
+                throw new Exception();
+            }
             assert binding.tlWeight != null;
             binding.tlWeight.setError(null);
         } catch (Exception e) {
