@@ -3,7 +3,6 @@ package es.iesagora.fitjourney.ui.second.profile;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,8 +14,6 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 
-import com.bumptech.glide.Glide;
-
 import java.util.Locale;
 
 import es.iesagora.fitjourney.R;
@@ -24,6 +21,7 @@ import es.iesagora.fitjourney.data.model.User;
 import es.iesagora.fitjourney.data.repositories.PreferencesRepository;
 import es.iesagora.fitjourney.databinding.FragmentProfileBinding;
 import es.iesagora.fitjourney.ui.main.MainActivity;
+import es.iesagora.fitjourney.utils.ImageUtils;
 import es.iesagora.fitjourney.viewmodel.SecondViewModel;
 
 /**
@@ -173,31 +171,12 @@ public class ProfileFragment extends Fragment {
             binding.tvProfileGoal.setText("No definido");
         }
 
-        String avatar = user.getDisplayAvatar();
-
-        // Si parece Base64, lo decodifica; si no, lo trata como URL
-        if (avatar.length() > 200 && !avatar.startsWith("http")) {
-            try {
-                byte[] imageBytes = Base64.decode(avatar, Base64.DEFAULT);
-
-                Glide.with(this)
-                        .asBitmap()
-                        .load(imageBytes)
-                        .circleCrop()
-                        .into(binding.ivProfilePhoto);
-
-            } catch (Exception e) {
-                Glide.with(this)
-                        .load("https://api.dicebear.com/7.x/avataaars/png?seed=Error")
-                        .circleCrop()
-                        .into(binding.ivProfilePhoto);
-            }
-        } else {
-            Glide.with(this)
-                    .load(avatar)
-                    .circleCrop()
-                    .into(binding.ivProfilePhoto);
-        }
+        ImageUtils.loadCircle(
+                requireContext(),
+                user.getPhoto_url(),
+                binding.ivProfilePhoto,
+                R.drawable.ic_profile
+        );
     }
 
     /**

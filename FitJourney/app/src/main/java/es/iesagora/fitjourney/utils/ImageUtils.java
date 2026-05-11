@@ -17,7 +17,7 @@ import java.io.InputStream;
 
 /**
  * Clase utilitaria para la conversión y carga de imágenes.
- * Centraliza toda la lógica de detección Base64 vs URL HTTP
+ * Centraliza toda la lógica de detección Base64 y URL HTTP
  * para evitar duplicación en adapters y fragments.
  */
 public class ImageUtils {

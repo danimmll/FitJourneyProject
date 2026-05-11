@@ -1,7 +1,6 @@
 package es.iesagora.fitjourney.ui.second.fitnesscenter.exercises;
 
 import android.os.Bundle;
-import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,9 +14,6 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -28,6 +24,7 @@ import es.iesagora.fitjourney.data.model.Exercise;
 import es.iesagora.fitjourney.data.repositories.PreferencesRepository;
 import es.iesagora.fitjourney.databinding.FragmentExerciseDetailBinding;
 import es.iesagora.fitjourney.ui.second.adapters.InstructionAdapter;
+import es.iesagora.fitjourney.utils.ImageUtils;
 import es.iesagora.fitjourney.viewmodel.SecondViewModel;
 
 /**
@@ -162,34 +159,12 @@ public class ExerciseDetailFragment extends Fragment {
 
         instructionAdapter.setInstructions(getInstructionsList(exercise));
 
-        String imageUrl = exercise.getImage_url();
-        if (imageUrl != null && !imageUrl.isEmpty()) {
-
-            if (imageUrl.length() > 200 || !imageUrl.startsWith("http")) {
-                try {
-                    byte[] imageBytes = Base64.decode(imageUrl, Base64.DEFAULT);
-                    Glide.with(this)
-                            .asBitmap()
-                            .load(imageBytes)
-                            .placeholder(R.drawable.ic_launcher_background)
-                            .error(android.R.drawable.ic_menu_report_image)
-                            .centerCrop()
-                            .into(binding.ivDetailImage);
-                } catch (Exception e) {
-                    binding.ivDetailImage.setImageResource(android.R.drawable.ic_menu_report_image);
-                }
-            } else {
-                Glide.with(this)
-                        .load(imageUrl)
-                        .transition(DrawableTransitionOptions.withCrossFade())
-                        .placeholder(R.drawable.ic_launcher_background)
-                        .error(android.R.drawable.ic_menu_report_image)
-                        .centerCrop()
-                        .into(binding.ivDetailImage);
-            }
-        } else {
-            binding.ivDetailImage.setImageResource(R.drawable.ic_launcher_background);
-        }
+        ImageUtils.loadInto(
+                requireContext(),
+                exercise.getImage_url(),
+                binding.ivDetailImage,
+                R.drawable.ic_ejercicios
+        );
     }
 
     /**

@@ -55,18 +55,6 @@ public class HomeFragment extends Fragment {
     private FragmentHomeBinding binding;
 
     /**
-     * ViewModel compartido de la sección secundaria.
-     * Gestiona la obtención de perfil y datos de entrenamientos.
-     */
-    private SecondViewModel viewModel;
-
-    /**
-     * Repositorio de preferencias locales.
-     * Se utiliza para recuperar el token de sesión del usuario.
-     */
-    private PreferencesRepository prefs;
-
-    /**
      * Usuario actualmente cargado en la pantalla Home.
      * Se utiliza para calcular métricas físicas y personalizar la UI.
      */
@@ -102,8 +90,8 @@ public class HomeFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        viewModel = new ViewModelProvider(requireActivity()).get(SecondViewModel.class);
-        prefs = new PreferencesRepository(requireContext());
+        SecondViewModel viewModel = new ViewModelProvider(requireActivity()).get(SecondViewModel.class);
+        PreferencesRepository prefs = new PreferencesRepository(requireContext());
 
         setupHeader();
         setupNavigationButtons();
