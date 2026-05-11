@@ -1,45 +1,80 @@
 package es.iesagora.fitjourney.utils;
 
 import android.content.ContentResolver;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.util.Base64;
+import android.util.Log;
+import android.widget.ImageView;
+
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 
 /**
- * Clase utilitaria para la conversión y manipulación de imágenes.
- * Proporciona métodos para:
- * - Convertir imágenes desde Uri a Base64
- * - Reducir el tamaño de imágenes manteniendo proporción
- * - Convertir cadenas Base64 de vuelta a Bitmap
- * Esta clase se utiliza principalmente para preparar imágenes
- * antes de ser enviadas o almacenadas, optimizando su tamaño
- * y formato.
+ * Clase utilitaria para la conversión y carga de imágenes.
  */
 public class ImageUtils {
 
+    private static final String TAG = "ImageUtils";
+
+    private ImageUtils() { /* utility class */ }
+
     /**
-     * Convierte una imagen localizada en un Uri a una cadena Base64.
-     * El proceso incluye:
-     * - Lectura de la imagen desde el ContentResolver
-     * - Decodificación a Bitmap
-     * - Redimensionado para optimizar tamaño
-     * - Compresión en formato JPEG con calidad del 70%
-     * - Codificación final en Base64
-     * Este método es útil para enviar imágenes a servidores o APIs.
+     * Carga una imagen en un ImageView detectando automáticamente si es Base64 o URL HTTP.
+     * Centraliza la lógica que antes estaba duplicada en 3 sitios distintos.
+     *
+     * @param context   contexto de la aplicación
+     * @param url       cadena con la URL o datos Base64 de la imagen
+     * @param imageView vista donde se cargará la imagen
+     * @param placeholder drawable de placeholder mientras carga
+     */
+    public static void loadInto(Context context, String url, ImageView imageView, int placeholder) {
+        if (url == null || url.isEmpty()) {
+            imageView.setImageResource(placeholder);
+            return;
+        }
+
+        if (url.length() > 200 || !url.startsWith("http")) {
+            try {
+                byte[] imageBytes = Base64.decode(url, Base64.DEFAULT);
+                Glide.with(context)
+                        .asBitmap()
+                        .load(imageBytes)
+                        .placeholder(placeholder)
+                        .error(placeholder)
+                        .centerCrop()
+                        .into(imageView);
+            } catch (Exception e) {
+                Log.e(TAG, "Error al decodificar Base64", e);
+                imageView.setImageResource(placeholder);
+            }
+        } else {
+            Glide.with(context)
+                    .load(url)
+                    .transition(DrawableTransitionOptions.withCrossFade())
+                    .placeholder(placeholder)
+                    .error(placeholder)
+                    .centerCrop()
+                    .into(imageView);
+        }
+    }
+
+    /**
+     * Convierte una imagen desde Uri a cadena Base64.
      *
      * @param resolver ContentResolver para acceder al Uri
-     * @param uri Uri de la imagen a convertir
-     * @return cadena Base64 de la imagen o null si ocurre un error
+     * @param uri      Uri de la imagen
+     * @return cadena Base64 o null si ocurre un error
      */
     public static String uriToBase64(ContentResolver resolver, Uri uri) {
         try {
             InputStream inputStream = resolver.openInputStream(uri);
             Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
-
             bitmap = getResizedBitmap(bitmap);
 
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -48,23 +83,17 @@ public class ImageUtils {
 
             return Base64.encodeToString(byteArray, Base64.DEFAULT);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            Log.e(TAG, "Error al convertir imagen a Base64", e);
             return null;
         }
     }
 
     /**
-     * Redimensiona un Bitmap manteniendo su proporción original.
-     * El tamaño máximo se ajusta al valor indicado, escalando
-     * el otro lado proporcionalmente para evitar deformaciones.
-     *
-     * @param image imagen original
-     * @return bitmap redimensionado
+     * Redimensiona un Bitmap manteniendo su proporción original (máximo 800px).
      */
     private static Bitmap getResizedBitmap(Bitmap image) {
         int width = image.getWidth();
         int height = image.getHeight();
-
         float bitmapRatio = (float) width / (float) height;
 
         if (bitmapRatio > 1) {
@@ -79,10 +108,9 @@ public class ImageUtils {
     }
 
     /**
-     * Convierte una cadena Base64 en un objeto Bitmap.
-     * Útil para reconstruir imágenes almacenadas o recibidas desde API.
+     * Convierte una cadena Base64 en un Bitmap.
      *
-     * @param base64Str cadena Base64 de la imagen
+     * @param base64Str cadena Base64
      * @return Bitmap decodificado o null si ocurre un error
      */
     public static Bitmap base64ToBitmap(String base64Str) {
@@ -90,6 +118,7 @@ public class ImageUtils {
             byte[] decodedBytes = Base64.decode(base64Str, Base64.DEFAULT);
             return BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.length);
         } catch (Exception e) {
+            Log.e(TAG, "Error al convertir Base64 a Bitmap", e);
             return null;
         }
     }

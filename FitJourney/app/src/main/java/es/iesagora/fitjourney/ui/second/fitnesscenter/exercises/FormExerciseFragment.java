@@ -156,8 +156,8 @@ public class FormExerciseFragment extends Fragment {
      * - Llama al ViewModel correspondiente
      */
     private void saveExercise() {
-        String name = Objects.requireNonNull(binding.etName.getText()).toString().trim();
-        String muscle = Objects.requireNonNull(binding.etMuscle.getText()).toString().trim();
+        String name       = Objects.requireNonNull(binding.etName.getText()).toString().trim();
+        String muscle     = Objects.requireNonNull(binding.etMuscle.getText()).toString().trim();
         String difficulty = Objects.requireNonNull(binding.etDifficulty.getText()).toString().trim();
         String description = Objects.requireNonNull(binding.etDescription.getText()).toString().trim();
 
@@ -176,15 +176,13 @@ public class FormExerciseFragment extends Fragment {
         if (exerciseToEdit == null) {
             viewModel.createExercise(newExercise, () -> {
                 Toast.makeText(getContext(), R.string.exercise_created, Toast.LENGTH_SHORT).show();
-                requireActivity().getOnBackPressedDispatcher();
+                requireActivity().getOnBackPressedDispatcher().onBackPressed();
             });
         } else {
             newExercise.setId_exercise(exerciseToEdit.getId_exercise());
-
             viewModel.updateExercise(exerciseToEdit.getId_exercise(), newExercise, () -> {
                 viewModel.selectExercise(newExercise);
-                Toast.makeText(getContext(), R.string.exercise_updated, Toast.LENGTH_SHORT).show();
-                requireActivity().getOnBackPressedDispatcher();
+                requireActivity().getOnBackPressedDispatcher().onBackPressed();
             });
         }
     }

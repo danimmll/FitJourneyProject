@@ -17,6 +17,7 @@ import es.iesagora.fitjourney.data.model.User;
 import es.iesagora.fitjourney.data.model.Workout;
 import es.iesagora.fitjourney.data.remote.AccessResponse;
 import es.iesagora.fitjourney.data.remote.Resource;
+import es.iesagora.fitjourney.data.remote.RetrofitClient;
 import es.iesagora.fitjourney.data.repositories.ExerciseRepository;
 import es.iesagora.fitjourney.data.repositories.PreferencesRepository;
 import es.iesagora.fitjourney.data.repositories.RoutineRepository;
@@ -296,6 +297,14 @@ public class SecondViewModel extends AndroidViewModel {
     }
 
     /**
+     * Cierra la sesión del usuario.
+     */
+    public void logout() {
+        preferencesRepository.clearSession();
+        RetrofitClient.reset();
+    }
+
+    /**
      * Historial de entrenamientos.
      */
     public LiveData<Resource<List<Workout>>> getWorkoutHistory() {
@@ -390,6 +399,14 @@ public class SecondViewModel extends AndroidViewModel {
         allUsersLiveData.setValue(Resource.loading());
         userRepository.getAllUsers(allUsersLiveData::setValue);
         return allUsersLiveData;
+    }
+
+    public LiveData<Resource<String>> getBanUserLiveData() {
+        return banUserLiveData;
+    }
+
+    public LiveData<Resource<String>> getDeleteUserLiveData() {
+        return deleteUserLiveData;
     }
 
     public LiveData<Resource<String>> deleteUserByAdmin(int userId) {

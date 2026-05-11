@@ -12,6 +12,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.SearchView;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
@@ -54,9 +55,6 @@ public class ExercisesFragment extends Fragment {
     /** Adaptador del RecyclerView de ejercicios */
     private ExerciseAdapter adapter;
 
-    /** Repositorio de preferencias del usuario */
-    private PreferencesRepository prefs;
-
     /** Lista completa de ejercicios obtenidos desde backend */
     private List<Exercise> allExercises = new ArrayList<>();
 
@@ -64,10 +62,19 @@ public class ExercisesFragment extends Fragment {
     private String currentQuery = "";
 
     /** Dificultad seleccionada en los filtros */
-    private String selectedDifficulty = "Todos";
+    private String selectedDifficulty = TODOS_STRING;
 
     /** Lista de niveles de dificultad disponibles */
-    private final String[] difficulties = {"Todos", "Principiante", "Intermedio", "Experto"};
+    private final String[] difficulties = {TODOS_STRING, PRINCIPIANTE_STRING, INTERMEDIO_STRING,
+            EXPERTO_STRING};
+
+    private static final String TODOS_STRING = "Todos";
+
+    private static final String PRINCIPIANTE_STRING = "Principiante";
+
+    private static final String INTERMEDIO_STRING = "Intermedio";
+
+    private static final String EXPERTO_STRING = "Experto";
 
     /**
      * Infla la vista del fragmento.
@@ -98,7 +105,7 @@ public class ExercisesFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         viewModel = new ViewModelProvider(requireActivity()).get(SecondViewModel.class);
-        prefs = new PreferencesRepository(requireContext());
+        PreferencesRepository prefs = new PreferencesRepository(requireContext());
 
         setupRecyclerView();
         setupCategories();
@@ -119,10 +126,7 @@ public class ExercisesFragment extends Fragment {
                         if (resource.data != null && !resource.data.isEmpty()) {
                             binding.rvExercises.setVisibility(View.VISIBLE);
                             binding.tvError.setVisibility(View.GONE);
-
-                            if (currentQuery.isEmpty() && selectedDifficulty.equals("Todos")) {
-                                allExercises = new ArrayList<>(resource.data);
-                            }
+                            allExercises = new ArrayList<>(resource.data);
 
                             applyFilters();
                         } else {
@@ -142,7 +146,7 @@ public class ExercisesFragment extends Fragment {
             }
         });
 
-        binding.svExercises.setOnQueryTextListener(new androidx.appcompat.widget.SearchView.OnQueryTextListener() {
+        binding.svExercises.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
 
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -265,20 +269,24 @@ public class ExercisesFragment extends Fragment {
      *         o si el filtro está en "Todos"; {@code false} en caso contrario
      */
     private boolean isMatchesDifficulty(Exercise ex) {
-        boolean matchesDifficulty = selectedDifficulty.equals("Todos");
+        boolean matchesDifficulty = selectedDifficulty.equals(TODOS_STRING);
 
         if (!matchesDifficulty && ex.getDifficulty() != null) {
             String exDiff = ex.getDifficulty().trim();
 
-            if (selectedDifficulty.equalsIgnoreCase("Principiante")
-                    && (exDiff.equalsIgnoreCase("Principiante") || exDiff.equals("1"))) {
-                matchesDifficulty = true;
-            } else if (selectedDifficulty.equalsIgnoreCase("Intermedio")
-                    && (exDiff.equalsIgnoreCase("Intermedio") || exDiff.equals("2"))) {
-                matchesDifficulty = true;
-            } else if (selectedDifficulty.equalsIgnoreCase("Experto")
-                    && (exDiff.equalsIgnoreCase("Experto") || exDiff.equals("3"))) {
-                matchesDifficulty = true;
+            matchesDifficulty = true;
+
+            if (selectedDifficulty.equalsIgnoreCase(PRINCIPIANTE_STRING)
+                    && (exDiff.equalsIgnoreCase(PRINCIPIANTE_STRING) || exDiff.equals("1"))) {
+                //COMPROBACION VACIA PUES CASA CON LA DIFICULTAD SOLO SE PONE EN FALSE SI NO CASA CON NIGUNA
+            } else if (selectedDifficulty.equalsIgnoreCase(INTERMEDIO_STRING)
+                    && (exDiff.equalsIgnoreCase(INTERMEDIO_STRING) || exDiff.equals("2"))) {
+                //COMPROBACION VACIA PUES CASA CON LA DIFICULTAD SOLO SE PONE EN FALSE SI NO CASA CON NIGUNA
+            } else if (selectedDifficulty.equalsIgnoreCase(EXPERTO_STRING)
+                    && (exDiff.equalsIgnoreCase(EXPERTO_STRING) || exDiff.equals("3"))) {
+                //COMPROBACION VACIA PUES CASA CON LA DIFICULTAD SOLO SE PONE EN FALSE SI NO CASA CON NIGUNA
+            } else {
+                matchesDifficulty = false;
             }
         }
         return matchesDifficulty;

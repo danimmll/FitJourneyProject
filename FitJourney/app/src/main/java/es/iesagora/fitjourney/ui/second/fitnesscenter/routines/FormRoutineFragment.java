@@ -35,6 +35,7 @@ import es.iesagora.fitjourney.data.model.RoutineExercise;
 import es.iesagora.fitjourney.data.remote.Resource;
 import es.iesagora.fitjourney.databinding.FragmentFormRoutineBinding;
 import es.iesagora.fitjourney.ui.second.adapters.AddedExerciseAdapter;
+import es.iesagora.fitjourney.utils.ImageUtils;
 import es.iesagora.fitjourney.viewmodel.SecondViewModel;
 
 /**
@@ -163,7 +164,7 @@ public class FormRoutineFragment extends Fragment {
         Resource<List<Exercise>> resource = viewModel.getExercises().getValue();
         if (resource == null || resource.data == null) {
             toast("Cargando catálogo de ejercicios, espera...");
-            return Collections.emptyList();
+            return null;
         }
         return resource.data;
     }
@@ -202,6 +203,7 @@ public class FormRoutineFragment extends Fragment {
         }
 
         int[] parsed = parseSetsAndReps(setsStr, repsStr);
+        if (parsed == null) return;   // ← null-check restaurado
 
         int sets = parsed[0];
         int reps = parsed[1];
@@ -235,7 +237,7 @@ public class FormRoutineFragment extends Fragment {
             return new int[]{ Integer.parseInt(setsStr), Integer.parseInt(repsStr) };
         } catch (NumberFormatException e) {
             toast("Series y repeticiones deben ser números válidos");
-            return new int[0];
+            return null;
         }
     }
 
@@ -298,6 +300,7 @@ public class FormRoutineFragment extends Fragment {
      * Recoge los datos del formulario, los valida y solicita
      * la creación de la rutina al ViewModel.
      */
+
     private void saveRoutine() {
         String name = binding.etRoutineName.getText() != null
                 ? binding.etRoutineName.getText().toString().trim() : "";
@@ -313,10 +316,16 @@ public class FormRoutineFragment extends Fragment {
 
         String photoUrl;
         if (selectedLocalImageUri != null) {
-            photoUrl = selectedLocalImageUri.toString();
+            photoUrl = ImageUtils.uriToBase64(
+                    requireContext().getContentResolver(),
+                    selectedLocalImageUri
+            );
+            if (photoUrl == null) {
+                toast("Error al procesar la imagen seleccionada");
+                return;
+            }
         } else {
-            if (imageUrl.isEmpty()) photoUrl = null;
-            else photoUrl = imageUrl;
+            photoUrl = imageUrl.isEmpty() ? null : imageUrl;
         }
 
         Routine routine = new Routine();

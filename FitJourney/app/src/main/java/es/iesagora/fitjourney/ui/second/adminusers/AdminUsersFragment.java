@@ -54,6 +54,9 @@ public class AdminUsersFragment extends Fragment {
         setupRecyclerView();
         setupSearchBar();
         loadUsers();
+
+        viewModel.banUser(0);
+        setupAdminObservers();
     }
 
     /**
@@ -72,7 +75,7 @@ public class AdminUsersFragment extends Fragment {
     private void setupSearchBar() {
         binding.etSearchUser.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) { /* TODO document why this method is empty */ }
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
@@ -82,7 +85,7 @@ public class AdminUsersFragment extends Fragment {
             }
 
             @Override
-            public void afterTextChanged(Editable s) {}
+            public void afterTextChanged(Editable s) { /* TODO document why this method is empty */ }
         });
     }
 
@@ -93,23 +96,70 @@ public class AdminUsersFragment extends Fragment {
         viewModel.getAllUsers().observe(getViewLifecycleOwner(), resource -> {
             if (resource != null) {
                 switch (resource.status) {
+
                     case LOADING:
                         binding.progressBarAdmin.setVisibility(View.VISIBLE);
                         binding.rvAdminUsers.setVisibility(View.GONE);
                         break;
+
                     case SUCCESS:
                         binding.progressBarAdmin.setVisibility(View.GONE);
                         binding.rvAdminUsers.setVisibility(View.VISIBLE);
+
                         if (resource.data != null) {
                             adapter.updateList(resource.data);
                         }
                         break;
+
                     case ERROR:
                         binding.progressBarAdmin.setVisibility(View.GONE);
                         binding.rvAdminUsers.setVisibility(View.VISIBLE);
+
                         Toast.makeText(getContext(), resource.message, Toast.LENGTH_LONG).show();
                         break;
                 }
+            }
+        });
+    }
+
+    /**
+     * Registra los observers de acciones admin una sola vez.
+     */
+    private void setupAdminObservers() {
+
+        viewModel.getBanUserLiveData().observe(getViewLifecycleOwner(), resource -> {
+            if (resource == null) return;
+            switch (resource.status) {
+                case LOADING:
+                    binding.progressBarAdmin.setVisibility(View.VISIBLE);
+                    break;
+                case SUCCESS:
+                    binding.progressBarAdmin.setVisibility(View.GONE);
+                    Toast.makeText(getContext(), "Usuario baneado correctamente", Toast.LENGTH_SHORT).show();
+                    loadUsers();
+                    break;
+                case ERROR:
+                    binding.progressBarAdmin.setVisibility(View.GONE);
+                    Toast.makeText(getContext(), "Error al banear: " + resource.message, Toast.LENGTH_SHORT).show();
+                    break;
+            }
+        });
+
+        viewModel.getDeleteUserLiveData().observe(getViewLifecycleOwner(), resource -> {
+            if (resource == null) return;
+            switch (resource.status) {
+                case LOADING:
+                    binding.progressBarAdmin.setVisibility(View.VISIBLE);
+                    break;
+                case SUCCESS:
+                    binding.progressBarAdmin.setVisibility(View.GONE);
+                    Toast.makeText(getContext(), "Usuario eliminado", Toast.LENGTH_SHORT).show();
+                    loadUsers();
+                    break;
+                case ERROR:
+                    binding.progressBarAdmin.setVisibility(View.GONE);
+                    Toast.makeText(getContext(), "Error al eliminar: " + resource.message, Toast.LENGTH_SHORT).show();
+                    break;
             }
         });
     }
@@ -119,11 +169,18 @@ public class AdminUsersFragment extends Fragment {
      */
     @SuppressLint("SetTextI18n")
     private void showUserOptionsDialog(User user) {
-        @SuppressLint("InflateParams") View dialogView = getLayoutInflater().inflate(R.layout.dialog_admin_user_options, null);
+
+        @SuppressLint("InflateParams")
+        View dialogView = getLayoutInflater().inflate(
+                R.layout.dialog_admin_user_options,
+                null
+        );
+
         BottomSheetDialog dialog = new BottomSheetDialog(requireContext());
         dialog.setContentView(dialogView);
 
         TextView tvTitle = dialogView.findViewById(R.id.tvOptionsTitle);
+
         View btnEdit = dialogView.findViewById(R.id.btnEditUser);
         View btnBan = dialogView.findViewById(R.id.btnBanUser);
         View btnDelete = dialogView.findViewById(R.id.btnDeleteUser);
@@ -152,73 +209,47 @@ public class AdminUsersFragment extends Fragment {
      * Navega a la pantalla de edición de perfil pasándole los datos del usuario.
      */
     private void navigateToEditUser(User user) {
+
         Bundle bundle = new Bundle();
+
         bundle.putString("userEmail", user.getEmail());
         bundle.putBoolean("isAdminEdit", true);
 
-        // Navegamos a la pantalla de edición (asegúrate de que R.id.editProfileFragment sea correcto en tu nav_graph)
-        Navigation.findNavController(requireView()).navigate(R.id.editProfileFragment, bundle);
+        Navigation.findNavController(requireView())
+                .navigate(R.id.editProfileFragment, bundle);
     }
 
     /**
-     * Lógica para banear/suspender a un usuario.
+     * Lanza la acción de banear/suspender a un usuario.
      */
     private void banUser(User user) {
-        // Asumiendo que crearás este método en el ViewModel
-        viewModel.banUser(user.getId_user()).observe(getViewLifecycleOwner(), resource -> {
-            if (resource != null) {
-                switch (resource.status) {
-                    case LOADING:
-                        binding.progressBarAdmin.setVisibility(View.VISIBLE);
-                        break;
-                    case SUCCESS:
-                        binding.progressBarAdmin.setVisibility(View.GONE);
-                        Toast.makeText(getContext(), "Usuario baneado correctamente", Toast.LENGTH_SHORT).show();
-                        loadUsers(); // Recargamos la lista para actualizar su estado
-                        break;
-                    case ERROR:
-                        binding.progressBarAdmin.setVisibility(View.GONE);
-                        Toast.makeText(getContext(), "Error al banear: " + resource.message, Toast.LENGTH_SHORT).show();
-                        break;
-                }
-            }
-        });
+        // Solo lanza la acción; el observer en setupAdminObservers() gestiona la respuesta
+        viewModel.banUser(user.getId_user());
     }
 
     /**
      * Muestra un diálogo de confirmación antes de eliminar permanentemente a un usuario.
      */
     private void confirmDeleteUser(User user) {
+
         new MaterialAlertDialogBuilder(requireContext())
                 .setTitle("Eliminar Usuario")
-                .setMessage("¿Estás seguro de que deseas eliminar permanentemente a " + user.getName() + "? Esta acción no se puede deshacer.")
+                .setMessage(
+                        "¿Estás seguro de que deseas eliminar permanentemente a "
+                                + user.getName()
+                                + "? Esta acción no se puede deshacer."
+                )
                 .setPositiveButton("Eliminar", (dialog, which) -> deleteUser(user))
                 .setNegativeButton("Cancelar", null)
                 .show();
     }
 
     /**
-     * Lógica para eliminar la cuenta de un usuario desde la administración.
+     * Lanza la acción para eliminar la cuenta de un usuario.
      */
     private void deleteUser(User user) {
-        viewModel.deleteUserByAdmin(user.getId_user()).observe(getViewLifecycleOwner(), resource -> {
-            if (resource != null) {
-                switch (resource.status) {
-                    case LOADING:
-                        binding.progressBarAdmin.setVisibility(View.VISIBLE);
-                        break;
-                    case SUCCESS:
-                        binding.progressBarAdmin.setVisibility(View.GONE);
-                        Toast.makeText(getContext(), "Usuario eliminado", Toast.LENGTH_SHORT).show();
-                        loadUsers(); // Recargamos la lista para que desaparezca
-                        break;
-                    case ERROR:
-                        binding.progressBarAdmin.setVisibility(View.GONE);
-                        Toast.makeText(getContext(), "Error al eliminar: " + resource.message, Toast.LENGTH_SHORT).show();
-                        break;
-                }
-            }
-        });
+        // Solo lanza la acción; el observer en setupAdminObservers() gestiona la respuesta
+        viewModel.deleteUserByAdmin(user.getId_user());
     }
 
     @Override

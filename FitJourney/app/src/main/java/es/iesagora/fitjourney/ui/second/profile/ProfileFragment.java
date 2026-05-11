@@ -17,6 +17,8 @@ import androidx.navigation.Navigation;
 
 import com.bumptech.glide.Glide;
 
+import java.util.Locale;
+
 import es.iesagora.fitjourney.R;
 import es.iesagora.fitjourney.data.model.User;
 import es.iesagora.fitjourney.data.repositories.PreferencesRepository;
@@ -151,11 +153,17 @@ public class ProfileFragment extends Fragment {
         binding.tvProfileName.setText(user.getName());
         binding.tvProfileEmail.setText(user.getEmail());
 
-        String weight = user.getWeight() != null ? user.getWeight() + " kg" : "-- kg";
-        String height = user.getHeight() != null ? user.getHeight() + " cm" : "-- cm";
+        // CORREGIDO: evitar "75.0 kg" usando intValue() o formato con 1 decimal
+        String weight = user.getWeight() != null
+                ? formatMetric(user.getWeight()) + " kg"
+                : "-- kg";
+        String height = user.getHeight() != null
+                ? formatMetric(user.getHeight()) + " cm"
+                : "-- cm";
 
         binding.tvProfileWeight.setText(weight);
         binding.tvProfileHeight.setText(height);
+
 
         if (user.getGoal() != null && !user.getGoal().isEmpty()) {
             String goal = user.getGoal().substring(0, 1).toUpperCase()
@@ -212,7 +220,7 @@ public class ProfileFragment extends Fragment {
         });
 
         binding.btnLogout.setOnClickListener(v -> {
-            prefs.clearSession();
+            viewModel.logout();
 
             Intent intent = new Intent(requireActivity(), MainActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -236,6 +244,15 @@ public class ProfileFragment extends Fragment {
             binding.fabAdminUsers.setVisibility(View.GONE);
         }
     }
+
+    private String formatMetric(Double value) {
+        if (value == null) return "--";
+        if (value == Math.floor(value)) {
+            return String.valueOf(value.intValue());
+        }
+        return String.format(Locale.getDefault(), "%.1f", value);
+    }
+
 
     /**
      * Limpia el binding al destruir la vista para evitar fugas de memoria.

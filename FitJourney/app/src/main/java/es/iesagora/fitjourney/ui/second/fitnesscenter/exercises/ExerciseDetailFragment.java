@@ -135,7 +135,7 @@ public class ExerciseDetailFragment extends Fragment {
                 .setPositiveButton("Eliminar", (dialog, which) ->
                         viewModel.deleteExercise(currentExercise.getId_exercise(), () -> {
                             Toast.makeText(getContext(), "Ejercicio eliminado", Toast.LENGTH_SHORT).show();
-                            requireActivity().getOnBackPressedDispatcher();
+                            requireActivity().getOnBackPressedDispatcher().onBackPressed();
                         }))
                 .setNegativeButton("Cancelar", null)
                 .show();

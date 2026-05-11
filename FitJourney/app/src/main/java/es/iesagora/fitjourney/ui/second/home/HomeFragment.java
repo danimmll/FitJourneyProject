@@ -261,21 +261,28 @@ public class HomeFragment extends Fragment {
         if (daysSinceLastWorkout == 0) {
             binding.tvStreakMessage.setText("¡Entrenaste hoy! Sigue así 🔥");
             streak = 1;
+
         } else if (daysSinceLastWorkout == 1) {
             binding.tvStreakMessage.setText("Ayer entrenaste. ¡No pierdas el ritmo!");
             streak = 1;
+
         } else if (daysSinceLastWorkout == 2) {
             binding.tvStreakMessage.setText("⚠️ Llevas 2 días sin entrenar. ¡Hoy es crucial!");
             streak = 1;
+
         } else {
             binding.tvStreakMessage.setText("Has perdido la racha. ¡Es hora de volver a empezar!");
+            streak = 0;
         }
 
         if (streak > 0) {
             for (int i = 0; i < workoutDates.size() - 1; i++) {
+
                 long diff = workoutDates.get(i).getTime() - workoutDates.get(i + 1).getTime();
+
                 long daysBetween = TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS);
-                if (daysBetween <= 3) {
+
+                if (daysBetween <= 2) {
                     streak++;
                 } else {
                     break;

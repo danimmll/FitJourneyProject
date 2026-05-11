@@ -199,14 +199,6 @@ public class MainViewModel extends AndroidViewModel {
     }
 
     /**
-     * Cierra la sesión del usuario.
-     */
-    public void logout() {
-        preferencesRepository.clearSession();
-        RetrofitClient.reset();
-    }
-
-    /**
      * Indica si hay un usuario logueado.
      */
     public boolean isUserLoggedIn() {
