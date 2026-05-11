@@ -233,14 +233,16 @@ public class ExercisesFragment extends Fragment {
      */
     private void applyFilters() {
 
-        List<Exercise> filteredList = allExercises.stream()
-                .filter(ex ->
-                        currentQuery.isEmpty()
-                                || (ex.getName() != null &&
-                                ex.getName().toLowerCase().contains(currentQuery.toLowerCase()))
-                )
-                .filter(this::isMatchesDifficulty)
-                .collect(java.util.stream.Collectors.toList());
+        List<Exercise> filteredList = new ArrayList<>();
+        String normalizedQuery = currentQuery == null ? "" : currentQuery.toLowerCase();
+
+        for (Exercise ex : allExercises) {
+            String exerciseName = ex.getName() != null ? ex.getName().toLowerCase() : "";
+            boolean matchesQuery = normalizedQuery.isEmpty() || exerciseName.contains(normalizedQuery);
+            if (matchesQuery && isMatchesDifficulty(ex)) {
+                filteredList.add(ex);
+            }
+        }
 
         if (filteredList.isEmpty() && !allExercises.isEmpty()) {
             showEmptyState();

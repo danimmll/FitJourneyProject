@@ -26,7 +26,6 @@ import com.google.android.material.textfield.TextInputEditText;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 import es.iesagora.fitjourney.R;
 import es.iesagora.fitjourney.data.model.Exercise;
@@ -120,19 +119,12 @@ public class FormRoutineFragment extends Fragment {
     }
 
     /**
-     * Muestra un cuadro de diálogo con un AutoCompleteTextView para buscar
-     * un ejercicio por su nombre y pedir series/repeticiones.
+     * Muestra el diálogo para añadir un ejercicio a la rutina.
+     * Complexity: 3 (early return + llamada a onConfirmAddExercise).
      */
     private void showAddExerciseDialog() {
-        if (viewModel.getExercises().getValue() == null || viewModel.getExercises().getValue().data == null) {
-            Toast.makeText(getContext(), "Cargando catálogo de ejercicios, espera...", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        List<Exercise> allExercises = viewModel.getExercises().getValue().data;
-        List<String> exerciseNames = allExercises.stream()
-                .map(Exercise::getName)
-                .collect(Collectors.toList());
+        List<Exercise> allExercises = getExerciseCatalog();
+        if (allExercises == null) return;
 
         View dialogView = LayoutInflater.from(getContext()).inflate(R.layout.dialog_add_routine_exercise, null);
         AutoCompleteTextView actvExercise = dialogView.findViewById(R.id.actvExercise);
@@ -140,6 +132,7 @@ public class FormRoutineFragment extends Fragment {
         TextInputEditText etReps = dialogView.findViewById(R.id.etReps);
         MaterialButton btnConfirmAdd = dialogView.findViewById(R.id.btnConfirmAdd);
 
+        List<String> exerciseNames = getExerciseNames(allExercises);
         ArrayAdapter<String> searchAdapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, exerciseNames);
         actvExercise.setAdapter(searchAdapter);
 
@@ -148,38 +141,113 @@ public class FormRoutineFragment extends Fragment {
                 .create();
         dialog.show();
 
-        btnConfirmAdd.setOnClickListener(v -> {
-            String selectedName = actvExercise.getText().toString().trim();
-            String setsStr = etSets.getText() != null ? etSets.getText().toString() : "";
-            String repsStr = etReps.getText() != null ? etReps.getText().toString() : "";
+        btnConfirmAdd.setOnClickListener(v ->
+                onConfirmAddExercise(actvExercise, etSets, etReps, allExercises, dialog));
+    }
 
-            if (selectedName.isEmpty() || setsStr.isEmpty() || repsStr.isEmpty()) {
-                Toast.makeText(getContext(), "Rellena todos los campos", Toast.LENGTH_SHORT).show();
-                return;
-            }
+    /**
+     * Devuelve la lista de ejercicios del catálogo, o null si aún no está lista.
+     * Muestra un Toast informativo en ese caso.
+     */
+    private List<Exercise> getExerciseCatalog() {
+        Resource<List<Exercise>> resource = viewModel.getExercises().getValue();
+        if (resource == null || resource.data == null) {
+            toast("Cargando catálogo de ejercicios, espera...");
+            return null;
+        }
+        return resource.data;
+    }
 
-            Exercise selectedExercise = allExercises.stream()
-                    .filter(ex -> ex.getName().equalsIgnoreCase(selectedName))
-                    .findFirst()
-                    .orElse(null);
+    /**
+     * Extrae los nombres de la lista de ejercicios.
+     */
+    private List<String> getExerciseNames(List<Exercise> exercises) {
+        List<String> names = new ArrayList<>();
+        for (Exercise e : exercises) names.add(e.getName());
+        return names;
+    }
 
-            if (selectedExercise == null) {
-                Toast.makeText(getContext(), "El ejercicio no existe en el catálogo", Toast.LENGTH_SHORT).show();
-                return;
-            }
+    /**
+     * Lógica del botón "Confirmar" del diálogo.
+     * Valida campos, busca el ejercicio y lo añade a la lista.
+     * Complexity: 6 (separada del método principal).
+     */
+    private void onConfirmAddExercise(AutoCompleteTextView actvExercise,
+                                      TextInputEditText etSets,
+                                      TextInputEditText etReps,
+                                      List<Exercise> allExercises,
+                                      AlertDialog dialog) {
+        String selectedName = actvExercise.getText().toString().trim();
+        String setsStr = etSets.getText() != null ? etSets.getText().toString() : "";
+        String repsStr = etReps.getText() != null ? etReps.getText().toString() : "";
 
-            RoutineExercise newRoutineEx = new RoutineExercise();
-            newRoutineEx.setId_exercise(selectedExercise.getId_exercise());
-            newRoutineEx.setExercise(selectedExercise);
-            newRoutineEx.setTarget_sets(Integer.parseInt(setsStr));
-            newRoutineEx.setTarget_reps(Integer.parseInt(repsStr));
+        if (selectedName.isEmpty() || setsStr.isEmpty() || repsStr.isEmpty()) {
+            toast("Rellena todos los campos");
+            return;
+        }
 
-            addedExercises.add(newRoutineEx);
-            adapter.notifyItemInserted(addedExercises.size() - 1);
-            updateEmptyState();
+        Exercise selectedExercise = findExerciseByName(allExercises, selectedName);
+        if (selectedExercise == null) {
+            toast("El ejercicio no existe en el catálogo");
+            return;
+        }
 
-            dialog.dismiss();
-        });
+        int[] parsed = parseSetsAndReps(setsStr, repsStr);
+        if (parsed == null) return;
+
+        int sets = parsed[0];
+        int reps = parsed[1];
+
+        if (sets <= 0 || reps <= 0) {
+            toast("Series y repeticiones deben ser mayores que 0");
+            return;
+        }
+
+        addRoutineExercise(selectedExercise, sets, reps);
+        dialog.dismiss();
+    }
+
+    /**
+     * Busca un ejercicio por nombre (ignorando mayúsculas).
+     * Devuelve null si no existe.
+     */
+    private Exercise findExerciseByName(List<Exercise> exercises, String name) {
+        for (Exercise e : exercises) {
+            if (e.getName().equalsIgnoreCase(name)) return e;
+        }
+        return null;
+    }
+
+    /**
+     * Parsea series y repeticiones. Muestra Toast y devuelve null si falla.
+     */
+    private int[] parseSetsAndReps(String setsStr, String repsStr) {
+        try {
+            return new int[]{Integer.parseInt(setsStr), Integer.parseInt(repsStr)};
+        } catch (NumberFormatException e) {
+            toast("Series y repeticiones deben ser números válidos");
+            return null;
+        }
+    }
+
+    /**
+     * Construye el RoutineExercise y lo añade al adapter.
+     */
+    private void addRoutineExercise(Exercise exercise, int sets, int reps) {
+        RoutineExercise newRoutineEx = new RoutineExercise();
+        newRoutineEx.setId_exercise(exercise.getId_exercise());
+        newRoutineEx.setExercise(exercise);
+        newRoutineEx.setTarget_sets(sets);
+        newRoutineEx.setTarget_reps(reps);
+
+        addedExercises.add(newRoutineEx);
+        adapter.notifyItemInserted(addedExercises.size() - 1);
+        updateEmptyState();
+    }
+
+    /** Atajo para Toast cortos. */
+    private void toast(String msg) {
+        Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT).show();
     }
 
     /**

@@ -67,9 +67,10 @@ public class AuthInterceptor implements Interceptor {
         // Continuamos con la petición modificada
         Response response = chain.proceed(builder.build());
 
-        // Si el servidor devuelve 401, limpiamos la sesión
+        // Si el servidor devuelve 401, limpiamos solo la sesión
+        // (se mantienen preferencias de app como tema/notificaciones)
         if (response.code() == 401) {
-            preferences.clear();
+            preferences.clearSession();
         }
 
         return response;
