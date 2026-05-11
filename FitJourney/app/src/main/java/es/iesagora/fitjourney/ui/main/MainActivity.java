@@ -104,6 +104,14 @@ public class MainActivity extends AppCompatActivity {
                 appBarConfiguration
         );
 
+        navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
+            if (destination.getId() == R.id.accessFragment) {
+                binding.appBarLayout.setVisibility(View.GONE);
+            } else {
+                binding.appBarLayout.setVisibility(View.VISIBLE);
+            }
+        });
+
         navController.navigate(R.id.accessFragment);
     }
 
