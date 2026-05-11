@@ -17,6 +17,8 @@ import java.io.InputStream;
 
 /**
  * Clase utilitaria para la conversión y carga de imágenes.
+ * Centraliza toda la lógica de detección Base64 vs URL HTTP
+ * para evitar duplicación en adapters y fragments.
  */
 public class ImageUtils {
 
@@ -26,12 +28,10 @@ public class ImageUtils {
 
     /**
      * Carga una imagen en un ImageView detectando automáticamente si es Base64 o URL HTTP.
-     * Centraliza la lógica que antes estaba duplicada en 3 sitios distintos.
-     *
-     * @param context   contexto de la aplicación
-     * @param url       cadena con la URL o datos Base64 de la imagen
-     * @param imageView vista donde se cargará la imagen
-     * @param placeholder drawable de placeholder mientras carga
+     * @param context     contexto de la aplicación
+     * @param url         cadena con la URL o datos Base64
+     * @param imageView   vista donde se cargará la imagen
+     * @param placeholder drawable de placeholder y error
      */
     public static void loadInto(Context context, String url, ImageView imageView, int placeholder) {
         if (url == null || url.isEmpty()) {
@@ -65,7 +65,47 @@ public class ImageUtils {
     }
 
     /**
+     * Carga una imagen circular en un ImageView detectando automáticamente si es Base64 o URL HTTP.
+     * @param context     contexto de la aplicación
+     * @param url         cadena con la URL o datos Base64
+     * @param imageView   vista donde se cargará la imagen
+     * @param placeholder drawable de placeholder y error
+     */
+    public static void loadCircle(Context context, String url, ImageView imageView, int placeholder) {
+        if (url == null || url.isEmpty()) {
+            imageView.setImageResource(placeholder);
+            return;
+        }
+
+        if (url.length() > 200 || !url.startsWith("http")) {
+            try {
+                byte[] imageBytes = Base64.decode(url, Base64.DEFAULT);
+                Glide.with(context)
+                        .asBitmap()
+                        .load(imageBytes)
+                        .placeholder(placeholder)
+                        .error(placeholder)
+                        .circleCrop()
+                        .into(imageView);
+            } catch (Exception e) {
+                Log.e(TAG, "Error al decodificar Base64 (círculo)", e);
+                imageView.setImageResource(placeholder);
+            }
+        } else {
+            Glide.with(context)
+                    .load(url)
+                    .transition(DrawableTransitionOptions.withCrossFade())
+                    .placeholder(placeholder)
+                    .error(placeholder)
+                    .circleCrop()
+                    .into(imageView);
+        }
+    }
+
+    /**
      * Convierte una imagen desde Uri a cadena Base64.
+     * Redimensiona a un máximo de 800px manteniendo proporción
+     * y comprime a JPEG con calidad del 70%.
      *
      * @param resolver ContentResolver para acceder al Uri
      * @param uri      Uri de la imagen
