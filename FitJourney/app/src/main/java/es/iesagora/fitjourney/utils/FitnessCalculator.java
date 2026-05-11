@@ -10,6 +10,10 @@ import java.util.Calendar;
  * No mantiene estado interno y actúa únicamente como clase de utilidades matemáticas.
  */
 public class FitnessCalculator {
+    private FitnessCalculator() {
+        /* This utility class should not be instantiated */
+    }
+
 
     /**
      * Calcula la edad a partir de una fecha de nacimiento en formato String.
@@ -20,11 +24,24 @@ public class FitnessCalculator {
      * @return edad calculada o 25 como valor por defecto si hay error
      */
     public static int calculateAge(String birthDateStr) {
-        if (birthDateStr == null || birthDateStr.length() < 4) return 25;
+        if (birthDateStr == null || birthDateStr.trim().isEmpty()) return 25;
         try {
-            int birthYear = Integer.parseInt(birthDateStr.substring(0, 4));
+            String normalized = birthDateStr.trim();
+            int birthYear;
+
+            if (normalized.matches("^\\d{4}[-/].*")) {
+                birthYear = Integer.parseInt(normalized.substring(0, 4));
+            } else if (normalized.matches("^\\d{2}/\\d{2}/\\d{4}$")) {
+                birthYear = Integer.parseInt(normalized.substring(6, 10));
+            } else if (normalized.length() >= 4) {
+                birthYear = Integer.parseInt(normalized.substring(0, 4));
+            } else {
+                return 25;
+            }
+
             int currentYear = Calendar.getInstance().get(Calendar.YEAR);
-            return currentYear - birthYear;
+            int age = currentYear - birthYear;
+            return Math.max(0, Math.min(age, 120));
         } catch (Exception e) {
             return 25;
         }

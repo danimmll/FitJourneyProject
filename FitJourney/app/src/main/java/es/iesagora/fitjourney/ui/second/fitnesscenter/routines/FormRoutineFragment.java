@@ -24,9 +24,9 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputEditText;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 import es.iesagora.fitjourney.R;
 import es.iesagora.fitjourney.data.model.Exercise;
@@ -40,8 +40,8 @@ import es.iesagora.fitjourney.viewmodel.SecondViewModel;
 /**
  * Fragment encargado de la creación de nuevas rutinas de entrenamiento.
  *
- * <p>Permite al usuario administrador o autorizado crear una rutina
- * con nombre, descripción, imagen asociada y una lista de ejercicios.</p>
+ * <p>Permite al usuario crear una rutina con nombre, descripción,
+ * imagen asociada y una lista de ejercicios seleccionados del catálogo.</p>
  */
 public class FormRoutineFragment extends Fragment {
 
@@ -49,7 +49,6 @@ public class FormRoutineFragment extends Fragment {
     private SecondViewModel viewModel;
     private Uri selectedLocalImageUri;
 
-    // Lista en memoria de los ejercicios que vamos añadiendo a la rutina
     private final List<RoutineExercise> addedExercises = new ArrayList<>();
     private AddedExerciseAdapter adapter;
 
@@ -63,7 +62,9 @@ public class FormRoutineFragment extends Fragment {
             });
 
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater,
+                             ViewGroup container,
+                             Bundle savedInstanceState) {
         binding = FragmentFormRoutineBinding.inflate(inflater, container, false);
         return binding.getRoot();
     }
@@ -71,9 +72,9 @@ public class FormRoutineFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
         viewModel = new ViewModelProvider(requireActivity()).get(SecondViewModel.class);
 
-        // Pedimos los ejercicios a la API por si no estaban cargados
         if (viewModel.getExercises().getValue() == null) {
             viewModel.fetchExercises();
         }
@@ -84,7 +85,7 @@ public class FormRoutineFragment extends Fragment {
     }
 
     /**
-     * Inicializa el RecyclerView para mostrar los ejercicios añadidos a la rutina.
+     * Inicializa el RecyclerView con los ejercicios añadidos a la rutina.
      */
     private void setupRecyclerView() {
         adapter = new AddedExerciseAdapter(addedExercises, position -> {
@@ -97,156 +98,239 @@ public class FormRoutineFragment extends Fragment {
     }
 
     /**
-     * Configura los listeners para los elementos de la interfaz de usuario.
+     * Configura los listeners de la interfaz.
      */
     private void setupListeners() {
-        binding.toolbar.setNavigationOnClickListener(v -> Navigation.findNavController(v).navigateUp());
-        binding.ivPhotoPreview.setOnClickListener(v -> getContent.launch("image/*"));
+        binding.toolbar.setNavigationOnClickListener(
+                v -> Navigation.findNavController(v).navigateUp());
+
+        binding.ivPhotoPreview.setOnClickListener(
+                v -> getContent.launch("image/*"));
 
         binding.etRoutineImage.setOnFocusChangeListener((v, hasFocus) -> {
             if (!hasFocus) {
-                String url = Objects.requireNonNull(binding.etRoutineImage.getText()).toString().trim();
+                String url = Objects.requireNonNull(
+                        binding.etRoutineImage.getText()).toString().trim();
                 if (!url.isEmpty()) {
                     selectedLocalImageUri = null;
-                    Glide.with(this).load(url).centerCrop().placeholder(R.drawable.img_construccion).into(binding.ivPhotoPreview);
+                    Glide.with(this)
+                            .load(url)
+                            .centerCrop()
+                            .placeholder(R.drawable.img_construccion)
+                            .into(binding.ivPhotoPreview);
                 }
             }
         });
 
-        // Abrimos el buscador de ejercicios
         binding.btnAddExercise.setOnClickListener(v -> showAddExerciseDialog());
-
         binding.btnSaveRoutine.setOnClickListener(v -> saveRoutine());
     }
 
     /**
-     * Muestra un cuadro de diálogo con un AutoCompleteTextView para buscar
-     * un ejercicio por su nombre y pedir series/repeticiones.
+     * Muestra el diálogo para buscar un ejercicio del catálogo
+     * e introducir series y repeticiones.
      */
     private void showAddExerciseDialog() {
-        if (viewModel.getExercises().getValue() == null || viewModel.getExercises().getValue().data == null) {
-            Toast.makeText(getContext(), "Cargando catálogo de ejercicios, espera...", Toast.LENGTH_SHORT).show();
-            return;
-        }
+        List<Exercise> allExercises = getExerciseCatalog();
+        if (allExercises == null) return;
 
-        List<Exercise> allExercises = viewModel.getExercises().getValue().data;
-        List<String> exerciseNames = allExercises.stream()
-                .map(Exercise::getName)
-                .collect(Collectors.toList());
+        View dialogView = LayoutInflater.from(getContext())
+                .inflate(R.layout.dialog_add_routine_exercise, null);
 
-        View dialogView = LayoutInflater.from(getContext()).inflate(R.layout.dialog_add_routine_exercise, null);
         AutoCompleteTextView actvExercise = dialogView.findViewById(R.id.actvExercise);
-        TextInputEditText etSets = dialogView.findViewById(R.id.etSets);
-        TextInputEditText etReps = dialogView.findViewById(R.id.etReps);
-        MaterialButton btnConfirmAdd = dialogView.findViewById(R.id.btnConfirmAdd);
+        TextInputEditText etSets          = dialogView.findViewById(R.id.etSets);
+        TextInputEditText etReps          = dialogView.findViewById(R.id.etReps);
+        MaterialButton btnConfirmAdd      = dialogView.findViewById(R.id.btnConfirmAdd);
 
-        ArrayAdapter<String> searchAdapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, exerciseNames);
-        actvExercise.setAdapter(searchAdapter);
+        actvExercise.setAdapter(new ArrayAdapter<>(
+                requireContext(),
+                android.R.layout.simple_dropdown_item_1line,
+                getExerciseNames(allExercises)));
 
         AlertDialog dialog = new MaterialAlertDialogBuilder(requireContext())
                 .setView(dialogView)
                 .create();
         dialog.show();
 
-        btnConfirmAdd.setOnClickListener(v -> {
-            String selectedName = actvExercise.getText().toString().trim();
-            String setsStr = etSets.getText() != null ? etSets.getText().toString() : "";
-            String repsStr = etReps.getText() != null ? etReps.getText().toString() : "";
-
-            if (selectedName.isEmpty() || setsStr.isEmpty() || repsStr.isEmpty()) {
-                Toast.makeText(getContext(), "Rellena todos los campos", Toast.LENGTH_SHORT).show();
-                return;
-            }
-
-            Exercise selectedExercise = allExercises.stream()
-                    .filter(ex -> ex.getName().equalsIgnoreCase(selectedName))
-                    .findFirst()
-                    .orElse(null);
-
-            if (selectedExercise == null) {
-                Toast.makeText(getContext(), "El ejercicio no existe en el catálogo", Toast.LENGTH_SHORT).show();
-                return;
-            }
-
-            RoutineExercise newRoutineEx = new RoutineExercise();
-            newRoutineEx.setId_exercise(selectedExercise.getId_exercise());
-            newRoutineEx.setExercise(selectedExercise);
-            newRoutineEx.setTarget_sets(Integer.parseInt(setsStr));
-            newRoutineEx.setTarget_reps(Integer.parseInt(repsStr));
-
-            addedExercises.add(newRoutineEx);
-            adapter.notifyItemInserted(addedExercises.size() - 1);
-            updateEmptyState();
-
-            dialog.dismiss();
-        });
+        btnConfirmAdd.setOnClickListener(v ->
+                onConfirmAddExercise(actvExercise, etSets, etReps, allExercises, dialog));
     }
 
     /**
-     * Actualiza el estado visual según si hay o no ejercicios en la rutina.
+     * Devuelve la lista de ejercicios del catálogo, o null si aún no ha cargado.
      */
-    private void updateEmptyState() {
-        if (addedExercises.isEmpty()) {
-            binding.tvEmptyState.setVisibility(View.VISIBLE);
-            binding.rvExercises.setVisibility(View.GONE);
-        } else {
-            binding.tvEmptyState.setVisibility(View.GONE);
-            binding.rvExercises.setVisibility(View.VISIBLE);
+    private List<Exercise> getExerciseCatalog() {
+        Resource<List<Exercise>> resource = viewModel.getExercises().getValue();
+        if (resource == null || resource.data == null) {
+            toast("Cargando catálogo de ejercicios, espera...");
+            return Collections.emptyList();
+        }
+        return resource.data;
+    }
+
+    /**
+     * Extrae los nombres de una lista de ejercicios.
+     */
+    private List<String> getExerciseNames(List<Exercise> exercises) {
+        List<String> names = new ArrayList<>();
+        for (Exercise e : exercises) names.add(e.getName());
+        return names;
+    }
+
+    /**
+     * Maneja la confirmación del diálogo: valida los campos,
+     * localiza el ejercicio y lo añade a la rutina.
+     */
+    private void onConfirmAddExercise(AutoCompleteTextView actvExercise,
+                                      TextInputEditText etSets,
+                                      TextInputEditText etReps,
+                                      List<Exercise> allExercises,
+                                      AlertDialog dialog) {
+        String selectedName = actvExercise.getText().toString().trim();
+        String setsStr = etSets.getText() != null ? etSets.getText().toString() : "";
+        String repsStr = etReps.getText() != null ? etReps.getText().toString() : "";
+
+        if (selectedName.isEmpty() || setsStr.isEmpty() || repsStr.isEmpty()) {
+            toast("Rellena todos los campos");
+            return;
+        }
+
+        Exercise selectedExercise = findExerciseByName(allExercises, selectedName);
+        if (selectedExercise == null) {
+            toast("El ejercicio no existe en el catálogo");
+            return;
+        }
+
+        int[] parsed = parseSetsAndReps(setsStr, repsStr);
+
+        int sets = parsed[0];
+        int reps = parsed[1];
+
+        if (sets <= 0 || reps <= 0) {
+            toast("Series y repeticiones deben ser mayores que 0");
+            return;
+        }
+
+        addRoutineExercise(selectedExercise, sets, reps);
+        dialog.dismiss();
+    }
+
+    /**
+     * Busca un ejercicio por nombre ignorando mayúsculas/minúsculas.
+     * Devuelve null si no existe en el catálogo.
+     */
+    private Exercise findExerciseByName(List<Exercise> exercises, String name) {
+        for (Exercise e : exercises) {
+            if (e.getName().equalsIgnoreCase(name)) return e;
+        }
+        return null;
+    }
+
+    /**
+     * Parsea series y repeticiones a enteros.
+     * Muestra un Toast y devuelve null si el formato no es válido.
+     */
+    private int[] parseSetsAndReps(String setsStr, String repsStr) {
+        try {
+            return new int[]{ Integer.parseInt(setsStr), Integer.parseInt(repsStr) };
+        } catch (NumberFormatException e) {
+            toast("Series y repeticiones deben ser números válidos");
+            return new int[0];
         }
     }
 
     /**
-     * Observa el estado del recurso proporcionado por el ViewModel al crear la rutina.
+     * Construye un {@link RoutineExercise} y lo inserta en la lista y el adapter.
+     */
+    private void addRoutineExercise(Exercise exercise, int sets, int reps) {
+        RoutineExercise newRoutineEx = new RoutineExercise();
+        newRoutineEx.setId_exercise(exercise.getId_exercise());
+        newRoutineEx.setExercise(exercise);
+        newRoutineEx.setTarget_sets(sets);
+        newRoutineEx.setTarget_reps(reps);
+
+        addedExercises.add(newRoutineEx);
+        adapter.notifyItemInserted(addedExercises.size() - 1);
+        updateEmptyState();
+    }
+
+    /**
+     * Muestra u oculta el mensaje de lista vacía según el estado actual.
+     */
+    private void updateEmptyState() {
+        boolean isEmpty = addedExercises.isEmpty();
+        binding.tvEmptyState.setVisibility(isEmpty ? View.VISIBLE : View.GONE);
+        binding.rvExercises.setVisibility(isEmpty ? View.GONE : View.VISIBLE);
+    }
+
+    /**
+     * Observa el estado de la acción de creación de rutina para
+     * actualizar la UI y navegar atrás al completarse.
      */
     private void setupObservers() {
         viewModel.getRoutineActionStatus().observe(getViewLifecycleOwner(), resource -> {
             if (resource == null) return;
+
             if (resource.status == Resource.Status.LOADING) {
                 binding.progressBar.setVisibility(View.VISIBLE);
                 binding.btnSaveRoutine.setEnabled(false);
-            } else {
-                binding.progressBar.setVisibility(View.GONE);
-                binding.btnSaveRoutine.setEnabled(true);
-                if (resource.status == Resource.Status.SUCCESS) {
-                    if (resource.message != null && resource.message.toLowerCase().contains("creada")) {
-                        Toast.makeText(getContext(), "Rutina guardada correctamente", Toast.LENGTH_SHORT).show();
-                        viewModel.getRoutineActionStatus().setValue(null);
-                        Navigation.findNavController(requireView()).navigateUp();
-                    }
-                } else if (resource.status == Resource.Status.ERROR) {
-                    Toast.makeText(getContext(), resource.message, Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            binding.progressBar.setVisibility(View.GONE);
+            binding.btnSaveRoutine.setEnabled(true);
+
+            if (resource.status == Resource.Status.SUCCESS) {
+                if (resource.message != null
+                        && resource.message.toLowerCase().contains("creada")) {
+                    toast("Rutina guardada correctamente");
                     viewModel.getRoutineActionStatus().setValue(null);
+                    Navigation.findNavController(requireView()).navigateUp();
                 }
+            } else if (resource.status == Resource.Status.ERROR) {
+                toast(resource.message);
+                viewModel.getRoutineActionStatus().setValue(null);
             }
         });
     }
 
     /**
-     * Recoge los datos del formulario, valida y llama al ViewModel para que la envíe.
+     * Recoge los datos del formulario, los valida y solicita
+     * la creación de la rutina al ViewModel.
      */
     private void saveRoutine() {
-        String name = binding.etRoutineName.getText() != null ? binding.etRoutineName.getText().toString().trim() : "";
-        String desc = binding.etRoutineDesc.getText() != null ? binding.etRoutineDesc.getText().toString().trim() : "";
-        String imageUrl = binding.etRoutineImage.getText() != null ? binding.etRoutineImage.getText().toString().trim() : "";
+        String name = binding.etRoutineName.getText() != null
+                ? binding.etRoutineName.getText().toString().trim() : "";
+        String desc = binding.etRoutineDesc.getText() != null
+                ? binding.etRoutineDesc.getText().toString().trim() : "";
+        String imageUrl = binding.etRoutineImage.getText() != null
+                ? binding.etRoutineImage.getText().toString().trim() : "";
 
         if (name.isEmpty()) {
             binding.tilRoutineName.setError("El nombre es obligatorio");
             return;
         }
 
+        String photoUrl;
+        if (selectedLocalImageUri != null) {
+            photoUrl = selectedLocalImageUri.toString();
+        } else {
+            if (imageUrl.isEmpty()) photoUrl = null;
+            else photoUrl = imageUrl;
+        }
+
         Routine routine = new Routine();
         routine.setName(name);
         routine.setDescription(desc.isEmpty() ? null : desc);
-
-        if (selectedLocalImageUri != null) {
-            routine.setPhoto_url(selectedLocalImageUri.toString());
-        } else {
-            routine.setPhoto_url(imageUrl.isEmpty() ? null : imageUrl);
-        }
-
+        routine.setPhoto_url(photoUrl);
         routine.setExercises(addedExercises);
 
         viewModel.createRoutine(routine);
+    }
+
+    /** Muestra un Toast corto. */
+    private void toast(String msg) {
+        Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT).show();
     }
 
     @Override

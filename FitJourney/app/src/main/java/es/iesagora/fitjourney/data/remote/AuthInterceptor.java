@@ -69,7 +69,7 @@ public class AuthInterceptor implements Interceptor {
 
         // Si el servidor devuelve 401, limpiamos la sesión
         if (response.code() == 401) {
-            preferences.clear();
+            preferences.clearSession();
         }
 
         return response;

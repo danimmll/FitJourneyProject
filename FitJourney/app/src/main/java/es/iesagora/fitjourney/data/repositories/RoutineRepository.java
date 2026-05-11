@@ -4,6 +4,10 @@ import android.content.Context;
 
 import androidx.annotation.NonNull;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+
+import java.io.IOException;
 import java.util.List;
 
 import es.iesagora.fitjourney.data.model.Routine;
@@ -28,6 +32,14 @@ public class RoutineRepository {
      * Instancia de la API utilizada para realizar peticiones.
      */
     private final AppApi api;
+
+    private static final String ERROR_CONEXION = "Error de conexión: ";
+    private static final String ERROR_CREAR = "Error al crear rutina";
+    private static final String ERROR_CARGAR = "Error al cargar rutinas";
+    private static final String ERROR_ELIMINAR = "Error al eliminar la rutina";
+    private static final String ERROR_DETALLE = "Error al cargar la rutina";
+    private static final String ERROR_FIELD = "error";
+    private final Gson gson = new Gson();
 
     /**
      * Callback para obtener listas de rutinas.
@@ -77,7 +89,7 @@ public class RoutineRepository {
                 if (response.isSuccessful() && response.body() != null) {
                     callback.onResult(Resource.success(response.body()));
                 } else {
-                    callback.onResult(Resource.error("Error al obtener rutinas"));
+                    callback.onResult(Resource.error(getError(response, ERROR_CARGAR)));
                 }
             }
 
@@ -85,7 +97,7 @@ public class RoutineRepository {
             public void onFailure(@NonNull Call<List<Routine>> call,
                                   @NonNull Throwable t) {
 
-                callback.onResult(Resource.error("Error de conexión: " + t.getMessage()));
+                callback.onResult(Resource.error(ERROR_CONEXION + t.getMessage()));
             }
         });
     }
@@ -108,7 +120,7 @@ public class RoutineRepository {
                 if (response.isSuccessful()) {
                     callback.onResult(Resource.success("Rutina creada con éxito"));
                 } else {
-                    callback.onResult(Resource.error("Error al crear rutina"));
+                    callback.onResult(Resource.error(getError(response, ERROR_CREAR)));
                 }
             }
 
@@ -116,7 +128,7 @@ public class RoutineRepository {
             public void onFailure(@NonNull Call<ResponseBody> call,
                                   @NonNull Throwable t) {
 
-                callback.onResult(Resource.error("Error de conexión: " + t.getMessage()));
+                callback.onResult(Resource.error(ERROR_CONEXION + t.getMessage()));
             }
         });
     }
@@ -139,7 +151,7 @@ public class RoutineRepository {
                 if (response.isSuccessful()) {
                     callback.onResult(Resource.success("Rutina eliminada correctamente"));
                 } else {
-                    callback.onResult(Resource.error("Error al eliminar la rutina"));
+                    callback.onResult(Resource.error(getError(response, ERROR_ELIMINAR)));
                 }
             }
 
@@ -147,7 +159,7 @@ public class RoutineRepository {
             public void onFailure(@NonNull Call<ResponseBody> call,
                                   @NonNull Throwable t) {
 
-                callback.onResult(Resource.error("Error de conexión: " + t.getMessage()));
+                callback.onResult(Resource.error(ERROR_CONEXION + t.getMessage()));
             }
         });
     }
@@ -170,7 +182,7 @@ public class RoutineRepository {
                 if (response.isSuccessful() && response.body() != null) {
                     callback.onResult(Resource.success(response.body()));
                 } else {
-                    callback.onResult(Resource.error("Error al cargar la rutina"));
+                    callback.onResult(Resource.error(getError(response, ERROR_DETALLE)));
                 }
             }
 
@@ -178,8 +190,23 @@ public class RoutineRepository {
             public void onFailure(@NonNull Call<Routine> call,
                                   @NonNull Throwable t) {
 
-                callback.onResult(Resource.error("Error de conexión: " + t.getMessage()));
+                callback.onResult(Resource.error(ERROR_CONEXION + t.getMessage()));
             }
         });
+    }
+
+    private <T> String getError(Response<T> response, String fallbackMessage) {
+        if (response.errorBody() == null) return fallbackMessage;
+
+        try {
+            String raw = response.errorBody().string();
+            JsonObject jsonObject = gson.fromJson(raw, JsonObject.class);
+            if (jsonObject != null && jsonObject.has(ERROR_FIELD)) {
+                return jsonObject.get(ERROR_FIELD).getAsString();
+            }
+            return fallbackMessage;
+        } catch (IOException e) {
+            return fallbackMessage;
+        }
     }
 }

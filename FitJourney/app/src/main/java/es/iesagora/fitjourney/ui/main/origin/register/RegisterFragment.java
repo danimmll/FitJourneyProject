@@ -316,6 +316,9 @@ public class RegisterFragment extends Fragment {
      */
     private String formatToDatabaseDate(String visualDate) {
         String[] parts = visualDate.split("/");
+        if (parts.length != 3) {
+            throw new IllegalArgumentException("Formato de fecha inválido");
+        }
         return parts[2] + "-" + parts[1] + "-" + parts[0];
     }
 

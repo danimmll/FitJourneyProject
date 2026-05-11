@@ -10,7 +10,6 @@ import com.bumptech.glide.Glide;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import es.iesagora.fitjourney.data.model.User;
 import es.iesagora.fitjourney.databinding.ViewholderAdminUserBinding;
@@ -61,10 +60,15 @@ public class AdminUsersAdapter extends RecyclerView.Adapter<AdminUsersAdapter.Us
             userList = new ArrayList<>(userListFull);
         } else {
             String filterPattern = text.toLowerCase().trim();
-            userList = userListFull.stream()
-                    .filter(u -> u.getName().toLowerCase().contains(filterPattern)
-                            || u.getEmail().toLowerCase().contains(filterPattern))
-                    .collect(Collectors.toList());
+            List<User> filtered = new ArrayList<>();
+            for (User user : userListFull) {
+                String name = user.getName() != null ? user.getName().toLowerCase() : "";
+                String email = user.getEmail() != null ? user.getEmail().toLowerCase() : "";
+                if (name.contains(filterPattern) || email.contains(filterPattern)) {
+                    filtered.add(user);
+                }
+            }
+            userList = filtered;
         }
         notifyDataSetChanged();
     }

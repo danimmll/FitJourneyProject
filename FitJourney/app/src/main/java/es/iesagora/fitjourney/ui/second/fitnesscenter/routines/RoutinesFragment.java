@@ -57,7 +57,11 @@ public class RoutinesFragment extends Fragment {
         // Sacamos el ID y el rol del usuario para saber qué rutinas puede borrar
         PreferencesRepository prefs = new PreferencesRepository(requireContext());
         String userIdStr = prefs.getUserId();
-        currentUserId = userIdStr != null ? Integer.parseInt(userIdStr) : -1;
+        try {
+            currentUserId = userIdStr != null ? Integer.parseInt(userIdStr) : -1;
+        } catch (NumberFormatException e) {
+            currentUserId = -1;
+        }
         boolean isAdmin = "admin".equalsIgnoreCase(prefs.getRole());
 
         setupRecyclerView(isAdmin);
