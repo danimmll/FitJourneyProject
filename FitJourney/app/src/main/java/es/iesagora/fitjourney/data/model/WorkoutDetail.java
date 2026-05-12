@@ -22,34 +22,34 @@ public class WorkoutDetail implements Serializable {
     /**
      * Identificador único del detalle del entrenamiento.
      */
-    private int id_detail;
+    private int idDetail;
 
     /**
      * Identificador del entrenamiento al que pertenece.
      */
-    private int id_workout;
+    private int idWorkout;
 
     /**
      * Identificador del ejercicio realizado.
      */
-    private int id_exercise;
+    private int idExercise;
 
     /**
      * Número de series realizadas durante el ejercicio.
      */
-    private Integer sets_performed;
+    private Integer setsPerformed;
 
     /**
      * Repeticiones realizadas.
      * Puede almacenarse como texto para permitir formatos
      * personalizados como "12-10-8" o similares.
      */
-    private String reps_performed;
+    private String repsPerformed;
 
     /**
      * Peso máximo utilizado durante el ejercicio.
      */
-    private Double max_weight_used;
+    private Double maxWeightUsed;
 
     /**
      * Información completa del ejercicio asociado.

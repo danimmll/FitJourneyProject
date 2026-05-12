@@ -75,6 +75,8 @@ public class FormRoutineFragment extends Fragment {
 
         viewModel = new ViewModelProvider(requireActivity()).get(SecondViewModel.class);
 
+        viewModel.getRoutineActionStatus().setValue(null);
+
         if (viewModel.getExercises().getValue() == null) {
             viewModel.fetchExercises();
         }
@@ -245,10 +247,10 @@ public class FormRoutineFragment extends Fragment {
      */
     private void addRoutineExercise(Exercise exercise, int sets, int reps) {
         RoutineExercise newRoutineEx = new RoutineExercise();
-        newRoutineEx.setId_exercise(exercise.getId_exercise());
+        newRoutineEx.setIdExercise(exercise.getIdExercise());
         newRoutineEx.setExercise(exercise);
-        newRoutineEx.setTarget_sets(sets);
-        newRoutineEx.setTarget_reps(reps);
+        newRoutineEx.setTargetSets(sets);
+        newRoutineEx.setTargetReps(reps);
 
         addedExercises.add(newRoutineEx);
         adapter.notifyItemInserted(addedExercises.size() - 1);
@@ -330,8 +332,12 @@ public class FormRoutineFragment extends Fragment {
         Routine routine = new Routine();
         routine.setName(name);
         routine.setDescription(desc.isEmpty() ? null : desc);
-        routine.setPhoto_url(photoUrl);
+        routine.setPhotoUrl(photoUrl);
         routine.setExercises(addedExercises);
+
+        // Asignar privacidad (Asegúrate de que binding.switchPublic existe en tu XML)
+        // boolean isPublic = binding.switchPublic.isChecked();
+        // routine.setIs_public(isPublic ? 1 : 0);
 
         viewModel.createRoutine(routine);
     }

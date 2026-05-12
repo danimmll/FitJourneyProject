@@ -23,32 +23,32 @@ public class Workout implements Serializable {
     /**
      * Identificador único del entrenamiento.
      */
-    private int id_workout;
+    private int idWorkout;
 
     /**
      * Identificador del usuario que realizó el entrenamiento.
      */
-    private int id_user;
+    private int idUser;
 
     /**
      * Identificador de la rutina utilizada en el entrenamiento.
      */
-    private int id_routine;
+    private int idRoutine;
 
     /**
      * Fecha en la que se realizó el entrenamiento.
      */
-    private String workout_date;
+    private String workoutDate;
 
     /**
      * Duración total del entrenamiento en minutos.
      */
-    private Integer duration_minutes;
+    private Integer durationMinutes;
 
     /**
      * Cantidad estimada de calorías quemadas.
      */
-    private Double calories_burned;
+    private Double caloriesBurned;
 
     /**
      * Notas u observaciones añadidas por el usuario.

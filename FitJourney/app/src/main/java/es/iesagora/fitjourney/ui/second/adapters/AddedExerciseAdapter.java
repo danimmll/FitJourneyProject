@@ -116,16 +116,16 @@ public class AddedExerciseAdapter
 
             ImageUtils.loadInto(
                     context,
-                    routineExercise.getExercise().getImage_url(),
+                    routineExercise.getExercise().getImageUrl(),
                     holder.ivExercise,
                     R.drawable.ic_ejercicios
             );
         }
 
         holder.tvDetails.setText(
-                routineExercise.getTarget_sets()
+                routineExercise.getTargetSets()
                         + " series x "
-                        + routineExercise.getTarget_reps()
+                        + routineExercise.getTargetReps()
         );
 
         holder.btnRemove.setOnClickListener(

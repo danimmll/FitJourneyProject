@@ -156,7 +156,7 @@ public class HomeFragment extends Fragment {
         try {
             float peso = Float.parseFloat(String.valueOf(user.getWeight()));
             float alturaCm = Float.parseFloat(String.valueOf(user.getHeight()));
-            int edad = FitnessCalculator.calculateAge(user.getBirth_date());
+            int edad = FitnessCalculator.calculateAge(user.getBirthDate());
 
             float imc = FitnessCalculator.calculateBMI(peso, alturaCm);
 
@@ -208,18 +208,18 @@ public class HomeFragment extends Fragment {
 
         for (Workout w : history) {
 
-            if (w.getCalories_burned() != null && w.getCalories_burned() > maxCalories) {
-                maxCalories = w.getCalories_burned();
+            if (w.getCaloriesBurned() != null && w.getCaloriesBurned() > maxCalories) {
+                maxCalories = w.getCaloriesBurned();
             }
 
             try {
-                if (w.getWorkout_date() != null) {
-                    String dateStr = w.getWorkout_date().length() >= 10
-                            ? w.getWorkout_date().substring(0, 10)
-                            : w.getWorkout_date();
+                if (w.getWorkoutDate() != null) {
+                    String dateStr = w.getWorkoutDate().length() >= 10
+                            ? w.getWorkoutDate().substring(0, 10)
+                            : w.getWorkoutDate();
 
-                    if (dateStr.equals(hoyStr) && w.getCalories_burned() != null) {
-                        caloriasHoy += w.getCalories_burned();
+                    if (dateStr.equals(hoyStr) && w.getCaloriesBurned() != null) {
+                        caloriasHoy += w.getCaloriesBurned();
                     }
 
                     Date d = sdf.parse(dateStr);
@@ -323,8 +323,8 @@ public class HomeFragment extends Fragment {
 
             if (history != null) {
                 for (Workout w : history) {
-                    if (w.getWorkout_date() != null &&
-                            w.getWorkout_date().startsWith(targetDate)) {
+                    if (w.getWorkoutDate() != null &&
+                            w.getWorkoutDate().startsWith(targetDate)) {
                         entrenoEseDia = true;
                         break;
                     }

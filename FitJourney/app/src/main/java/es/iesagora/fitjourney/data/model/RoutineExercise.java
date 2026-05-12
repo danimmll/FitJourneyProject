@@ -20,32 +20,32 @@ public class RoutineExercise implements Serializable {
     /**
      * Identificador único de la relación rutina-ejercicio.
      */
-    private int id_routine_exercise;
+    private int idRoutineExercise;
 
     /**
      * Identificador de la rutina a la que pertenece el ejercicio.
      */
-    private int id_routine;
+    private int idRoutine;
 
     /**
      * Identificador del ejercicio asociado.
      */
-    private int id_exercise;
+    private int idExercise;
 
     /**
      * Número de series objetivo para el ejercicio.
      */
-    private Integer target_sets;
+    private Integer targetSets;
 
     /**
      * Número de repeticiones objetivo por serie.
      */
-    private Integer target_reps;
+    private Integer targetReps;
 
     /**
      * Peso objetivo recomendado para realizar el ejercicio.
      */
-    private Double target_weight;
+    private Double targetWeight;
 
     /**
      * Información completa del ejercicio asociado.

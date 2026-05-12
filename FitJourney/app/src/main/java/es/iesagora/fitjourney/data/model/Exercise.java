@@ -22,7 +22,7 @@ public class Exercise implements Serializable {
     /**
      * Identificador único del ejercicio.
      */
-    private int id_exercise;
+    private int idExercise;
 
     /**
      * Nombre del ejercicio.
@@ -34,7 +34,7 @@ public class Exercise implements Serializable {
      * Grupo muscular principal que trabaja el ejercicio.
      * Ejemplo: "Pecho", "Piernas", "Espalda", etc.
      */
-    private String muscle_group;
+    private String muscleGroup;
 
     /**
      * Nivel de dificultad del ejercicio.
@@ -50,12 +50,12 @@ public class Exercise implements Serializable {
     /**
      * URL de la imagen asociada al ejercicio.
      */
-    private String image_url;
+    private String imageUrl;
 
     /**
      * URL del vídeo demostrativo del ejercicio.
      */
-    private String video_url;
+    private String videoUrl;
 
     /**
      * Equipamiento necesario para realizar el ejercicio.
@@ -66,7 +66,7 @@ public class Exercise implements Serializable {
     /**
      * Fecha de creación del ejercicio.
      */
-    private String creation_date;
+    private String creationDate;
 
     /**
      * Estado del ejercicio.

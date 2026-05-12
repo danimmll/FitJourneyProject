@@ -31,9 +31,6 @@ import es.iesagora.fitjourney.viewmodel.MainViewModel;
 public class LoginFragment extends Fragment {
 
     private FragmentLoginBinding binding;
-    private MainViewModel viewModel;
-    private NavController navController;
-
     private static final String KEY_EMAIL = "email";
     private static final String KEY_PASSWORD = "password";
 
@@ -64,8 +61,8 @@ public class LoginFragment extends Fragment {
 
         super.onViewCreated(view, savedInstanceState);
 
-        viewModel = new ViewModelProvider(this).get(MainViewModel.class);
-        navController = Navigation.findNavController(view);
+        MainViewModel viewModel = new ViewModelProvider(this).get(MainViewModel.class);
+        NavController navController = Navigation.findNavController(view);
 
         viewModel.getLoginState().observe(getViewLifecycleOwner(), resource -> {
             if (resource == null) return;

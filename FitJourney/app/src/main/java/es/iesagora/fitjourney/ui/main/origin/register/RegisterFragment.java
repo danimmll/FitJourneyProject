@@ -24,7 +24,6 @@ import java.util.Objects;
 
 import es.iesagora.fitjourney.R;
 import es.iesagora.fitjourney.data.model.User;
-import es.iesagora.fitjourney.data.repositories.PreferencesRepository;
 import es.iesagora.fitjourney.databinding.FragmentRegisterBinding;
 import es.iesagora.fitjourney.ui.second.SecondActivity;
 import es.iesagora.fitjourney.viewmodel.MainViewModel;
@@ -291,7 +290,7 @@ public class RegisterFragment extends Fragment {
             newUser.setName(name);
             newUser.setEmail(email);
             newUser.setPassword(pass);
-            newUser.setBirth_date(birthDate);
+            newUser.setBirthDate(birthDate);
             newUser.setGender(gender);
             newUser.setGoal(goal);
             newUser.setHeight(height);

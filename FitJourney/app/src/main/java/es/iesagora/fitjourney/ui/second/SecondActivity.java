@@ -6,7 +6,6 @@ import android.view.MenuItem;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -16,7 +15,6 @@ import java.util.Objects;
 
 import es.iesagora.fitjourney.R;
 import es.iesagora.fitjourney.databinding.ActivitySecondBinding;
-import es.iesagora.fitjourney.viewmodel.SecondViewModel;
 
 /**
  * Actividad principal de la segunda pantalla de la aplicación (zona autenticada).
@@ -31,12 +29,6 @@ import es.iesagora.fitjourney.viewmodel.SecondViewModel;
 public class SecondActivity extends AppCompatActivity {
 
     /**
-     * ViewBinding asociado al layout de la actividad.
-     * Permite acceder a las vistas del XML de forma segura y sin findViewById.
-     */
-    private ActivitySecondBinding binding;
-
-    /**
      * Controlador de navegación de Android Navigation Component.
      * Gestiona la navegación entre fragmentos dentro del NavHostFragment.
      */
@@ -47,12 +39,6 @@ public class SecondActivity extends AppCompatActivity {
      * Define qué destinos se consideran "top level" dentro de la navegación.
      */
     private AppBarConfiguration appBarConfiguration;
-
-    /**
-     * ViewModel de la actividad secundaria.
-     * Encargado de gestionar la lógica relacionada con la pantalla principal del usuario.
-     */
-    private SecondViewModel viewModel;
 
     /**
      * Método de creación de la actividad.
@@ -68,11 +54,10 @@ public class SecondActivity extends AppCompatActivity {
      */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
 
-        viewModel = new ViewModelProvider(this).get(SecondViewModel.class);
-
-        binding = ActivitySecondBinding.inflate(getLayoutInflater());
+        ActivitySecondBinding binding = ActivitySecondBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
         setSupportActionBar(binding.toolbar);

@@ -10,7 +10,6 @@ import androidx.lifecycle.MutableLiveData;
 import es.iesagora.fitjourney.data.model.User;
 import es.iesagora.fitjourney.data.remote.AccessResponse;
 import es.iesagora.fitjourney.data.remote.Resource;
-import es.iesagora.fitjourney.data.remote.RetrofitClient;
 import es.iesagora.fitjourney.data.repositories.PreferencesRepository;
 import es.iesagora.fitjourney.data.repositories.UserRepository;
 import lombok.Getter;
@@ -186,7 +185,7 @@ public class MainViewModel extends AndroidViewModel {
         if (data.getUser() != null) {
             preferencesRepository.setRole(data.getUser().getRole());
             preferencesRepository.setUserId(
-                    String.valueOf(data.getUser().getId_user())
+                    String.valueOf(data.getUser().getIdUser())
             );
         }
     }

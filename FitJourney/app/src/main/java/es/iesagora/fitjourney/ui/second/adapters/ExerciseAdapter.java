@@ -107,7 +107,7 @@ public class ExerciseAdapter extends RecyclerView.Adapter<ExerciseAdapter.Exerci
         Exercise exercise = exercises.get(position);
 
         holder.tvName.setText(exercise.getName());
-        holder.tvMuscle.setText(exercise.getMuscle_group());
+        holder.tvMuscle.setText(exercise.getMuscleGroup());
 
         String diff = exercise.getDifficulty() != null
                 ? exercise.getDifficulty().toLowerCase()
@@ -133,7 +133,7 @@ public class ExerciseAdapter extends RecyclerView.Adapter<ExerciseAdapter.Exerci
 
         ImageUtils.loadInto(
                 context,
-                exercise.getImage_url(),
+                exercise.getImageUrl(),
                 holder.ivImage,
                 R.drawable.ic_ejercicios
         );

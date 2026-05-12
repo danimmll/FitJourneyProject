@@ -130,7 +130,7 @@ public class ExerciseDetailFragment extends Fragment {
                 .setTitle("¿Eliminar Ejercicio?")
                 .setMessage("Esta acción no se puede deshacer.")
                 .setPositiveButton("Eliminar", (dialog, which) ->
-                        viewModel.deleteExercise(currentExercise.getId_exercise(), () -> {
+                        viewModel.deleteExercise(currentExercise.getIdExercise(), () -> {
                             Toast.makeText(getContext(), "Ejercicio eliminado", Toast.LENGTH_SHORT).show();
                             requireActivity().getOnBackPressedDispatcher().onBackPressed();
                         }))
@@ -145,7 +145,7 @@ public class ExerciseDetailFragment extends Fragment {
      */
     private void fillData(Exercise exercise) {
         binding.tvDetailName.setText(exercise.getName());
-        binding.tvDetailMuscle.setText(exercise.getMuscle_group());
+        binding.tvDetailMuscle.setText(exercise.getMuscleGroup());
 
         String diff = exercise.getDifficulty();
         if (diff != null) {
@@ -161,7 +161,7 @@ public class ExerciseDetailFragment extends Fragment {
 
         ImageUtils.loadInto(
                 requireContext(),
-                exercise.getImage_url(),
+                exercise.getImageUrl(),
                 binding.ivDetailImage,
                 R.drawable.ic_ejercicios
         );

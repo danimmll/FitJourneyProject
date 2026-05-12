@@ -24,7 +24,7 @@ public class Routine implements Serializable {
     /**
      * Identificador único de la rutina.
      */
-    private int id_routine;
+    private int idRoutine;
 
     /**
      * Nombre de la rutina.
@@ -40,17 +40,17 @@ public class Routine implements Serializable {
     /**
      * URL de la imagen asociada a la rutina.
      */
-    private String photo_url;
+    private String photoUrl;
 
     /**
      * Fecha de creación de la rutina.
      */
-    private String creation_date;
+    private String creationDate;
 
     /**
      * Identificador del usuario que creó la rutina.
      */
-    private int id_user;
+    private int idUser;
 
     /**
      * Estado de la rutina.
@@ -58,6 +58,8 @@ public class Routine implements Serializable {
      * 0 = Inactiva
      */
     private int active;
+
+    private int isPublic;
 
     /**
      * Lista de ejercicios que forman parte de la rutina.
@@ -72,8 +74,8 @@ public class Routine implements Serializable {
      * @return URL de la imagen de la rutina.
      */
     public String getDisplayImage() {
-        if (photo_url != null && !photo_url.trim().isEmpty()) {
-            return photo_url;
+        if (photoUrl != null && !photoUrl.trim().isEmpty()) {
+            return photoUrl;
         }
 
         return "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=500&auto=format&fit=crop";

@@ -54,7 +54,8 @@ public class RoutinesFragment extends Fragment {
 
         viewModel = new ViewModelProvider(requireActivity()).get(SecondViewModel.class);
 
-        // Sacamos el ID y el rol del usuario para saber qué rutinas puede borrar
+        viewModel.getRoutineActionStatus().setValue(null);
+
         PreferencesRepository prefs = new PreferencesRepository(requireContext());
         String userIdStr = prefs.getUserId();
         try {
@@ -71,7 +72,6 @@ public class RoutinesFragment extends Fragment {
                 Navigation.findNavController(v).navigate(R.id.action_routinesFragment_to_formRoutineFragment)
         );
 
-        // Pedimos a la API que nos traiga la lista de rutinas
         viewModel.fetchRoutines();
 
         setupObservers();
@@ -101,7 +101,6 @@ public class RoutinesFragment extends Fragment {
             }
         });
 
-        // Escucha la respuesta al intentar borrar una rutina
         viewModel.getRoutineActionStatus().observe(getViewLifecycleOwner(), resource -> {
             if (resource == null) return;
 
@@ -126,14 +125,15 @@ public class RoutinesFragment extends Fragment {
         adapter = new RoutineAdapter(currentUserId, isAdmin, new RoutineAdapter.OnRoutineListener() {
             @Override
             public void onRoutineClick(Routine routine) {
-                // TODO: Cuando hagamos la pantalla de detalles (para ver los ejercicios de la rutina), navegaremos desde aquí.
-                Toast.makeText(getContext(), "Cargando: " + routine.getName(), Toast.LENGTH_SHORT).show();
-
-                /*
                 Bundle bundle = new Bundle();
-                bundle.putInt("routine_id", routine.getId_routine());
-                Navigation.findNavController(requireView()).navigate(R.id.action_routines_to_routineDetail, bundle);
-                */
+                bundle.putInt("routine_id", routine.getIdRoutine());
+
+                try {
+                    Navigation.findNavController(requireView())
+                            .navigate(R.id.action_routinesFragment_to_formRoutineFragment, bundle);
+                } catch (IllegalArgumentException e) {
+                    Toast.makeText(getContext(), "Falta crear el fragmento de detalles en nav_second.xml", Toast.LENGTH_SHORT).show();
+                }
             }
 
             @Override
@@ -173,11 +173,15 @@ public class RoutinesFragment extends Fragment {
         List<Routine> filtered = new ArrayList<>();
 
         if (binding.chipAll.isChecked()) {
-            filtered.addAll(allRoutines);
-        } else if (binding.chipPersonal.isChecked()) {
-            // Recorremos la lista y nos quedamos solo con las que creó el usuario logueado
             for (Routine r : allRoutines) {
-                if (r.getId_user() == currentUserId) {
+                boolean isPublic = (r.getIs_public() != null && r.getIs_public() == 1);
+                if (isPublic || r.getIdUser() == currentUserId) {
+                    filtered.add(r);
+                }
+            }
+        } else if (binding.chipPersonal.isChecked()) {
+            for (Routine r : allRoutines) {
+                if (r.getIdUser() == currentUserId) {
                     filtered.add(r);
                 }
             }
@@ -185,7 +189,6 @@ public class RoutinesFragment extends Fragment {
 
         adapter.setRoutines(filtered);
 
-        // Si la lista está vacía tras filtrar, mostramos el mensaje de "No hay rutinas"
         if (filtered.isEmpty()) {
             binding.rvRoutines.setVisibility(View.GONE);
             binding.tvEmptyRoutines.setVisibility(View.VISIBLE);
@@ -201,8 +204,10 @@ public class RoutinesFragment extends Fragment {
     private void showDeleteDialog(Routine routine) {
         new AlertDialog.Builder(requireContext())
                 .setTitle("Borrar Rutina")
-                .setMessage("¿Estás seguro de que quieres eliminar la rutina '" + routine.getName() + "'?\n\nLa rutina y su configuración desaparecerán para siempre.")
-                .setPositiveButton("Borrar para siempre", (dialog, which) -> viewModel.deleteRoutine(routine.getId_routine()))
+                .setMessage("¿Estás seguro de que quieres eliminar la rutina '" +
+                        routine.getName() + "'?\n\nLa rutina y su configuración desaparecerán para siempre.")
+                .setPositiveButton("Borrar para siempre", (dialog, which) ->
+                        viewModel.deleteRoutine(routine.getIdRoutine()))
                 .setNegativeButton("Cancelar", null)
                 .show();
     }

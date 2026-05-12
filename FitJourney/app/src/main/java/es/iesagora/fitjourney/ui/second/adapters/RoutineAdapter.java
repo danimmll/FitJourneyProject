@@ -1,5 +1,6 @@
 package es.iesagora.fitjourney.ui.second.adapters;
 
+import android.annotation.SuppressLint;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,6 +34,7 @@ public class RoutineAdapter extends RecyclerView.Adapter<RoutineAdapter.ViewHold
         this.listener = listener;
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     public void setRoutines(List<Routine> routines) {
         this.routines = routines;
         notifyDataSetChanged();
@@ -51,7 +53,7 @@ public class RoutineAdapter extends RecyclerView.Adapter<RoutineAdapter.ViewHold
         holder.tvName.setText(routine.getName());
         holder.tvDesc.setText(routine.getDescription());
 
-        if (isAdmin || routine.getId_user() == currentUserId) {
+        if (isAdmin || routine.getIdUser() == currentUserId) {
             holder.btnDelete.setVisibility(View.VISIBLE);
             holder.btnDelete.setOnClickListener(v -> listener.onDeleteClick(routine));
         } else {
@@ -67,7 +69,8 @@ public class RoutineAdapter extends RecyclerView.Adapter<RoutineAdapter.ViewHold
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
-        TextView tvName, tvDesc;
+        TextView tvName;
+        TextView tvDesc;
         ImageView btnDelete;
 
         public ViewHolder(@NonNull View itemView) {

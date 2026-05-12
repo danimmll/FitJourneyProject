@@ -3,14 +3,16 @@ const prisma = new PrismaClient();
 
 const createRoutine = async (req, res, next) => {
     try {
-        const { name, description, photo_url, exercises } = req.body;
+        // Añadido is_public a la desestructuración del body
+        const { name, description, photo_url, is_public, exercises } = req.body;
 
         const routine = await prisma.routine.create({
             data: {
                 name,
                 description,
                 photo_url: photo_url || null,
-                id_user: req.user.id,
+                id_user: req.user.id, // O req.user.id_user dependiendo de cómo lo mande tu middleware
+                is_public: is_public !== undefined ? is_public : 1, // Se guarda el valor recibido, por defecto 1 (pública)
                 exercises: {
                     create: exercises && exercises.length > 0 ? exercises.map(ex => ({
                         id_exercise: ex.id_exercise,
@@ -31,7 +33,8 @@ const createRoutine = async (req, res, next) => {
 
 const getUserRoutines = async (req, res, next) => {
     try {
-        // Trae TODAS las rutinas activas de cualquier usuario (Admin o Comunidad)
+        // Trae TODAS las rutinas activas. 
+        // El filtro de "Privadas/Públicas" se encarga de hacerlo el Frontend (RoutinesFragment)
         const routines = await prisma.routine.findMany({
             where: { active: 1 },
             include: { exercises: { include: { exercise: true } } }

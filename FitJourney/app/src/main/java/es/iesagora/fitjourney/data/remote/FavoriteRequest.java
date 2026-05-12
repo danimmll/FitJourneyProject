@@ -16,5 +16,5 @@ public class FavoriteRequest {
     /**
      * Identificador del ejercicio favorito.
      */
-    private int id_exercise;
+    private int idExercise;
 }

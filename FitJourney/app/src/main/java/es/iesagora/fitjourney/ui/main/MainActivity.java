@@ -6,7 +6,6 @@ import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -23,7 +22,6 @@ import es.iesagora.fitjourney.data.repositories.PreferencesRepository;
 import es.iesagora.fitjourney.databinding.ActivityMainBinding;
 import es.iesagora.fitjourney.ui.second.SecondActivity;
 import es.iesagora.fitjourney.utils.NotificationWorker;
-import es.iesagora.fitjourney.viewmodel.MainViewModel;
 
 /**
  * Actividad principal de la aplicación.
@@ -34,22 +32,10 @@ import es.iesagora.fitjourney.viewmodel.MainViewModel;
  */
 public class MainActivity extends AppCompatActivity {
 
-    // ===================== VARIABLES =====================
-
-    /**
-     * ViewBinding de la actividad principal.
-     */
-    private ActivityMainBinding binding;
-
     /**
      * Controlador de navegación de Jetpack Navigation.
      */
     private NavController navController;
-
-    /**
-     * ViewModel principal de autenticación.
-     */
-    private MainViewModel viewModel;
 
     /**
      * Método principal de creación de la actividad.
@@ -60,7 +46,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        viewModel = new ViewModelProvider(this).get(MainViewModel.class);
         PreferencesRepository prefs = new PreferencesRepository(this);
 
         AppCompatDelegate.setDefaultNightMode(prefs.getTheme());
@@ -85,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
-        binding = ActivityMainBinding.inflate(getLayoutInflater());
+        ActivityMainBinding binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
         binding.progressBar.setVisibility(View.GONE);

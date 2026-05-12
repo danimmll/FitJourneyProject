@@ -208,10 +208,9 @@ public class AdminUsersFragment extends Fragment {
      * Navega a la pantalla de edición de perfil pasándole los datos del usuario.
      */
     private void navigateToEditUser(User user) {
-
         Bundle bundle = new Bundle();
 
-        bundle.putString("userEmail", user.getEmail());
+        bundle.putSerializable("user_data", user);
         bundle.putBoolean("isAdminEdit", true);
 
         Navigation.findNavController(requireView())
@@ -222,8 +221,7 @@ public class AdminUsersFragment extends Fragment {
      * Lanza la acción de banear/suspender a un usuario.
      */
     private void banUser(User user) {
-        // Solo lanza la acción; el observer en setupAdminObservers() gestiona la respuesta
-        viewModel.banUser(user.getId_user());
+        viewModel.banUser(user.getIdUser());
     }
 
     /**
@@ -248,7 +246,7 @@ public class AdminUsersFragment extends Fragment {
      */
     private void deleteUser(User user) {
         // Solo lanza la acción; el observer en setupAdminObservers() gestiona la respuesta
-        viewModel.deleteUserByAdmin(user.getId_user());
+        viewModel.deleteUserByAdmin(user.getIdUser());
     }
 
     @Override

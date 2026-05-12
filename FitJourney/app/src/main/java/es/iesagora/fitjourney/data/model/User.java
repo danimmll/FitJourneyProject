@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class User implements Serializable {
 
-    private int id_user;
+    private int idUser;
     private String email;
     private String name;
     private String password;
@@ -22,23 +22,23 @@ public class User implements Serializable {
     private String goal;
     private Double height;
     private Double weight;
-    private String birth_date;
-    private String photo_url;
+    private String birthDate;
+    private String photoUrl;
     private String role;
     private int active;
-    private String register_date;
+    private String registerDate;
 
     /**
      * Constructor personalizado — CORREGIDO: antes el cuerpo estaba vacío
      * y todos los campos llegaban a null al servidor.
      */
-    public User(String idUser, String name, String email, String pass,
+    public User(String id, String name, String email, String pass,
                 String birthDate, String gender, String goal,
                 int height, float weight) {
         this.name       = name;
         this.email      = email;
         this.password   = pass;
-        this.birth_date = birthDate;
+        this.birthDate = birthDate;
         this.gender     = gender;
         this.goal       = goal;
         this.height     = (double) height;
@@ -51,8 +51,8 @@ public class User implements Serializable {
      * En caso contrario, se genera automáticamente un avatar con DiceBear.
      */
     public String getDisplayAvatar() {
-        if (this.photo_url != null && !this.photo_url.trim().isEmpty()) {
-            return this.photo_url;
+        if (this.photoUrl != null && !this.photoUrl.trim().isEmpty()) {
+            return this.photoUrl;
         }
 
         String safeName = (this.name != null)

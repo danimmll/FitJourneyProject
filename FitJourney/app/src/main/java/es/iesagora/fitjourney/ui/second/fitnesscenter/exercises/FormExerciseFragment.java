@@ -133,12 +133,12 @@ public class FormExerciseFragment extends Fragment {
         binding.btnSave.setText(R.string.update);
 
         binding.etName.setText(exerciseToEdit.getName());
-        binding.etMuscle.setText(exerciseToEdit.getMuscle_group());
+        binding.etMuscle.setText(exerciseToEdit.getMuscleGroup());
         binding.etDifficulty.setText(exerciseToEdit.getDifficulty());
         binding.etDescription.setText(exerciseToEdit.getDescription());
 
-        if (exerciseToEdit.getImage_url() != null && !exerciseToEdit.getImage_url().isEmpty()) {
-            currentImageBase64 = exerciseToEdit.getImage_url();
+        if (exerciseToEdit.getImageUrl() != null && !exerciseToEdit.getImageUrl().isEmpty()) {
+            currentImageBase64 = exerciseToEdit.getImageUrl();
 
             if (currentImageBase64.length() > 200) {
                 Bitmap bmp = ImageUtils.base64ToBitmap(currentImageBase64);
@@ -170,8 +170,8 @@ public class FormExerciseFragment extends Fragment {
         newExercise.setName(name);
         newExercise.setDifficulty(difficulty);
         newExercise.setDescription(description);
-        newExercise.setMuscle_group(muscle);
-        newExercise.setImage_url(currentImageBase64);
+        newExercise.setMuscleGroup(muscle);
+        newExercise.setImageUrl(currentImageBase64);
 
         if (exerciseToEdit == null) {
             viewModel.createExercise(newExercise, () -> {
@@ -179,8 +179,8 @@ public class FormExerciseFragment extends Fragment {
                 requireActivity().getOnBackPressedDispatcher().onBackPressed();
             });
         } else {
-            newExercise.setId_exercise(exerciseToEdit.getId_exercise());
-            viewModel.updateExercise(exerciseToEdit.getId_exercise(), newExercise, () -> {
+            newExercise.setIdExercise(exerciseToEdit.getIdExercise());
+            viewModel.updateExercise(exerciseToEdit.getIdExercise(), newExercise, () -> {
                 viewModel.selectExercise(newExercise);
                 requireActivity().getOnBackPressedDispatcher().onBackPressed();
             });
