@@ -7,12 +7,6 @@
     android:layout_height="match_parent"
     android:background="@color/fondo">
 
-    <com.google.android.material.appbar.AppBarLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/fondo"
-        app:elevation="0dp"/>
-
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -27,8 +21,8 @@
 
             <FrameLayout
                 android:id="@+id/frameAvatar"
-                android:layout_width="110dp"
-                android:layout_height="110dp"
+                android:layout_width="115dp"
+                android:layout_height="115dp"
                 android:layout_marginTop="16dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -41,9 +35,9 @@
                     android:layout_gravity="center"
                     android:contentDescription="Foto de perfil"
                     android:padding="3dp"
-                    app:strokeColor="@color/mainrosa"
-                    app:strokeWidth="2dp"
                     app:cornerSize="50%"
+                    app:strokeColor="@color/mainazul"
+                    app:strokeWidth="2dp"
                     tools:src="@drawable/ic_profile" />
 
             </FrameLayout>
@@ -66,12 +60,12 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="28dp"
+                android:letterSpacing="0.1"
                 android:text="NOMBRE COMPLETO"
-                android:textColor="@color/mainrosa"
+                android:textAllCaps="true"
+                android:textColor="@color/mainazul"
                 android:textSize="11sp"
                 android:textStyle="bold"
-                android:letterSpacing="0.1"
-                android:textAllCaps="true"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/tvEditProfile" />
@@ -106,6 +100,93 @@
                     tools:text="Alex Vance" />
             </com.google.android.material.textfield.TextInputLayout>
 
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilCurrentPassword"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:hint="Contraseña actual"
+                app:boxBackgroundColor="@color/surface"
+                app:boxCornerRadiusBottomEnd="12dp"
+                app:boxCornerRadiusBottomStart="12dp"
+                app:boxCornerRadiusTopEnd="12dp"
+                app:boxCornerRadiusTopStart="12dp"
+                app:boxStrokeColor="@color/mainazul"
+                app:boxStrokeWidth="0dp"
+                app:endIconMode="password_toggle"
+                app:endIconTint="@color/mainazul"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tilName">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etCurrentPassword"
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:backgroundTint="@android:color/transparent"
+                    android:inputType="textPassword"
+                    android:textColor="@color/text" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilNewPassword"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:hint="Nueva contraseña"
+                app:boxBackgroundColor="@color/surface"
+                app:boxCornerRadiusBottomEnd="12dp"
+                app:boxCornerRadiusBottomStart="12dp"
+                app:boxCornerRadiusTopEnd="12dp"
+                app:boxCornerRadiusTopStart="12dp"
+                app:boxStrokeColor="@color/mainazul"
+                app:boxStrokeWidth="0dp"
+                app:endIconMode="password_toggle"
+                app:endIconTint="@color/mainazul"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tilCurrentPassword">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etNewPassword"
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:backgroundTint="@android:color/transparent"
+                    android:inputType="textPassword"
+                    android:textColor="@color/text" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilConfirmPassword"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:hint="Confirmar contraseña"
+                app:boxBackgroundColor="@color/surface"
+                app:boxCornerRadiusBottomEnd="12dp"
+                app:boxCornerRadiusBottomStart="12dp"
+                app:boxCornerRadiusTopEnd="12dp"
+                app:boxCornerRadiusTopStart="12dp"
+                app:boxStrokeColor="@color/mainazul"
+                app:boxStrokeWidth="0dp"
+                app:endIconMode="password_toggle"
+                app:endIconTint="@color/mainazul"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tilNewPassword">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etConfirmPassword"
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:backgroundTint="@android:color/transparent"
+                    android:inputType="textPassword"
+                    android:textColor="@color/text" />
+            </com.google.android.material.textfield.TextInputLayout>
+
             <LinearLayout
                 android:id="@+id/llStats"
                 android:layout_width="0dp"
@@ -114,7 +195,7 @@
                 android:orientation="horizontal"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/tilName">
+                app:layout_constraintTop_toBottomOf="@id/tilConfirmPassword">
 
                 <LinearLayout
                     android:layout_width="0dp"
@@ -129,12 +210,12 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="ALTURA"
-                        android:textColor="@color/mainrosa"
-                        android:textSize="11sp"
-                        android:textStyle="bold"
                         android:letterSpacing="0.1"
-                        android:textAllCaps="true" />
+                        android:text="ALTURA"
+                        android:textAllCaps="true"
+                        android:textColor="@color/mainazul"
+                        android:textSize="11sp"
+                        android:textStyle="bold" />
 
                     <LinearLayout
                         android:layout_width="wrap_content"
@@ -179,12 +260,12 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="PESO"
-                        android:textColor="@color/mainrosa"
-                        android:textSize="11sp"
-                        android:textStyle="bold"
                         android:letterSpacing="0.1"
-                        android:textAllCaps="true" />
+                        android:text="PESO"
+                        android:textAllCaps="true"
+                        android:textColor="@color/mainazul"
+                        android:textSize="11sp"
+                        android:textStyle="bold" />
 
                     <LinearLayout
                         android:layout_width="wrap_content"
@@ -247,98 +328,64 @@
                     android:inputType="textUri" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <TextView
-                android:id="@+id/tvLabelGoal"
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnSelectImage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:backgroundTint="@color/mainazul"
+                android:text="ELEGIR DE GALERÍA"
+                app:cornerRadius="8dp"
+                app:icon="@android:drawable/ic_menu_gallery"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tilPhotoUrl" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tLGoal"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
-                android:text="OBJETIVO PRINCIPAL"
-                android:textColor="@color/mainrosa"
-                android:textSize="11sp"
-                android:textStyle="bold"
-                android:letterSpacing="0.1"
-                android:textAllCaps="true"
+                android:hint="OBJETIVO PRINCIPAL"
+                app:boxBackgroundColor="@color/surface"
+                app:boxCornerRadiusBottomEnd="12dp"
+                app:boxCornerRadiusBottomStart="12dp"
+                app:boxCornerRadiusTopEnd="12dp"
+                app:boxCornerRadiusTopStart="12dp"
+                app:boxStrokeColor="@color/mainrosa"
+                app:boxStrokeWidth="0dp"
+                app:hintTextColor="@color/mainrosa"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/tilPhotoUrl" /> <com.google.android.material.chip.ChipGroup
-            android:id="@+id/chipGroupGoal"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            app:singleSelection="true"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tvLabelGoal">
+                app:layout_constraintTop_toBottomOf="@id/btnSelectImage">
 
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chipMuscle"
-                style="@style/Widget.MaterialComponents.Chip.Choice"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Ganar músculo"
-                android:textColor="@color/text"
-                android:textSize="14sp"
-                app:chipBackgroundColor="@color/surface"
-                app:chipCornerRadius="20dp"
-                app:chipStrokeColor="@color/stroke"
-                app:chipStrokeWidth="1dp" />
-
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chipFat"
-                style="@style/Widget.MaterialComponents.Chip.Choice"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Perder grasa"
-                android:textColor="@color/text"
-                android:textSize="14sp"
-                app:chipBackgroundColor="@color/surface"
-                app:chipCornerRadius="20dp"
-                app:chipStrokeColor="@color/stroke"
-                app:chipStrokeWidth="1dp" />
-
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chipFit"
-                style="@style/Widget.MaterialComponents.Chip.Choice"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Mantenerse en forma"
-                android:textColor="@color/text"
-                android:textSize="14sp"
-                app:chipBackgroundColor="@color/surface"
-                app:chipCornerRadius="20dp"
-                app:chipStrokeColor="@color/stroke"
-                app:chipStrokeWidth="1dp" />
-
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chipStrength"
-                style="@style/Widget.MaterialComponents.Chip.Choice"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Fuerza"
-                android:textColor="@color/text"
-                android:textSize="14sp"
-                app:chipBackgroundColor="@color/surface"
-                app:chipCornerRadius="20dp"
-                app:chipStrokeColor="@color/stroke"
-                app:chipStrokeWidth="1dp" />
-
-        </com.google.android.material.chip.ChipGroup>
+                <AutoCompleteTextView
+                    android:id="@+id/actvGoal"
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:backgroundTint="@android:color/transparent"
+                    android:inputType="none"
+                    android:paddingHorizontal="16dp"
+                    android:textColor="@color/text"
+                    android:textSize="15sp" />
+            </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnSaveProfile"
                 android:layout_width="0dp"
                 android:layout_height="60dp"
                 android:layout_marginTop="36dp"
-                android:backgroundTint="@color/mainrosa"
+                android:backgroundTint="@color/mainazul"
+                android:letterSpacing="0.05"
                 android:text="GUARDAR CAMBIOS"
                 android:textColor="@color/white"
                 android:textSize="15sp"
                 android:textStyle="bold"
-                android:letterSpacing="0.05"
                 app:cornerRadius="16dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/chipGroupGoal" />
+                app:layout_constraintTop_toBottomOf="@id/tLGoal" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnDeleteAccount"
