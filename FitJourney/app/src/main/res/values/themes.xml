@@ -4,11 +4,11 @@
 
     </style>
 
-    <style name="Theme.FitJourney" parent="Base.Theme.FitJourney" >
+    <style name="Theme.FitJourney" parent="Base.Theme.FitJourney">
 
-    <item name="android:statusBarColor">@color/fondo</item>
+        <item name="android:statusBarColor">@color/fondo</item>
 
-    <item name="android:windowLightStatusBar">true</item>
+        <item name="android:windowLightStatusBar">true</item>
 
     </style>
 
