@@ -1,5 +1,6 @@
 package es.iesagora.fitjourney.ui.second.fitnesscenter.exercises;
 
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -143,6 +144,10 @@ public class ExerciseDetailFragment extends Fragment {
     /**
      * Rellena la interfaz con los datos del ejercicio seleccionado.
      *
+     * CORRECCIÓN: Se añade try-catch a startActivity para evitar crash si ninguna
+     * app puede abrir la URL. También se usa Intent.createChooser para que el usuario
+     * elija entre navegador y app de YouTube cuando ambos pueden manejar la URL.
+     *
      * @param exercise ejercicio a mostrar
      */
     private void fillData(Exercise exercise) {
@@ -151,10 +156,7 @@ public class ExerciseDetailFragment extends Fragment {
 
         if (youtubeUrl != null && !youtubeUrl.trim().isEmpty()) {
             binding.btnYoutube.setVisibility(View.VISIBLE);
-            binding.btnYoutube.setOnClickListener(v -> {
-                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(youtubeUrl));
-                startActivity(intent);
-            });
+            binding.btnYoutube.setOnClickListener(v -> openYoutubeUrl(youtubeUrl.trim()));
         } else {
             binding.btnYoutube.setVisibility(View.GONE);
         }
@@ -180,6 +182,36 @@ public class ExerciseDetailFragment extends Fragment {
                 binding.ivDetailImage,
                 R.drawable.ic_ejercicios
         );
+    }
+
+    /**
+     * Abre la URL de YouTube en el navegador o en la app de YouTube.
+     * Las URLs de búsqueda (results?search_query=...) no las gestiona la app
+     * de YouTube, por lo que forzamos el navegador web si es una URL de búsqueda.
+     *
+     * @param url URL de YouTube (búsqueda o vídeo directo)
+     */
+    private void openYoutubeUrl(String url) {
+        try {
+            Intent intent;
+
+            if (url.contains("/results") || url.contains("search_query")) {
+                intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                intent.addCategory(Intent.CATEGORY_BROWSABLE);
+                startActivity(Intent.createChooser(intent, "Abrir con"));
+            } else {
+                intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                startActivity(intent);
+            }
+        } catch (ActivityNotFoundException e) {
+            Toast.makeText(getContext(),
+                    "No se encontró ninguna aplicación para abrir el enlace.",
+                    Toast.LENGTH_SHORT).show();
+        } catch (Exception e) {
+            Toast.makeText(getContext(),
+                    "Error al abrir el vídeo.",
+                    Toast.LENGTH_SHORT).show();
+        }
     }
 
     /**
