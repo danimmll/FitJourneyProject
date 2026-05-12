@@ -1,5 +1,13 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <style name="Base.Theme.FitJourney" parent="Theme.Material3.DayNight.NoActionBar">
 
+        <style name="Theme.FitJourney" parent="Base.Theme.FitJourney" >
+
+            <item name="android:statusBarColor">@color/fondo</item>
+
+            <item name="android:windowLightStatusBar">false</item>
+
+        </style>
+
     </style>
 </resources>

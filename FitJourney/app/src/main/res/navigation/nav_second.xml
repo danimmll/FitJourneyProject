@@ -67,6 +67,9 @@
         <action
             android:id="@+id/action_routinesFragment_to_formRoutineFragment"
             app:destination="@id/formRoutineFragment" />
+        <action
+            android:id="@+id/action_routinesFragment_to_routineDetailFragment"
+            app:destination="@id/routineDetailFragment" />
     </fragment>
 
     <fragment
@@ -85,7 +88,7 @@
     <fragment
         android:id="@+id/editProfileFragment"
         android:name="es.iesagora.fitjourney.ui.second.profile.EditProfileFragment"
-        android:label="Editar Perfil"
+        android:label=""
         tools:layout="@layout/fragment_edit_profile">
 
         <argument
@@ -97,17 +100,22 @@
     <fragment
         android:id="@+id/formWorkoutFragment"
         android:name="es.iesagora.fitjourney.ui.second.fitnesscenter.workouts.FormWorkoutFragment"
-        android:label="fragment_form_workout"
+        android:label=""
         tools:layout="@layout/fragment_form_workout" />
     <fragment
         android:id="@+id/formRoutineFragment"
         android:name="es.iesagora.fitjourney.ui.second.fitnesscenter.routines.FormRoutineFragment"
-        android:label="fragment_form_routine"
+        android:label=""
         tools:layout="@layout/fragment_form_routine" />
     <fragment
         android:id="@+id/adminUsersFragment"
         android:name="es.iesagora.fitjourney.ui.second.adminusers.AdminUsersFragment"
-        android:label="fragment_admin_users"
+        android:label=""
         tools:layout="@layout/fragment_admin_users" />
+    <fragment
+        android:id="@+id/routineDetailFragment"
+        android:name="es.iesagora.fitjourney.RoutineDetailFragment"
+        android:label=""
+        tools:layout="@layout/fragment_routine_detail" />
 
 </navigation>

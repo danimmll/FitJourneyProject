@@ -117,6 +117,19 @@
                 app:shapeAppearanceOverlay="@style/RoundedCornersImage"
                 tools:src="@drawable/ic_launcher_background" />
 
+            <com.google.android.material.materialswitch.MaterialSwitch
+                android:id="@+id/switchPublic"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:checked="true"
+                android:text="Hacer esta rutina pública"
+                android:textColor="@color/text"
+                android:textSize="16sp"
+
+                app:thumbTint="@color/text"
+                app:trackTint="@color/mainazul" />
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

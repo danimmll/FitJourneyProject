@@ -204,7 +204,7 @@ public class FormRoutineFragment extends Fragment {
         }
 
         int[] parsed = parseSetsAndReps(setsStr, repsStr);
-        if (parsed == null) return;   // ← null-check restaurado
+        if (parsed == null) return;
 
         int sets = parsed[0];
         int reps = parsed[1];
@@ -249,6 +249,8 @@ public class FormRoutineFragment extends Fragment {
         RoutineExercise newRoutineEx = new RoutineExercise();
         newRoutineEx.setIdExercise(exercise.getIdExercise());
         newRoutineEx.setExercise(exercise);
+
+        // Lo mismo para los sets y reps
         newRoutineEx.setTargetSets(sets);
         newRoutineEx.setTargetReps(reps);
 
@@ -335,9 +337,8 @@ public class FormRoutineFragment extends Fragment {
         routine.setPhotoUrl(photoUrl);
         routine.setExercises(addedExercises);
 
-        // Asignar privacidad (Asegúrate de que binding.switchPublic existe en tu XML)
-        // boolean isPublic = binding.switchPublic.isChecked();
-        // routine.setIs_public(isPublic ? 1 : 0);
+        boolean isPublic = binding.switchPublic.isChecked();
+        routine.setIsPublic(isPublic ? 1 : 0);
 
         viewModel.createRoutine(routine);
     }
