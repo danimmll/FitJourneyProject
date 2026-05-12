@@ -114,7 +114,7 @@
         tools:layout="@layout/fragment_admin_users" />
     <fragment
         android:id="@+id/routineDetailFragment"
-        android:name="es.iesagora.fitjourney.RoutineDetailFragment"
+        android:name="es.iesagora.fitjourney.ui.second.fitnesscenter.routines.RoutineDetailFragment"
         android:label=""
         tools:layout="@layout/fragment_routine_detail" />
 

@@ -103,6 +103,27 @@
                     tools:text="Avanzado" />
             </LinearLayout>
 
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnYoutube"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:layout_marginTop="24dp"
+                android:backgroundTint="#E52D27"
+                android:letterSpacing="0.05"
+                android:text="VER VÍDEO EN YOUTUBE"
+                android:textColor="@color/white"
+                android:textStyle="bold"
+                app:cornerRadius="12dp"
+                app:icon="@android:drawable/ic_media_play"
+                app:iconTint="@color/white" />
+
+            <View
+                android:id="@+id/dividerInstructions"
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:layout_marginTop="24dp"
+                android:background="@color/mainrosa" />
+
             <TextView
                 android:id="@+id/tvLabelInstructions"
                 android:layout_width="wrap_content"

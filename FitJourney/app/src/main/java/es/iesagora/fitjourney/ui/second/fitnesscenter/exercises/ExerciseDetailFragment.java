@@ -1,5 +1,7 @@
 package es.iesagora.fitjourney.ui.second.fitnesscenter.exercises;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -144,6 +146,19 @@ public class ExerciseDetailFragment extends Fragment {
      * @param exercise ejercicio a mostrar
      */
     private void fillData(Exercise exercise) {
+
+        String youtubeUrl = exercise.getVideoUrl();
+
+        if (youtubeUrl != null && !youtubeUrl.trim().isEmpty()) {
+            binding.btnYoutube.setVisibility(View.VISIBLE);
+            binding.btnYoutube.setOnClickListener(v -> {
+                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(youtubeUrl));
+                startActivity(intent);
+            });
+        } else {
+            binding.btnYoutube.setVisibility(View.GONE);
+        }
+
         binding.tvDetailName.setText(exercise.getName());
         binding.tvDetailMuscle.setText(exercise.getMuscleGroup());
 

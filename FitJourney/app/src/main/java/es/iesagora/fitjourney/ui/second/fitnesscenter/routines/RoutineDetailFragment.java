@@ -1,4 +1,4 @@
-package es.iesagora.fitjourney;
+package es.iesagora.fitjourney.ui.second.fitnesscenter.routines;
 
 import android.os.Bundle;
 
@@ -7,6 +7,8 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import es.iesagora.fitjourney.R;
 
 /**
  * A simple {@link Fragment} subclass.
