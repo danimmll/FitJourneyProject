@@ -173,7 +173,7 @@ public class ProfileFragment extends Fragment {
 
         ImageUtils.loadCircle(
                 requireContext(),
-                user.getPhoto_url(),
+                user.getDisplayAvatar(),
                 binding.ivProfilePhoto,
                 R.drawable.ic_profile
         );

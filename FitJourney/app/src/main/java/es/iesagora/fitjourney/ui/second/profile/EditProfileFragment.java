@@ -16,7 +16,6 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 
-import com.bumptech.glide.Glide;
 import com.google.android.material.chip.Chip;
 
 import java.util.Objects;
@@ -26,6 +25,7 @@ import es.iesagora.fitjourney.data.model.User;
 import es.iesagora.fitjourney.data.repositories.PreferencesRepository;
 import es.iesagora.fitjourney.databinding.FragmentEditProfileBinding;
 import es.iesagora.fitjourney.ui.main.MainActivity;
+import es.iesagora.fitjourney.utils.ImageUtils;
 import es.iesagora.fitjourney.viewmodel.SecondViewModel;
 
 /**
@@ -62,42 +62,15 @@ public class EditProfileFragment extends Fragment {
      */
     private User currentUser;
 
-    /**
-     * Repositorio de preferencias locales.
-     * Se utiliza para obtener información de sesión como el token del usuario.
-     */
-    private PreferencesRepository prefs;
-
-    /**
-     * Infla la vista del fragmento de edición de perfil.
-     * Se encarga de crear la interfaz del fragmento a partir del layout XML.
-     *
-     * @param inflater objeto utilizado para inflar el layout
-     * @param container contenedor padre donde se insertará la vista
-     * @param savedInstanceState estado previo del fragmento si existe
-     * @return vista raíz del fragmento
-     */
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container,
                              Bundle savedInstanceState) {
+
         binding = FragmentEditProfileBinding.inflate(inflater, container, false);
         return binding.getRoot();
     }
 
-    /**
-     * Inicializa la lógica principal del fragmento.
-     * En este método se realiza:
-     * - Inicialización del ViewModel y repositorio de preferencias
-     * - Configuración de la toolbar y navegación hacia atrás
-     * - Configuración de los Chips de objetivos
-     * - Recepción y carga de datos del usuario mediante argumentos
-     * - Configuración de botones de guardar y eliminar cuenta
-     * - Observación de estados de actualización y eliminación de perfil
-     *
-     * @param view vista raíz del fragmento
-     * @param savedInstanceState estado previo del fragmento
-     */
     @Override
     public void onViewCreated(@NonNull View view,
                               @Nullable Bundle savedInstanceState) {
@@ -105,97 +78,130 @@ public class EditProfileFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         viewModel = new ViewModelProvider(requireActivity()).get(SecondViewModel.class);
-        prefs = new PreferencesRepository(requireContext());
+        PreferencesRepository prefs = new PreferencesRepository(requireContext());
 
-        // Botón de navegación hacia atrás en la toolbar
         binding.toolbar.setNavigationOnClickListener(v ->
                 Navigation.findNavController(v).navigateUp()
         );
 
-        // Configura comportamiento visual de los chips de objetivo
         setupChips();
 
-        // Carga de datos del usuario desde argumentos
         if (getArguments() != null && getArguments().containsKey("user_data")) {
+
             currentUser = (User) getArguments().getSerializable("user_data");
             loadUserData();
+
         } else {
-            Toast.makeText(getContext(), "Error al cargar datos", Toast.LENGTH_SHORT).show();
+
+            Toast.makeText(
+                    getContext(),
+                    "Error al cargar datos",
+                    Toast.LENGTH_SHORT
+            ).show();
+
             Navigation.findNavController(view).navigateUp();
             return;
         }
 
-        // Acción de guardar cambios del perfil
         binding.btnSaveProfile.setOnClickListener(v -> submitChanges());
 
-        // Acción de desactivar cuenta
-        binding.btnDeleteAccount.setOnClickListener(v -> showDeleteConfirmationDialog());
+        binding.btnDeleteAccount.setOnClickListener(
+                v -> showDeleteConfirmationDialog()
+        );
 
-        viewModel.getUpdateProfileStatus().observe(getViewLifecycleOwner(), resource -> {
-            if (resource == null) return;
+        viewModel.getUpdateProfileStatus().observe(
+                getViewLifecycleOwner(),
+                resource -> {
 
-            switch (resource.status) {
-                case LOADING:
-                    binding.progressBar.setVisibility(View.VISIBLE);
-                    binding.btnSaveProfile.setEnabled(false);
-                    break;
+                    if (resource == null) return;
 
-                case SUCCESS:
-                    binding.progressBar.setVisibility(View.GONE);
-                    binding.btnSaveProfile.setEnabled(true);
+                    switch (resource.status) {
 
-                    Toast.makeText(getContext(),
-                            "¡Perfil actualizado con éxito!",
-                            Toast.LENGTH_SHORT).show();
+                        case LOADING:
+                            binding.progressBar.setVisibility(View.VISIBLE);
+                            binding.btnSaveProfile.setEnabled(false);
+                            break;
 
-                    String token = prefs.getToken();
-                    if (token != null) viewModel.fetchProfile(token);
+                        case SUCCESS:
+                            binding.progressBar.setVisibility(View.GONE);
+                            binding.btnSaveProfile.setEnabled(true);
 
-                    Navigation.findNavController(requireView()).navigateUp();
-                    break;
+                            Toast.makeText(
+                                    getContext(),
+                                    "¡Perfil actualizado con éxito!",
+                                    Toast.LENGTH_SHORT
+                            ).show();
 
-                case ERROR:
-                    binding.progressBar.setVisibility(View.GONE);
-                    binding.btnSaveProfile.setEnabled(true);
+                            String token = prefs.getToken();
 
-                    Toast.makeText(getContext(),
-                            "Error: " + resource.message,
-                            Toast.LENGTH_LONG).show();
-                    break;
-            }
-        });
+                            if (token != null) {
+                                viewModel.fetchProfile(token);
+                            }
 
-        viewModel.getDeleteAccountStatus().observe(getViewLifecycleOwner(), resource -> {
-            if (resource == null) return;
+                            Navigation.findNavController(requireView())
+                                    .navigateUp();
+                            break;
 
-            switch (resource.status) {
-                case LOADING:
-                    binding.progressBar.setVisibility(View.VISIBLE);
-                    break;
+                        case ERROR:
+                            binding.progressBar.setVisibility(View.GONE);
+                            binding.btnSaveProfile.setEnabled(true);
 
-                case SUCCESS:
-                    binding.progressBar.setVisibility(View.GONE);
+                            Toast.makeText(
+                                    getContext(),
+                                    "Error: " + resource.message,
+                                    Toast.LENGTH_LONG
+                            ).show();
+                            break;
+                    }
+                });
 
-                    Toast.makeText(getContext(),
-                            "Cuenta desactivada",
-                            Toast.LENGTH_LONG).show();
+        viewModel.getDeleteAccountStatus().observe(
+                getViewLifecycleOwner(),
+                resource -> {
 
-                    prefs.clearSession();
+                    if (resource == null) return;
 
-                    Intent intent = new Intent(requireActivity(), MainActivity.class);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                    startActivity(intent);
-                    break;
+                    switch (resource.status) {
 
-                case ERROR:
-                    binding.progressBar.setVisibility(View.GONE);
+                        case LOADING:
+                            binding.progressBar.setVisibility(View.VISIBLE);
+                            break;
 
-                    Toast.makeText(getContext(),
-                            "Error: " + resource.message,
-                            Toast.LENGTH_LONG).show();
-                    break;
-            }
-        });
+                        case SUCCESS:
+                            binding.progressBar.setVisibility(View.GONE);
+
+                            Toast.makeText(
+                                    getContext(),
+                                    "Cuenta desactivada",
+                                    Toast.LENGTH_LONG
+                            ).show();
+
+                            prefs.clearSession();
+
+                            Intent intent = new Intent(
+                                    requireActivity(),
+                                    MainActivity.class
+                            );
+
+                            intent.setFlags(
+                                    Intent.FLAG_ACTIVITY_NEW_TASK
+                                            | Intent.FLAG_ACTIVITY_CLEAR_TASK
+                            );
+
+                            startActivity(intent);
+                            break;
+
+                        case ERROR:
+                            binding.progressBar.setVisibility(View.GONE);
+
+                            Toast.makeText(
+                                    getContext(),
+                                    "Error: " + resource.message,
+                                    Toast.LENGTH_LONG
+                            ).show();
+                            break;
+                    }
+                });
     }
 
     /**
@@ -204,103 +210,170 @@ public class EditProfileFragment extends Fragment {
      * proporcionando feedback visual al usuario sobre la selección actual.
      */
     private void setupChips() {
-        int colorRosa = ContextCompat.getColor(requireContext(), R.color.mainrosa);
-        int colorStroke = ContextCompat.getColor(requireContext(), R.color.stroke);
 
-        binding.chipGroupGoal.setOnCheckedStateChangeListener((group, checkedIds) -> {
-            for (int i = 0; i < group.getChildCount(); i++) {
-                Chip chip = (Chip) group.getChildAt(i);
+        int colorRosa = ContextCompat.getColor(
+                requireContext(),
+                R.color.mainrosa
+        );
 
-                if (chip.isChecked()) {
-                    chip.setChipStrokeColor(ColorStateList.valueOf(colorRosa));
-                    chip.setChipStrokeWidth(5f);
-                } else {
-                    chip.setChipStrokeColor(ColorStateList.valueOf(colorStroke));
-                    chip.setChipStrokeWidth(3f);
-                }
-            }
-        });
+        int colorStroke = ContextCompat.getColor(
+                requireContext(),
+                R.color.stroke
+        );
+
+        binding.chipGroupGoal.setOnCheckedStateChangeListener(
+                (group, checkedIds) -> {
+
+                    for (int i = 0; i < group.getChildCount(); i++) {
+
+                        Chip chip = (Chip) group.getChildAt(i);
+
+                        if (chip.isChecked()) {
+
+                            chip.setChipStrokeColor(
+                                    ColorStateList.valueOf(colorRosa)
+                            );
+
+                            chip.setChipStrokeWidth(5f);
+
+                        } else {
+
+                            chip.setChipStrokeColor(
+                                    ColorStateList.valueOf(colorStroke)
+                            );
+
+                            chip.setChipStrokeWidth(3f);
+                        }
+                    }
+                });
     }
 
     /**
      * Carga los datos del usuario en los campos del formulario.
      * Se encarga de:
      * - Rellenar nombre, altura y peso
-     * - Cargar avatar con Glide
+     * - Cargar avatar del usuario
      * - Seleccionar el chip de objetivo correspondiente
      */
     private void loadUserData() {
+
         if (currentUser == null) return;
 
-        binding.etName.setText(currentUser.getName() != null ? currentUser.getName() : "");
+        binding.etName.setText(
+                currentUser.getName() != null
+                        ? currentUser.getName()
+                        : ""
+        );
 
         if (currentUser.getHeight() != null) {
-            binding.etHeight.setText(String.valueOf(currentUser.getHeight().intValue()));
+
+            binding.etHeight.setText(
+                    String.valueOf(currentUser.getHeight().intValue())
+            );
         }
 
         if (currentUser.getWeight() != null) {
-            binding.etWeight.setText(String.valueOf(currentUser.getWeight()));
+
+            binding.etWeight.setText(
+                    String.valueOf(currentUser.getWeight())
+            );
         }
 
-        Glide.with(this)
-                .load(currentUser.getDisplayAvatar())
-                .circleCrop()
-                .into(binding.ivAvatar);
+        ImageUtils.loadCircle(
+                requireContext(),
+                currentUser.getDisplayAvatar(),
+                binding.ivAvatar,
+                R.drawable.ic_profile
+        );
 
-        String goal = currentUser.getGoal() != null ? currentUser.getGoal().toLowerCase() : "";
+        String goal = currentUser.getGoal() != null
+                ? currentUser.getGoal().toLowerCase()
+                : "";
 
         if (goal.contains("músculo") || goal.contains("muscle")) {
+
             binding.chipMuscle.setChecked(true);
+
         } else if (goal.contains("grasa") || goal.contains("fat")) {
+
             binding.chipFat.setChecked(true);
+
         } else if (goal.contains("fuerza") || goal.contains("strength")) {
+
             binding.chipStrength.setChecked(true);
+
         } else {
+
             binding.chipFit.setChecked(true);
         }
     }
 
-    /**
-     * Recoge y valida los datos introducidos por el usuario.
-     * - Valida nombre no vacío
-     * - Determina objetivo seleccionado
-     * - Convierte altura y peso a números
-     * - Crea objeto {@link User} actualizado
-     * - Envía actualización al ViewModel
-     */
     private void submitChanges() {
-        String name = Objects.requireNonNull(binding.etName.getText()).toString().trim();
-        String heightStr = Objects.requireNonNull(binding.etHeight.getText()).toString().trim();
-        String weightStr = Objects.requireNonNull(binding.etWeight.getText()).toString().trim();
+
+        String name = Objects.requireNonNull(
+                binding.etName.getText()
+        ).toString().trim();
+
+        String heightStr = Objects.requireNonNull(
+                binding.etHeight.getText()
+        ).toString().trim();
+
+        String weightStr = Objects.requireNonNull(
+                binding.etWeight.getText()
+        ).toString().trim();
 
         if (name.isEmpty()) {
-            binding.tilName.setError("El nombre no puede estar vacío");
+
+            binding.tilName.setError(
+                    "El nombre no puede estar vacío"
+            );
+
             return;
+
         } else {
+
             binding.tilName.setError(null);
         }
 
         String goal = "Mantenerse en forma";
 
-        if (binding.chipMuscle.isChecked()) goal = "Ganar músculo";
-        else if (binding.chipFat.isChecked()) goal = "Perder grasa";
-        else if (binding.chipStrength.isChecked()) goal = "Fuerza";
+        if (binding.chipMuscle.isChecked()) {
+            goal = "Ganar músculo";
+
+        } else if (binding.chipFat.isChecked()) {
+            goal = "Perder grasa";
+
+        } else if (binding.chipStrength.isChecked()) {
+            goal = "Fuerza";
+        }
 
         User updatedUser = new User();
+
         updatedUser.setName(name);
         updatedUser.setGoal(goal);
 
         try {
-            if (!heightStr.isEmpty())
-                updatedUser.setHeight(Double.parseDouble(heightStr));
 
-            if (!weightStr.isEmpty())
-                updatedUser.setWeight(Double.parseDouble(weightStr));
+            if (!heightStr.isEmpty()) {
+                updatedUser.setHeight(
+                        Double.parseDouble(heightStr)
+                );
+            }
+
+            if (!weightStr.isEmpty()) {
+                updatedUser.setWeight(
+                        Double.parseDouble(weightStr)
+                );
+            }
 
         } catch (NumberFormatException e) {
-            Toast.makeText(getContext(),
+
+            Toast.makeText(
+                    getContext(),
                     "Revisa el peso o altura",
-                    Toast.LENGTH_SHORT).show();
+                    Toast.LENGTH_SHORT
+            ).show();
+
             return;
         }
 
@@ -309,30 +382,37 @@ public class EditProfileFragment extends Fragment {
 
     /**
      * Muestra un diálogo de confirmación para desactivar la cuenta.
-     * Si el usuario confirma, se marca la cuenta como inactiva
-     * y se envía la actualización al ViewModel.
      */
     private void showDeleteConfirmationDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+
+        AlertDialog.Builder builder =
+                new AlertDialog.Builder(requireContext());
 
         builder.setTitle("¿Desactivar cuenta?");
-        builder.setMessage("Tu perfil se ocultará, pero tus datos permanecerán guardados. ¿Estás seguro?");
 
-        builder.setPositiveButton("Desactivar", (dialog, which) -> {
-            User userDesactivado = new User();
-            userDesactivado.setActive(0);
-            viewModel.updateProfile(userDesactivado);
-        });
+        builder.setMessage(
+                "Tu perfil se ocultará, pero tus datos permanecerán guardados. ¿Estás seguro?"
+        );
 
-        builder.setNegativeButton("Cancelar", (dialog, which) -> dialog.cancel());
+        builder.setPositiveButton(
+                "Desactivar",
+                (dialog, which) -> {
+
+                    User userDesactivado = new User();
+
+                    userDesactivado.setActive(0);
+
+                    viewModel.updateProfile(userDesactivado);
+                });
+
+        builder.setNegativeButton(
+                "Cancelar",
+                (dialog, which) -> dialog.cancel()
+        );
 
         builder.show();
     }
 
-    /**
-     * Libera recursos del binding cuando la vista se destruye.
-     * Evita fugas de memoria en el ciclo de vida del fragmento.
-     */
     @Override
     public void onDestroyView() {
         super.onDestroyView();

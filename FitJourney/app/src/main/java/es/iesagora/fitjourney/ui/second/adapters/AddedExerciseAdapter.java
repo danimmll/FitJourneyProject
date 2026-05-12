@@ -1,6 +1,7 @@
 package es.iesagora.fitjourney.ui.second.adapters;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,12 +12,11 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bumptech.glide.Glide;
-
 import java.util.List;
 
 import es.iesagora.fitjourney.R;
 import es.iesagora.fitjourney.data.model.RoutineExercise;
+import es.iesagora.fitjourney.utils.ImageUtils;
 
 /**
  * Adapter encargado de mostrar los ejercicios añadidos a una rutina.
@@ -40,6 +40,9 @@ public class AddedExerciseAdapter
 
     /** Listener para eliminar ejercicios */
     private final OnRemoveClickListener listener;
+
+    /** Contexto de la UI */
+    private Context context;
 
     /**
      * Interfaz utilizada para notificar la eliminación de un ejercicio.
@@ -77,7 +80,9 @@ public class AddedExerciseAdapter
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
 
-        View view = LayoutInflater.from(parent.getContext())
+        context = parent.getContext();
+
+        View view = LayoutInflater.from(context)
                 .inflate(R.layout.viewholder_added_exercise, parent, false);
 
         return new ViewHolder(view);
@@ -89,7 +94,7 @@ public class AddedExerciseAdapter
      * <p>Se encarga de:</p>
      * <ul>
      *     <li>Mostrar nombre del ejercicio.</li>
-     *     <li>Cargar imagen mediante Glide.</li>
+     *     <li>Cargar imagen del ejercicio.</li>
      *     <li>Mostrar series y repeticiones.</li>
      *     <li>Gestionar eliminación del ejercicio.</li>
      * </ul>
@@ -105,19 +110,16 @@ public class AddedExerciseAdapter
 
         if (routineExercise.getExercise() != null) {
 
-            holder.tvName.setText(routineExercise.getExercise().getName());
+            holder.tvName.setText(
+                    routineExercise.getExercise().getName()
+            );
 
-            String imageUrl = routineExercise.getExercise().getImage_url();
-
-            if (imageUrl == null || imageUrl.isEmpty()) {
-                imageUrl = "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=500&auto=format&fit=crop";
-            }
-
-            Glide.with(holder.itemView.getContext())
-                    .load(imageUrl)
-                    .centerCrop()
-                    .placeholder(R.drawable.img_construccion)
-                    .into(holder.ivExercise);
+            ImageUtils.loadInto(
+                    context,
+                    routineExercise.getExercise().getImage_url(),
+                    holder.ivExercise,
+                    R.drawable.ic_ejercicios
+            );
         }
 
         holder.tvDetails.setText(

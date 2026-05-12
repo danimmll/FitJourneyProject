@@ -55,7 +55,6 @@ public class AdminUsersFragment extends Fragment {
         setupSearchBar();
         loadUsers();
 
-        viewModel.banUser(0);
         setupAdminObservers();
     }
 
