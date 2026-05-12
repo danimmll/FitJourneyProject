@@ -1,11 +1,7 @@
 package es.iesagora.fitjourney.ui.second.fitnesscenter.exercises;
 
-import android.app.Activity;
-import android.content.Intent;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,8 +13,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
-
-import com.bumptech.glide.Glide;
 
 import java.util.Objects;
 
@@ -32,57 +26,36 @@ import es.iesagora.fitjourney.viewmodel.SecondViewModel;
  * Fragment encargado de crear y editar ejercicios dentro del Fitness Center.
  *
  * <p>Este fragment permite al usuario administrador crear nuevos ejercicios o editar existentes,
- * gestionando información como nombre, grupo muscular, dificultad, descripción e imagen.</p>
- *
- * Responsabilidades principales:
- * <ul>
- *     <li>Mostrar formulario de creación/edición de ejercicios.</li>
- *     <li>Permitir selección de imagen desde la galería.</li>
- *     <li>Convertir imágenes a Base64 para almacenamiento.</li>
- *     <li>Gestionar modo creación o edición según argumentos recibidos.</li>
- *     <li>Enviar datos al ViewModel para persistencia.</li>
- * </ul>
+ * gestionando información como nombre, grupo muscular, dificultad, descripción e imagen
+ * tanto por URL como por galería local.</p>
  */
 public class FormExerciseFragment extends Fragment {
 
-    /** ViewBinding del layout del formulario de ejercicios */
     private FragmentFormExerciseBinding binding;
-
-    /** ViewModel compartido para gestión de ejercicios */
     private SecondViewModel viewModel;
-
-    /** Ejercicio a editar (null si es creación) */
     private Exercise exerciseToEdit = null;
 
-    /** Imagen actual en formato Base64 */
+    /** Imagen seleccionada desde la galería (prioridad sobre la URL) */
+    private Uri selectedLocalImageUri = null;
+
+    /** Mantiene la imagen Base64 previa en caso de que se esté editando y no se modifique */
     private String currentImageBase64 = null;
 
     /**
-     * Launcher para seleccionar imagen desde la galería del dispositivo.
-     * Convierte la imagen seleccionada a Base64 y la muestra en preview.
+     * Launcher para seleccionar imagen desde la galería usando el contrato GetContent.
      */
-    private final ActivityResultLauncher<Intent> galleryLauncher = registerForActivityResult(
-            new ActivityResultContracts.StartActivityForResult(),
-            result -> {
-                if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
-                    Uri imageUri = result.getData().getData();
-                    binding.ivPreview.setImageURI(imageUri);
-                    currentImageBase64 = ImageUtils.uriToBase64(
-                            requireContext().getContentResolver(),
-                            imageUri
-                    );
-                }
-            }
-    );
+    private final ActivityResultLauncher<String> getContent =
+            registerForActivityResult(new ActivityResultContracts.GetContent(), uri -> {
+                if (uri != null) {
+                    selectedLocalImageUri = uri;
+                    currentImageBase64 = null;
+                    assert binding.etImageUrl != null;
+                    binding.etImageUrl.setText("");
 
-    /**
-     * Infla la vista del fragmento.
-     *
-     * @param inflater inflador del layout
-     * @param container contenedor padre
-     * @param savedInstanceState estado previo
-     * @return vista raíz del fragmento
-     */
+                    ImageUtils.loadInto(requireContext(), uri.toString(), binding.ivPreview, R.drawable.ic_ejercicios);
+                }
+            });
+
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -90,16 +63,6 @@ public class FormExerciseFragment extends Fragment {
         return binding.getRoot();
     }
 
-    /**
-     * Inicializa la interfaz y determina si el fragmento está en modo creación o edición.
-     * Configura:
-     * - ViewModel
-     * - Carga de datos si es edición
-     * - Eventos de botones (imagen y guardar)
-     *
-     * @param view vista raíz
-     * @param savedInstanceState estado previo
-     */
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -117,9 +80,26 @@ public class FormExerciseFragment extends Fragment {
             binding.btnSave.setText(R.string.create);
         }
 
-        binding.btnSelectImage.setOnClickListener(v -> {
-            Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-            galleryLauncher.launch(intent);
+        setupListeners();
+    }
+
+    /**
+     * Configura los eventos de los botones y los focos de los campos de texto.
+     */
+    private void setupListeners() {
+        binding.btnSelectImage.setOnClickListener(v -> getContent.launch("image/*"));
+        binding.ivPreview.setOnClickListener(v -> getContent.launch("image/*"));
+
+        assert binding.etImageUrl != null;
+        binding.etImageUrl.setOnFocusChangeListener((v, hasFocus) -> {
+            if (!hasFocus) {
+                String url = binding.etImageUrl.getText() != null ? binding.etImageUrl.getText().toString().trim() : "";
+                if (!url.isEmpty()) {
+                    selectedLocalImageUri = null;
+                    currentImageBase64 = null;
+                    ImageUtils.loadInto(requireContext(), url, binding.ivPreview, R.drawable.ic_ejercicios);
+                }
+            }
         });
 
         binding.btnSave.setOnClickListener(v -> saveExercise());
@@ -133,45 +113,65 @@ public class FormExerciseFragment extends Fragment {
         binding.btnSave.setText(R.string.update);
 
         binding.etName.setText(exerciseToEdit.getName());
-        binding.etMuscle.setText(exerciseToEdit.getMuscleGroup());
         binding.etDifficulty.setText(exerciseToEdit.getDifficulty());
         binding.etDescription.setText(exerciseToEdit.getDescription());
 
-        if (exerciseToEdit.getImageUrl() != null && !exerciseToEdit.getImageUrl().isEmpty()) {
-            currentImageBase64 = exerciseToEdit.getImageUrl();
+        String muscle = exerciseToEdit.getMuscleGroup();
+        binding.etMuscle.setText(muscle);
 
-            if (currentImageBase64.length() > 200) {
-                Bitmap bmp = ImageUtils.base64ToBitmap(currentImageBase64);
-                binding.ivPreview.setImageBitmap(bmp);
+        String existingImage = exerciseToEdit.getImageUrl();
+
+        if (existingImage != null && !existingImage.isEmpty()) {
+            if (existingImage.startsWith("http")) {
+                assert binding.etImageUrl != null;
+                binding.etImageUrl.setText(existingImage);
             } else {
-                Glide.with(this).load(currentImageBase64).into(binding.ivPreview);
+                currentImageBase64 = existingImage;
             }
+
+            ImageUtils.loadInto(requireContext(), existingImage, binding.ivPreview, R.drawable.ic_ejercicios);
         }
     }
 
     /**
      * Valida y guarda un ejercicio (creación o actualización).
-     * - Valida campos obligatorios
-     * - Construye objeto Exercise
-     * - Llama al ViewModel correspondiente
      */
     private void saveExercise() {
-        String name       = Objects.requireNonNull(binding.etName.getText()).toString().trim();
-        String muscle     = Objects.requireNonNull(binding.etMuscle.getText()).toString().trim();
+        String name = Objects.requireNonNull(binding.etName.getText()).toString().trim();
+        String muscle = Objects.requireNonNull(binding.etMuscle.getText()).toString().trim();
         String difficulty = Objects.requireNonNull(binding.etDifficulty.getText()).toString().trim();
         String description = Objects.requireNonNull(binding.etDescription.getText()).toString().trim();
+        assert binding.etImageUrl != null;
+        String imageUrlStr = Objects.requireNonNull(binding.etImageUrl.getText()).toString().trim();
 
-        if (name.isEmpty() || muscle.isEmpty()) {
+        if (name.isEmpty() || muscle.isEmpty() || difficulty.isEmpty() || description.isEmpty()) {
             Toast.makeText(getContext(), "Faltan datos obligatorios", Toast.LENGTH_SHORT).show();
             return;
+        }
+
+        String finalPhotoData;
+
+        if (selectedLocalImageUri != null) {
+            finalPhotoData = ImageUtils.uriToBase64(requireContext().getContentResolver(), selectedLocalImageUri);
+            if (finalPhotoData == null) {
+                Toast.makeText(getContext(), "Error al procesar la imagen de la galería", Toast.LENGTH_SHORT).show();
+                return;
+            }
+        } else if (!imageUrlStr.isEmpty()) {
+            finalPhotoData = imageUrlStr;
+        } else {
+            finalPhotoData = currentImageBase64;
         }
 
         Exercise newExercise = new Exercise();
         newExercise.setName(name);
         newExercise.setDifficulty(difficulty);
         newExercise.setDescription(description);
+
         newExercise.setMuscleGroup(muscle);
-        newExercise.setImageUrl(currentImageBase64);
+        newExercise.setMuscleGroup(muscle);
+        newExercise.setImageUrl(finalPhotoData);
+        newExercise.setImageUrl(finalPhotoData);
 
         if (exerciseToEdit == null) {
             viewModel.createExercise(newExercise, () -> {
@@ -179,17 +179,18 @@ public class FormExerciseFragment extends Fragment {
                 requireActivity().getOnBackPressedDispatcher().onBackPressed();
             });
         } else {
-            newExercise.setIdExercise(exerciseToEdit.getIdExercise());
-            viewModel.updateExercise(exerciseToEdit.getIdExercise(), newExercise, () -> {
+            int exId = exerciseToEdit.getIdExercise();
+
+            newExercise.setIdExercise(exId);
+            newExercise.setIdExercise(exId);
+
+            viewModel.updateExercise(exId, newExercise, () -> {
                 viewModel.selectExercise(newExercise);
                 requireActivity().getOnBackPressedDispatcher().onBackPressed();
             });
         }
     }
 
-    /**
-     * Limpia referencias del binding para evitar memory leaks.
-     */
     @Override
     public void onDestroyView() {
         super.onDestroyView();

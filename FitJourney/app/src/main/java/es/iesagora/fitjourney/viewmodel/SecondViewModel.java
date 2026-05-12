@@ -76,7 +76,7 @@ public class SecondViewModel extends AndroidViewModel {
             new MutableLiveData<>();
 
     /**
-     * Perfil del usuario.
+     * Perfil del usuario autenticado.
      */
     private final MutableLiveData<Resource<AccessResponse>> profileLiveData =
             new MutableLiveData<>();
@@ -88,10 +88,10 @@ public class SecondViewModel extends AndroidViewModel {
             new MutableLiveData<>();
 
     /**
-     * Estado de actualización del perfil.
+     * Estado de actualización del perfil (propio o editado por admin).
      */
-    private final MutableLiveData<Resource<es.iesagora.fitjourney.data.model.User>>
-            updateProfileLiveData = new MutableLiveData<>();
+    private final MutableLiveData<Resource<User>> updateProfileLiveData =
+            new MutableLiveData<>();
 
     /**
      * Estado de eliminación de cuenta.
@@ -118,16 +118,27 @@ public class SecondViewModel extends AndroidViewModel {
             new MutableLiveData<>();
 
     /**
+     * Lista de todos los usuarios (solo administradores).
+     */
+    private final MutableLiveData<Resource<List<User>>> allUsersLiveData =
+            new MutableLiveData<>();
+
+    /**
+     * Estado de eliminación de un usuario por un administrador.
+     */
+    private final MutableLiveData<Resource<String>> deleteUserLiveData =
+            new MutableLiveData<>();
+
+    /**
+     * Estado de baneo de un usuario por un administrador.
+     */
+    private final MutableLiveData<Resource<String>> banUserLiveData =
+            new MutableLiveData<>();
+
+    /**
      * Lista completa de ejercicios (sin filtrar).
      */
     private List<Exercise> fullExerciseList = new ArrayList<>();
-
-    private final MutableLiveData<Resource<List<User>>> allUsersLiveData =
-            new MutableLiveData<>();
-    private final MutableLiveData<Resource<String>> deleteUserLiveData =
-            new MutableLiveData<>();
-    private final MutableLiveData<Resource<String>> banUserLiveData =
-            new MutableLiveData<>();
 
     /**
      * Constructor del ViewModel.
@@ -148,35 +159,43 @@ public class SecondViewModel extends AndroidViewModel {
     }
 
     /**
-     * Devuelve LiveData de ejercicios.
+     * Devuelve LiveData de la lista de ejercicios.
+     *
+     * @return LiveData con estado y lista de ejercicios.
      */
     public LiveData<Resource<List<Exercise>>> getExercises() {
         return exercisesLiveData;
     }
 
     /**
-     * Devuelve el ejercicio seleccionado.
+     * Devuelve el ejercicio seleccionado en memoria.
+     *
+     * @return LiveData del ejercicio.
      */
     public LiveData<Exercise> getSelectedExercise() {
         return exerciseSelected;
     }
 
     /**
-     * Devuelve un ejercicio cargado por ID.
+     * Devuelve el estado de la carga de un ejercicio individual por ID.
+     *
+     * @return LiveData con estado y ejercicio.
      */
     public LiveData<Resource<Exercise>> getSingleExercise() {
         return singleExerciseLiveData;
     }
 
     /**
-     * Selecciona un ejercicio.
+     * Almacena en memoria el ejercicio seleccionado.
+     *
+     * @param exercise Ejercicio a seleccionar.
      */
     public void selectExercise(Exercise exercise) {
         exerciseSelected.setValue(exercise);
     }
 
     /**
-     * Obtiene todos los ejercicios desde el repositorio.
+     * Obtiene el catálogo completo de ejercicios desde el servidor.
      */
     public void fetchExercises() {
         exercisesLiveData.setValue(Resource.loading());
@@ -190,10 +209,11 @@ public class SecondViewModel extends AndroidViewModel {
     }
 
     /**
-     * Filtra ejercicios por nombre.
+     * Filtra la lista local de ejercicios por nombre.
+     *
+     * @param query Texto a buscar en los nombres de los ejercicios.
      */
     public void searchExercises(String query) {
-
         if (query == null || query.trim().isEmpty()) {
             exercisesLiveData.setValue(Resource.success(new ArrayList<>(fullExerciseList)));
             return;
@@ -212,7 +232,9 @@ public class SecondViewModel extends AndroidViewModel {
     }
 
     /**
-     * Obtiene un ejercicio por ID.
+     * Obtiene los detalles de un ejercicio mediante su ID.
+     *
+     * @param id Identificador del ejercicio.
      */
     public void fetchExerciseById(int id) {
         singleExerciseLiveData.setValue(Resource.loading());
@@ -220,7 +242,10 @@ public class SecondViewModel extends AndroidViewModel {
     }
 
     /**
-     * Elimina un ejercicio.
+     * Elimina un ejercicio del servidor.
+     *
+     * @param id        Identificador del ejercicio a borrar.
+     * @param onSuccess Callback a ejecutar tras la eliminación exitosa.
      */
     public void deleteExercise(int id, Runnable onSuccess) {
         repository.deleteExercise(id, result -> {
@@ -236,7 +261,10 @@ public class SecondViewModel extends AndroidViewModel {
     }
 
     /**
-     * Crea un ejercicio.
+     * Crea un nuevo ejercicio en el servidor.
+     *
+     * @param exercise  Objeto con los datos del nuevo ejercicio.
+     * @param onSuccess Callback a ejecutar tras la creación exitosa.
      */
     public void createExercise(Exercise exercise, Runnable onSuccess) {
         repository.createExercise(exercise, result -> {
@@ -248,7 +276,11 @@ public class SecondViewModel extends AndroidViewModel {
     }
 
     /**
-     * Actualiza un ejercicio.
+     * Actualiza la información de un ejercicio existente.
+     *
+     * @param id        Identificador del ejercicio.
+     * @param exercise  Objeto con los nuevos datos.
+     * @param onSuccess Callback a ejecutar tras la actualización exitosa.
      */
     public void updateExercise(int id, Exercise exercise, Runnable onSuccess) {
         repository.updateExercise(id, exercise, result -> {
@@ -260,14 +292,18 @@ public class SecondViewModel extends AndroidViewModel {
     }
 
     /**
-     * Devuelve el perfil del usuario.
+     * Devuelve el estado de la carga del perfil del usuario.
+     *
+     * @return LiveData con estado y perfil.
      */
     public LiveData<Resource<AccessResponse>> getProfile() {
         return profileLiveData;
     }
 
     /**
-     * Obtiene el perfil del usuario desde la API.
+     * Solicita al servidor los datos actualizados del usuario autenticado.
+     *
+     * @param token Token de acceso actual.
      */
     public void fetchProfile(String token) {
         profileLiveData.setValue(Resource.loading());
@@ -275,9 +311,11 @@ public class SecondViewModel extends AndroidViewModel {
     }
 
     /**
-     * Actualiza el perfil del usuario.
+     * Actualiza los datos del perfil del propio usuario autenticado.
+     *
+     * @param user Objeto User con las modificaciones.
      */
-    public void updateProfile(es.iesagora.fitjourney.data.model.User user) {
+    public void updateProfile(User user) {
         updateProfileLiveData.setValue(Resource.loading());
 
         userRepository.updateUserProfile(user, result -> {
@@ -290,14 +328,28 @@ public class SecondViewModel extends AndroidViewModel {
     }
 
     /**
-     * Estado de actualización del perfil.
+     * Actualiza los datos del perfil de un usuario específico (Solo administradores).
+     *
+     * @param userId Identificador del usuario a editar.
+     * @param user   Objeto User con las modificaciones.
      */
-    public LiveData<Resource<es.iesagora.fitjourney.data.model.User>> getUpdateProfileStatus() {
+    public void updateUserByAdmin(int userId, User user) {
+        updateProfileLiveData.setValue(Resource.loading());
+
+        userRepository.updateUserByAdmin(userId, user, updateProfileLiveData::setValue);
+    }
+
+    /**
+     * Devuelve el estado de la última solicitud de actualización de perfil.
+     *
+     * @return LiveData con estado de la actualización.
+     */
+    public LiveData<Resource<User>> getUpdateProfileStatus() {
         return updateProfileLiveData;
     }
 
     /**
-     * Cierra la sesión del usuario.
+     * Cierra la sesión local del usuario y limpia tokens y preferencias.
      */
     public void logout() {
         preferencesRepository.clearSession();
@@ -305,14 +357,16 @@ public class SecondViewModel extends AndroidViewModel {
     }
 
     /**
-     * Historial de entrenamientos.
+     * Devuelve el historial de entrenamientos completados.
+     *
+     * @return LiveData con estado e historial.
      */
     public LiveData<Resource<List<Workout>>> getWorkoutHistory() {
         return workoutHistoryLiveData;
     }
 
     /**
-     * Obtiene historial de entrenamientos.
+     * Solicita al servidor el historial completo de entrenamientos del usuario.
      */
     public void fetchWorkoutHistory() {
         workoutHistoryLiveData.setValue(Resource.loading());
@@ -320,14 +374,19 @@ public class SecondViewModel extends AndroidViewModel {
     }
 
     /**
-     * Estado de eliminación de cuenta.
+     * Devuelve el estado de la solicitud de eliminación de cuenta.
+     *
+     * @return LiveData con estado de la eliminación.
      */
     public LiveData<Resource<String>> getDeleteAccountStatus() {
         return deleteAccountLiveData;
     }
 
     /**
-     * Elimina la cuenta del usuario.
+     * Elimina permanentemente la cuenta del usuario autenticado.
+     *
+     * @param email    Email de confirmación.
+     * @param password Contraseña de confirmación.
      */
     public void deleteMyAccount(String email, String password) {
         deleteAccountLiveData.setValue(Resource.loading());
@@ -335,28 +394,34 @@ public class SecondViewModel extends AndroidViewModel {
     }
 
     /**
-     * Lista de rutinas.
+     * Devuelve la lista de rutinas disponibles.
+     *
+     * @return LiveData con estado y lista de rutinas.
      */
     public LiveData<Resource<List<Routine>>> getRoutines() {
         return routinesLiveData;
     }
 
     /**
-     * Estado de acciones sobre rutinas.
+     * Devuelve el estado de la última acción realizada sobre una rutina.
+     *
+     * @return MutableLiveData del estado de la acción.
      */
     public MutableLiveData<Resource<String>> getRoutineActionStatus() {
         return routineActionLiveData;
     }
 
     /**
-     * Rutina seleccionada por ID.
+     * Devuelve los detalles de una rutina cargada por ID.
+     *
+     * @return LiveData con estado y rutina individual.
      */
     public LiveData<Resource<Routine>> getSingleRoutine() {
         return singleRoutineLiveData;
     }
 
     /**
-     * Obtiene todas las rutinas.
+     * Solicita al servidor todas las rutinas públicas y las privadas del usuario.
      */
     public void fetchRoutines() {
         routinesLiveData.setValue(Resource.loading());
@@ -364,7 +429,9 @@ public class SecondViewModel extends AndroidViewModel {
     }
 
     /**
-     * Crea una rutina.
+     * Registra una nueva rutina en el servidor.
+     *
+     * @param routine Objeto con los datos de la rutina.
      */
     public void createRoutine(Routine routine) {
         routineActionLiveData.setValue(Resource.loading());
@@ -376,7 +443,9 @@ public class SecondViewModel extends AndroidViewModel {
     }
 
     /**
-     * Elimina una rutina.
+     * Elimina físicamente una rutina del servidor.
+     *
+     * @param id Identificador de la rutina.
      */
     public void deleteRoutine(int id) {
         routineActionLiveData.setValue(Resource.loading());
@@ -388,33 +457,62 @@ public class SecondViewModel extends AndroidViewModel {
     }
 
     /**
-     * Obtiene una rutina por ID.
+     * Obtiene los detalles y ejercicios de una rutina mediante su ID.
+     *
+     * @param id Identificador de la rutina.
      */
     public void fetchRoutineById(int id) {
         singleRoutineLiveData.setValue(Resource.loading());
         routineRepository.getRoutineById(id, singleRoutineLiveData::setValue);
     }
 
+    /**
+     * Solicita al servidor el directorio completo de usuarios (Solo administradores).
+     *
+     * @return LiveData con el estado y la lista de usuarios.
+     */
     public LiveData<Resource<List<User>>> getAllUsers() {
         allUsersLiveData.setValue(Resource.loading());
         userRepository.getAllUsers(allUsersLiveData::setValue);
         return allUsersLiveData;
     }
 
+    /**
+     * Devuelve el estado de una solicitud de baneo de usuario.
+     *
+     * @return LiveData con el estado de la acción.
+     */
     public LiveData<Resource<String>> getBanUserLiveData() {
         return banUserLiveData;
     }
 
+    /**
+     * Devuelve el estado de una solicitud de eliminación de usuario.
+     *
+     * @return LiveData con el estado de la acción.
+     */
     public LiveData<Resource<String>> getDeleteUserLiveData() {
         return deleteUserLiveData;
     }
 
+    /**
+     * Ejecuta un borrado lógico de un usuario y sus registros relacionados (Solo administradores).
+     *
+     * @param userId Identificador del usuario a eliminar.
+     * @return LiveData para monitorizar el estado de la petición.
+     */
     public LiveData<Resource<String>> deleteUserByAdmin(int userId) {
         deleteUserLiveData.setValue(Resource.loading());
         userRepository.deleteUserByAdmin(userId, deleteUserLiveData::setValue);
         return deleteUserLiveData;
     }
 
+    /**
+     * Desactiva el acceso a la plataforma para un usuario específico (Solo administradores).
+     *
+     * @param userId Identificador del usuario a banear.
+     * @return LiveData para monitorizar el estado de la petición.
+     */
     public LiveData<Resource<String>> banUser(int userId) {
         banUserLiveData.setValue(Resource.loading());
         userRepository.banUser(userId, banUserLiveData::setValue);

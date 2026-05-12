@@ -43,19 +43,16 @@ const updateProfile = async (req, res, next) => {
 const deleteUser = async (req, res, next) => {
     const { id } = req.params;
     try {
-        // Desactivar usuario
         await prisma.user.update({
             where: { id_user: parseInt(id) },
             data: { active: 0 }
         });
 
-        // Desactivar Rutinas
         await prisma.routine.updateMany({
             where: { id_user: parseInt(id) },
             data: { active: 0 }
         });
 
-        // Desactivar Entrenamientos
         await prisma.workout.updateMany({
             where: { id_user: parseInt(id) },
             data: { active: 0 }
@@ -67,4 +64,18 @@ const deleteUser = async (req, res, next) => {
     }
 };
 
-module.exports = { getAllUsers, getProfile, updateProfile, deleteUser };
+const updateUserByAdmin = async (req, res, next) => {
+    const { id } = req.params;
+    try {
+        const updatedUser = await prisma.user.update({
+            where: { id_user: parseInt(id) },
+            data: req.body
+        });
+        const { password, ...userData } = updatedUser;
+        res.json(userData);
+    } catch (error) {
+        next(error); 
+    }
+};
+
+module.exports = { getAllUsers, getProfile, updateProfile, deleteUser, updateUserByAdmin };

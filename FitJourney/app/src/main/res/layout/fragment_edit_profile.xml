@@ -227,6 +227,36 @@
                 </LinearLayout>
             </LinearLayout>
 
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilPhotoUrl"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                app:boxBackgroundColor="@color/surface"
+                app:boxCornerRadiusBottomEnd="12dp"
+                app:boxCornerRadiusBottomStart="12dp"
+                app:boxCornerRadiusTopEnd="12dp"
+                app:boxCornerRadiusTopStart="12dp"
+                app:boxStrokeColor="@color/mainrosa"
+                app:boxStrokeWidth="0dp"
+                android:hint="URL de la foto (opcional)"
+                app:hintTextColor="@color/mainrosa"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/llStats">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etPhotoUrl"
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:backgroundTint="@android:color/transparent"
+                    android:paddingHorizontal="16dp"
+                    android:textColor="@color/text"
+                    android:textSize="15sp"
+                    android:inputType="textUri" />
+            </com.google.android.material.textfield.TextInputLayout>
+
             <TextView
                 android:id="@+id/tvLabelGoal"
                 android:layout_width="0dp"
@@ -240,71 +270,69 @@
                 android:textAllCaps="true"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/llStats" />
+                app:layout_constraintTop_toBottomOf="@id/tilPhotoUrl" /> <com.google.android.material.chip.ChipGroup
+            android:id="@+id/chipGroupGoal"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            app:singleSelection="true"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvLabelGoal">
 
-            <com.google.android.material.chip.ChipGroup
-                android:id="@+id/chipGroupGoal"
-                android:layout_width="0dp"
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipMuscle"
+                style="@style/Widget.MaterialComponents.Chip.Choice"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                app:singleSelection="true"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/tvLabelGoal">
+                android:text="Ganar músculo"
+                android:textColor="@color/text"
+                android:textSize="14sp"
+                app:chipBackgroundColor="@color/surface"
+                app:chipCornerRadius="20dp"
+                app:chipStrokeColor="@color/stroke"
+                app:chipStrokeWidth="1dp" />
 
-                <com.google.android.material.chip.Chip
-                    android:id="@+id/chipMuscle"
-                    style="@style/Widget.MaterialComponents.Chip.Choice"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Ganar músculo"
-                    android:textColor="@color/text"
-                    android:textSize="14sp"
-                    app:chipBackgroundColor="@color/surface"
-                    app:chipCornerRadius="20dp"
-                    app:chipStrokeColor="@color/stroke"
-                    app:chipStrokeWidth="1dp" />
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipFat"
+                style="@style/Widget.MaterialComponents.Chip.Choice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Perder grasa"
+                android:textColor="@color/text"
+                android:textSize="14sp"
+                app:chipBackgroundColor="@color/surface"
+                app:chipCornerRadius="20dp"
+                app:chipStrokeColor="@color/stroke"
+                app:chipStrokeWidth="1dp" />
 
-                <com.google.android.material.chip.Chip
-                    android:id="@+id/chipFat"
-                    style="@style/Widget.MaterialComponents.Chip.Choice"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Perder grasa"
-                    android:textColor="@color/text"
-                    android:textSize="14sp"
-                    app:chipBackgroundColor="@color/surface"
-                    app:chipCornerRadius="20dp"
-                    app:chipStrokeColor="@color/stroke"
-                    app:chipStrokeWidth="1dp" />
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipFit"
+                style="@style/Widget.MaterialComponents.Chip.Choice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Mantenerse en forma"
+                android:textColor="@color/text"
+                android:textSize="14sp"
+                app:chipBackgroundColor="@color/surface"
+                app:chipCornerRadius="20dp"
+                app:chipStrokeColor="@color/stroke"
+                app:chipStrokeWidth="1dp" />
 
-                <com.google.android.material.chip.Chip
-                    android:id="@+id/chipFit"
-                    style="@style/Widget.MaterialComponents.Chip.Choice"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Mantenerse en forma"
-                    android:textColor="@color/text"
-                    android:textSize="14sp"
-                    app:chipBackgroundColor="@color/surface"
-                    app:chipCornerRadius="20dp"
-                    app:chipStrokeColor="@color/stroke"
-                    app:chipStrokeWidth="1dp" />
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipStrength"
+                style="@style/Widget.MaterialComponents.Chip.Choice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Fuerza"
+                android:textColor="@color/text"
+                android:textSize="14sp"
+                app:chipBackgroundColor="@color/surface"
+                app:chipCornerRadius="20dp"
+                app:chipStrokeColor="@color/stroke"
+                app:chipStrokeWidth="1dp" />
 
-                <com.google.android.material.chip.Chip
-                    android:id="@+id/chipStrength"
-                    style="@style/Widget.MaterialComponents.Chip.Choice"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Fuerza"
-                    android:textColor="@color/text"
-                    android:textSize="14sp"
-                    app:chipBackgroundColor="@color/surface"
-                    app:chipCornerRadius="20dp"
-                    app:chipStrokeColor="@color/stroke"
-                    app:chipStrokeWidth="1dp" />
-
-            </com.google.android.material.chip.ChipGroup>
+        </com.google.android.material.chip.ChipGroup>
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnSaveProfile"

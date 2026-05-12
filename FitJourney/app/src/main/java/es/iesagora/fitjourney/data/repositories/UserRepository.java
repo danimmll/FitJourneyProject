@@ -286,6 +286,38 @@ public class UserRepository {
     }
 
     /**
+     * Permite a un administrador actualizar el perfil de otro usuario.
+     *
+     * @param userId   Identificador del usuario a editar.
+     * @param user     Nuevos datos del usuario.
+     * @param callback Callback con el resultado.
+     */
+    public void updateUserByAdmin(int userId, User user, ProfileCallback callback) {
+
+        callback.onResult(Resource.loading());
+
+        api.updateUserByAdmin(userId, user).enqueue(new Callback<>() {
+            @Override
+            public void onResponse(@NonNull Call<User> call,
+                                   @NonNull Response<User> response) {
+
+                if (response.isSuccessful() && response.body() != null) {
+                    callback.onResult(Resource.success(response.body()));
+                } else {
+                    callback.onResult(Resource.error(getError(response)));
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<User> call,
+                                  @NonNull Throwable t) {
+
+                callback.onResult(Resource.error(ERROR_CONEXION + t.getMessage()));
+            }
+        });
+    }
+
+    /**
      * Obtiene todos los usuarios registrados (solo para administradores).
      *
      * @param callback Callback con el resultado.

@@ -84,14 +84,34 @@
                 android:textColor="@color/text" />
         </com.google.android.material.textfield.TextInputLayout>
 
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tilImageUrl"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:hint="URL de la imagen (opcional)"
+            android:textColorHint="#B0B0B0"
+            app:boxStrokeColor="@color/mainazul"
+            app:hintTextColor="@color/mainazul"
+            app:layout_constraintTop_toBottomOf="@id/tilDifficulty">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etImageUrl"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textUri"
+                android:textColor="@color/text" />
+        </com.google.android.material.textfield.TextInputLayout>
+
         <LinearLayout
             android:id="@+id/layoutImage"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="16dp"
             android:gravity="center"
             android:orientation="vertical"
-            app:layout_constraintTop_toBottomOf="@id/tilDifficulty">
+            app:layout_constraintTop_toBottomOf="@id/tilImageUrl">
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnSelectImage"
