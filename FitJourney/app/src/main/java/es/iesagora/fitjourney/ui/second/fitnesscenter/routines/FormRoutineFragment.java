@@ -18,7 +18,6 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 
-import com.bumptech.glide.Glide;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputEditText;
@@ -41,23 +40,28 @@ import es.iesagora.fitjourney.viewmodel.SecondViewModel;
  * Fragment encargado de la creación de nuevas rutinas de entrenamiento.
  *
  * <p>Permite al usuario crear una rutina con nombre, descripción,
- * imagen asociada y una lista de ejercicios seleccionados del catálogo.</p>
+ * imagen asociada (vía URL o galería) y una lista de ejercicios seleccionados del catálogo.</p>
  */
 public class FormRoutineFragment extends Fragment {
 
     private FragmentFormRoutineBinding binding;
     private SecondViewModel viewModel;
-    private Uri selectedLocalImageUri;
+
+    // Variable para almacenar la imagen local seleccionada de la galería
+    private Uri selectedLocalImageUri = null;
 
     private final List<RoutineExercise> addedExercises = new ArrayList<>();
     private AddedExerciseAdapter adapter;
 
+    /**
+     * Lanzador para la galería. Carga la imagen, limpia la URL y muestra el preview.
+     */
     private final ActivityResultLauncher<String> getContent =
             registerForActivityResult(new ActivityResultContracts.GetContent(), uri -> {
                 if (uri != null) {
                     selectedLocalImageUri = uri;
                     binding.etRoutineImage.setText("");
-                    Glide.with(this).load(uri).centerCrop().into(binding.ivPhotoPreview);
+                    ImageUtils.loadInto(requireContext(), uri.toString(), binding.ivPhotoPreview, R.drawable.img_construccion);
                 }
             });
 
@@ -106,20 +110,15 @@ public class FormRoutineFragment extends Fragment {
         binding.toolbar.setNavigationOnClickListener(
                 v -> Navigation.findNavController(v).navigateUp());
 
-        binding.ivPhotoPreview.setOnClickListener(
-                v -> getContent.launch("image/*"));
+        binding.btnSelectRoutineImage.setOnClickListener(v -> getContent.launch("image/*"));
+        binding.ivPhotoPreview.setOnClickListener(v -> getContent.launch("image/*"));
 
         binding.etRoutineImage.setOnFocusChangeListener((v, hasFocus) -> {
             if (!hasFocus) {
-                String url = Objects.requireNonNull(
-                        binding.etRoutineImage.getText()).toString().trim();
+                String url = Objects.requireNonNull(binding.etRoutineImage.getText()).toString().trim();
                 if (!url.isEmpty()) {
                     selectedLocalImageUri = null;
-                    Glide.with(this)
-                            .load(url)
-                            .centerCrop()
-                            .placeholder(R.drawable.img_construccion)
-                            .into(binding.ivPhotoPreview);
+                    ImageUtils.loadInto(requireContext(), url, binding.ivPhotoPreview, R.drawable.img_construccion);
                 }
             }
         });
@@ -250,7 +249,6 @@ public class FormRoutineFragment extends Fragment {
         newRoutineEx.setIdExercise(exercise.getIdExercise());
         newRoutineEx.setExercise(exercise);
 
-        // Lo mismo para los sets y reps
         newRoutineEx.setTargetSets(sets);
         newRoutineEx.setTargetReps(reps);
 
@@ -303,7 +301,6 @@ public class FormRoutineFragment extends Fragment {
      * Recoge los datos del formulario, los valida y solicita
      * la creación de la rutina al ViewModel.
      */
-
     private void saveRoutine() {
         String name = binding.etRoutineName.getText() != null
                 ? binding.etRoutineName.getText().toString().trim() : "";
@@ -317,24 +314,22 @@ public class FormRoutineFragment extends Fragment {
             return;
         }
 
-        String photoUrl;
+        String finalPhotoData = null;
+
         if (selectedLocalImageUri != null) {
-            photoUrl = ImageUtils.uriToBase64(
-                    requireContext().getContentResolver(),
-                    selectedLocalImageUri
-            );
-            if (photoUrl == null) {
+            finalPhotoData = ImageUtils.uriToBase64(requireContext().getContentResolver(), selectedLocalImageUri);
+            if (finalPhotoData == null) {
                 toast("Error al procesar la imagen seleccionada");
                 return;
             }
-        } else {
-            photoUrl = imageUrl.isEmpty() ? null : imageUrl;
+        } else if (!imageUrl.isEmpty()) {
+            finalPhotoData = imageUrl;
         }
 
         Routine routine = new Routine();
         routine.setName(name);
         routine.setDescription(desc.isEmpty() ? null : desc);
-        routine.setPhotoUrl(photoUrl);
+        routine.setPhotoUrl(finalPhotoData);
         routine.setExercises(addedExercises);
 
         boolean isPublic = binding.switchPublic.isChecked();

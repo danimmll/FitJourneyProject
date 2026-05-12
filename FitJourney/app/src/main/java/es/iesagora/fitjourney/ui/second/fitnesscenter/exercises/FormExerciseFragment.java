@@ -49,7 +49,6 @@ public class FormExerciseFragment extends Fragment {
                 if (uri != null) {
                     selectedLocalImageUri = uri;
                     currentImageBase64 = null;
-                    assert binding.etImageUrl != null;
                     binding.etImageUrl.setText("");
 
                     ImageUtils.loadInto(requireContext(), uri.toString(), binding.ivPreview, R.drawable.ic_ejercicios);
@@ -90,7 +89,6 @@ public class FormExerciseFragment extends Fragment {
         binding.btnSelectImage.setOnClickListener(v -> getContent.launch("image/*"));
         binding.ivPreview.setOnClickListener(v -> getContent.launch("image/*"));
 
-        assert binding.etImageUrl != null;
         binding.etImageUrl.setOnFocusChangeListener((v, hasFocus) -> {
             if (!hasFocus) {
                 String url = binding.etImageUrl.getText() != null ? binding.etImageUrl.getText().toString().trim() : "";
@@ -123,7 +121,6 @@ public class FormExerciseFragment extends Fragment {
 
         if (existingImage != null && !existingImage.isEmpty()) {
             if (existingImage.startsWith("http")) {
-                assert binding.etImageUrl != null;
                 binding.etImageUrl.setText(existingImage);
             } else {
                 currentImageBase64 = existingImage;
@@ -141,7 +138,6 @@ public class FormExerciseFragment extends Fragment {
         String muscle = Objects.requireNonNull(binding.etMuscle.getText()).toString().trim();
         String difficulty = Objects.requireNonNull(binding.etDifficulty.getText()).toString().trim();
         String description = Objects.requireNonNull(binding.etDescription.getText()).toString().trim();
-        assert binding.etImageUrl != null;
         String imageUrlStr = Objects.requireNonNull(binding.etImageUrl.getText()).toString().trim();
 
         if (name.isEmpty() || muscle.isEmpty() || difficulty.isEmpty() || description.isEmpty()) {
