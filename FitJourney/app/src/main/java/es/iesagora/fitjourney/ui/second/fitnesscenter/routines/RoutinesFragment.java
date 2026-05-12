@@ -70,7 +70,7 @@ public class RoutinesFragment extends Fragment {
         setupChips();
 
         binding.btnCreateRoutine.setOnClickListener(v ->
-                Navigation.findNavController(v).navigate(R.id.action_routinesFragment_to_formRoutineFragment)
+                Navigation.findNavController(v).navigate(R.id.formRoutineFragment)
         );
 
         viewModel.fetchRoutines();

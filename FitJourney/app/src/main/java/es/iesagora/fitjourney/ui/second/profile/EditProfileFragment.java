@@ -225,7 +225,8 @@ public class EditProfileFragment extends Fragment {
 
         String goalStr = binding.actvGoal.getText().toString().trim();
 
-        String passwordStr = binding.etConfirmPassword.getText() != null ? binding.etConfirmPassword.getText().toString().trim() : "";
+        String newPasswordStr = binding.etNewPassword.getText() != null ? binding.etNewPassword.getText().toString().trim() : "";
+        String confirmPasswordStr = binding.etConfirmPassword.getText() != null ? binding.etConfirmPassword.getText().toString().trim() : "";
 
         if (name.isEmpty()) {
             binding.tilName.setError("El nombre no puede estar vacío");
@@ -259,8 +260,13 @@ public class EditProfileFragment extends Fragment {
         updatedUser.setGoal(goalStr);
         updatedUser.setPhotoUrl(finalPhotoData);
 
-        if (!isAdminEdit && !passwordStr.isEmpty()) {
-            updatedUser.setPassword(passwordStr);
+        if (!isAdminEdit && !newPasswordStr.isEmpty()) {
+            if (!newPasswordStr.equals(confirmPasswordStr)) {
+                binding.tilConfirmPassword.setError("Las contraseñas no coinciden");
+                return;
+            }
+            binding.tilConfirmPassword.setError(null);
+            updatedUser.setPassword(newPasswordStr);
         }
 
         try {

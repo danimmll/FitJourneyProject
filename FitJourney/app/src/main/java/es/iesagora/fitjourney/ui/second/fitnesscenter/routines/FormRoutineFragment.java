@@ -284,12 +284,9 @@ public class FormRoutineFragment extends Fragment {
             binding.btnSaveRoutine.setEnabled(true);
 
             if (resource.status == Resource.Status.SUCCESS) {
-                if (resource.message != null
-                        && resource.message.toLowerCase().contains("creada")) {
-                    toast("Rutina guardada correctamente");
-                    viewModel.getRoutineActionStatus().setValue(null);
-                    Navigation.findNavController(requireView()).navigateUp();
-                }
+                toast("Rutina guardada correctamente");
+                viewModel.getRoutineActionStatus().setValue(null);
+                Navigation.findNavController(requireView()).navigateUp();
             } else if (resource.status == Resource.Status.ERROR) {
                 toast(resource.message);
                 viewModel.getRoutineActionStatus().setValue(null);
