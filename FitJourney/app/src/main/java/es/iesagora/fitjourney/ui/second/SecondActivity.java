@@ -11,10 +11,12 @@ import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
-
+import android.util.Base64;
+import org.json.JSONObject;
 import java.util.Objects;
 
 import es.iesagora.fitjourney.R;
+import es.iesagora.fitjourney.data.repositories.PreferencesRepository;
 import es.iesagora.fitjourney.databinding.ActivitySecondBinding;
 import es.iesagora.fitjourney.ui.main.MainActivity;
 import es.iesagora.fitjourney.utils.SessionEvent;
@@ -30,6 +32,13 @@ public class SecondActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        PreferencesRepository prefs = new PreferencesRepository(this);
+        if (!isTokenValid(prefs.getToken())) {
+            prefs.clearSession();
+            redirectToLogin();
+            return;
+        }
 
         ActivitySecondBinding binding = ActivitySecondBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
@@ -49,13 +58,28 @@ public class SecondActivity extends AppCompatActivity {
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(binding.bottomNavigationView, navController);
 
-        // Observar sesión expirada (token inválido / 401)
         SessionEvent.getSessionExpired().observe(this, expired -> {
             if (expired != null && expired) {
                 SessionEvent.clear();
                 redirectToLogin();
             }
         });
+    }
+
+    private boolean isTokenValid(String token) {
+        if (token == null || token.trim().isEmpty()) return false;
+        try {
+            String[] parts = token.split("\\.");
+            if (parts.length != 3) return false;
+            String payload = new String(Base64.decode(parts[1], Base64.URL_SAFE | Base64.NO_WRAP | Base64.NO_PADDING));
+            JSONObject json = new JSONObject(payload);
+            long exp = json.optLong("exp", 0L);
+            if (exp <= 0) return false;
+            long now = System.currentTimeMillis() / 1000L;
+            return exp > now;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     /**

@@ -165,8 +165,6 @@ public class FormExerciseFragment extends Fragment {
         newExercise.setDescription(description);
 
         newExercise.setMuscleGroup(muscle);
-        newExercise.setMuscleGroup(muscle);
-        newExercise.setImageUrl(finalPhotoData);
         newExercise.setImageUrl(finalPhotoData);
 
         if (exerciseToEdit == null) {
@@ -177,7 +175,6 @@ public class FormExerciseFragment extends Fragment {
         } else {
             int exId = exerciseToEdit.getIdExercise();
 
-            newExercise.setIdExercise(exId);
             newExercise.setIdExercise(exId);
 
             viewModel.updateExercise(exId, newExercise, () -> {
