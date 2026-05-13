@@ -1,6 +1,9 @@
 package es.iesagora.fitjourney.viewmodel;
 
+import static android.content.ContentValues.TAG;
+
 import android.app.Application;
+import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -253,9 +256,7 @@ public class SecondViewModel extends AndroidViewModel {
                 fetchExercises();
                 onSuccess.run();
             } else {
-                Toast.makeText(getApplication(),
-                        result.message != null ? result.message : "Error al eliminar",
-                        Toast.LENGTH_SHORT).show();
+                Log.d(TAG, "deleteExercise: error" );
             }
         });
     }
