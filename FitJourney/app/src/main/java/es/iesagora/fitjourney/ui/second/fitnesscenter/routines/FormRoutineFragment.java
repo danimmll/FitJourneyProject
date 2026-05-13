@@ -33,6 +33,7 @@ import es.iesagora.fitjourney.data.model.Exercise;
 import es.iesagora.fitjourney.data.model.Routine;
 import es.iesagora.fitjourney.data.model.RoutineExercise;
 import es.iesagora.fitjourney.data.remote.Resource;
+import es.iesagora.fitjourney.databinding.DialogAddRoutineExerciseBinding;
 import es.iesagora.fitjourney.databinding.FragmentFormRoutineBinding;
 import es.iesagora.fitjourney.ui.second.adapters.AddedExerciseAdapter;
 import es.iesagora.fitjourney.ui.second.adapters.SelectExerciseAdapter;
@@ -125,27 +126,21 @@ public class FormRoutineFragment extends Fragment {
         List<Exercise> allExercises = getExerciseCatalog();
         if (allExercises == null) return;
 
-        View dialogView = LayoutInflater.from(getContext()).inflate(R.layout.dialog_add_routine_exercise, null);
-
-        RecyclerView rvExercisePicker = dialogView.findViewById(R.id.rvExercisePicker);
-        SearchView searchExercise = dialogView.findViewById(R.id.searchExercise);
-        TextView tvSelectedExercise = dialogView.findViewById(R.id.tvSelectedExercise);
-        TextInputEditText etSets = dialogView.findViewById(R.id.etSets);
-        TextInputEditText etReps = dialogView.findViewById(R.id.etReps);
-        MaterialButton btnConfirmAdd = dialogView.findViewById(R.id.btnConfirmAdd);
+        DialogAddRoutineExerciseBinding dialogBinding =
+                DialogAddRoutineExerciseBinding.inflate(getLayoutInflater());
 
         final Exercise[] selectedExercise = {null};
 
         SelectExerciseAdapter pickerAdapter = new SelectExerciseAdapter(exercise -> {
             selectedExercise[0] = exercise;
-            tvSelectedExercise.setText("Seleccionado: " + exercise.getName());
+            dialogBinding.tvSelectedExercise.setText("Seleccionado: " + exercise.getName());
         });
 
-        rvExercisePicker.setLayoutManager(new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false));
-        rvExercisePicker.setAdapter(pickerAdapter);
+        dialogBinding.rvExercisePicker.setLayoutManager(new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false));
+        dialogBinding.rvExercisePicker.setAdapter(pickerAdapter);
         pickerAdapter.submitList(allExercises);
 
-        searchExercise.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+        dialogBinding.searchExercise.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 return false;
@@ -166,16 +161,16 @@ public class FormRoutineFragment extends Fragment {
         });
 
         AlertDialog dialog = new MaterialAlertDialogBuilder(requireContext())
-                .setView(dialogView)
+                .setView(dialogBinding.getRoot())
                 .create();
         dialog.show();
 
-        btnConfirmAdd.setOnClickListener(v -> {
+        dialogBinding.btnConfirmAdd.setOnClickListener(v -> {
             if (selectedExercise[0] == null) {
                 toast("Por favor, selecciona un ejercicio deslizando en la lista.");
                 return;
             }
-            onConfirmAddExercise(selectedExercise[0], etSets, etReps, dialog);
+            onConfirmAddExercise(selectedExercise[0], dialogBinding.etSets, dialogBinding.etReps, dialog);
         });
     }
 
