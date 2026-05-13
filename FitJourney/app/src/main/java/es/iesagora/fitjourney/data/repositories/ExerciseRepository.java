@@ -1,6 +1,7 @@
 package es.iesagora.fitjourney.data.repositories;
 
 import android.content.Context;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 
@@ -147,7 +148,7 @@ public class ExerciseRepository {
                 if (response.isSuccessful()) {
                     callback.onResult(Resource.success(null));
                 } else {
-                    callback.onResult(Resource.error("Error al borrar: " + response.code()));
+                    Log.d("deleteExercise", "onResponse: "+ response.message() );
                 }
             }
 
