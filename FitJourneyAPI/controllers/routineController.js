@@ -36,7 +36,13 @@ const getUserRoutines = async (req, res, next) => {
         // Trae TODAS las rutinas activas. 
         // El filtro de "Privadas/Públicas" se encarga de hacerlo el Frontend (RoutinesFragment)
         const routines = await prisma.routine.findMany({
-            where: { active: 1 },
+            where: {
+                active: 1,
+                OR: [
+                    { id_user: req.user.id },
+                    { is_public: 1 }
+                ]
+            },
             include: { exercises: { include: { exercise: true } } }
         });
         res.json(routines);
@@ -49,7 +55,7 @@ const deleteRoutine = async (req, res, next) => {
     const { id } = req.params;
     try {
         const routine = await prisma.routine.findUnique({ where: { id_routine: parseInt(id) } });
-        
+
         // Verifica si existe y si es el dueño o admin
         if (!routine || (routine.id_user !== req.user.id && req.user.role !== 'admin')) {
             return res.status(403).json({ error: "No tienes permiso para eliminar esta rutina" });
@@ -71,12 +77,17 @@ const getRoutineById = async (req, res, next) => {
     try {
         const routine = await prisma.routine.findUnique({
             where: { id_routine: parseInt(id) },
-            include: { exercises: { include: { exercise: true } } } 
+            include: { exercises: { include: { exercise: true } } }
         });
 
         if (!routine || routine.active === 0) {
             return res.status(404).json({ error: "Rutina no encontrada" });
         }
+
+        if (routine.id_user !== req.user.id && routine.is_public !== 1 && req.user.role !== 'admin') {
+            return res.status(403).json({ error: "No tienes permiso para ver esta rutina" });
+        }
+
         res.json(routine);
     } catch (error) {
         next(error);

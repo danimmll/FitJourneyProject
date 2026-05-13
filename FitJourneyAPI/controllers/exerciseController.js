@@ -80,9 +80,13 @@ const updateExercise = async (req, res, next) => {
 const deleteExercise = async (req, res, next) => {
     const { id } = req.params;
     try {
-        // Borrado físico real
+        const exerciseId = parseInt(id, 10);
+        if (Number.isNaN(exerciseId)) {
+            return res.status(400).json({ error: "ID de ejercicio no válido" });
+        }
+
         await prisma.exercise.delete({
-            where: { id_exercise: parseInt(id) }
+            where: { id_exercise: exerciseId }
         });
         res.json({ message: "Ejercicio eliminado físicamente de la base de datos" });
     } catch (error) {
