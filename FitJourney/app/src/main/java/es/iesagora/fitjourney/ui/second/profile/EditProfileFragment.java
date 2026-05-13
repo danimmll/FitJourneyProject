@@ -54,6 +54,7 @@ public class EditProfileFragment extends Fragment {
 
     private Uri selectedLocalImageUri = null;
     private String currentImageBase64 = null;
+    private boolean passwordWasChanged = false;
 
     /**
      * Lanzador para abrir la galería y seleccionar una foto.
@@ -266,6 +267,7 @@ public class EditProfileFragment extends Fragment {
             }
             binding.tilConfirmPassword.setError(null);
             updatedUser.setPassword(newPasswordStr);
+            passwordWasChanged = true;
         }
 
         try {
@@ -306,6 +308,17 @@ public class EditProfileFragment extends Fragment {
 
                     if (!isAdminEdit && prefs.getToken() != null) {
                         viewModel.fetchProfile(prefs.getToken());
+                    }
+
+                    if (!isAdminEdit && passwordWasChanged) {
+                        viewModel.logout();
+                        passwordWasChanged = false;
+                        Toast.makeText(getContext(), "Contraseña actualizada. Inicia sesión de nuevo.", Toast.LENGTH_LONG).show();
+                        Intent intent = new Intent(requireContext(), MainActivity.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        startActivity(intent);
+                        requireActivity().finish();
+                        return;
                     }
 
                     LiveData<Resource<User>> updateStatus = viewModel.getUpdateProfileStatus();

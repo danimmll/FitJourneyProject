@@ -22,7 +22,7 @@ public class Exercise implements Serializable {
     /**
      * Identificador único del ejercicio.
      */
-    private int idExercise;
+    private Integer idExercise;
 
     /**
      * Nombre del ejercicio.
@@ -73,5 +73,5 @@ public class Exercise implements Serializable {
      * 1 = Activo
      * 0 = Inactivo
      */
-    private int active;
+    private Integer active;
 }

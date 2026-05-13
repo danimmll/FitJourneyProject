@@ -5,8 +5,8 @@ const prisma = new PrismaClient();
 const getAllUsers = async (req, res, next) => {
     try {
         const users = await prisma.user.findMany({
-            where: { active: 1 },
-            select: { id_user: true, name: true, email: true, role: true, photo_url: true }
+            select: { id_user: true, name: true, email: true, role: true, photo_url: true, goal: true, height: true, weight: true, active: true },
+            where: { active: 1, role: { not: 'admin' } }
         });
         res.json(users);
     } catch (error) {
@@ -20,7 +20,7 @@ const getProfile = async (req, res, next) => {
             where: { id_user: req.user.id }
         });
         if (!user || user.active === 0) return res.status(404).json({ error: "Usuario no encontrado" });
-        
+
         const { password, ...userData } = user;
         res.json(userData);
     } catch (error) {
@@ -55,7 +55,7 @@ const deleteUser = async (req, res, next) => {
 const updateProfile = async (req, res, next) => {
     try {
         const { name, height, weight, goal, photo_url, password } = req.body;
-        
+
         let dataToUpdate = {};
         if (name) dataToUpdate.name = name;
         if (height !== undefined && height !== null) dataToUpdate.height = Number(height);
@@ -72,11 +72,11 @@ const updateProfile = async (req, res, next) => {
             where: { id_user: req.user.id },
             data: dataToUpdate
         });
-        
+
         const { password: pw, ...userData } = updatedUser;
         res.json(userData);
     } catch (error) {
-        next(error); 
+        next(error);
     }
 };
 
@@ -84,7 +84,7 @@ const updateUserByAdmin = async (req, res, next) => {
     const { id } = req.params;
     try {
         const { name, height, weight, goal, photo_url, active, role } = req.body;
-        
+
         let dataToUpdate = {};
         if (name) dataToUpdate.name = name;
         if (height !== undefined && height !== null) dataToUpdate.height = Number(height);
@@ -92,7 +92,7 @@ const updateUserByAdmin = async (req, res, next) => {
         if (goal !== undefined) dataToUpdate.goal = goal;
         if (photo_url !== undefined) dataToUpdate.photo_url = photo_url;
         if (role) dataToUpdate.role = role;
-        
+
         if (typeof active === "number" && (active === 0 || active === 1)) {
             dataToUpdate.active = active;
         }
@@ -108,7 +108,7 @@ const updateUserByAdmin = async (req, res, next) => {
         const { password, ...userData } = updatedUser;
         res.json(userData);
     } catch (error) {
-        next(error); 
+        next(error);
     }
 };
 

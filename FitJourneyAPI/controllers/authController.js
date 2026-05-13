@@ -8,15 +8,19 @@ const register = async (req, res, next) => {
     try {
         const { email, name, password, gender, goal, height, weight, birth_date, photo_url } = req.body;
 
+        if (!email || !name || !password) {
+            return res.status(400).json({ error: "Email, nombre y contraseña son obligatorios" });
+        }
+
         const existingUser = await prisma.user.findUnique({ where: { email } });
 
         if (existingUser) {
             if (existingUser.active === 1) {
                 return res.status(400).json({ error: "El email ya está registrado y en uso." });
             } else {
-                return res.status(409).json({ 
-                    error: "Cuenta inactiva detectada.", 
-                    action_required: "PROMPT_REACTIVATION" 
+                return res.status(409).json({
+                    error: "Cuenta inactiva detectada.",
+                    action_required: "PROMPT_REACTIVATION"
                 });
             }
         }
@@ -25,8 +29,8 @@ const register = async (req, res, next) => {
         const newUser = await prisma.user.create({
             data: {
                 email, name, password: hashedPassword, gender, goal,
-                height: height ? parseFloat(height) : null,
-                weight: weight ? parseFloat(weight) : null,
+                height: height !== undefined && height !== null && height !== '' ? parseFloat(height) : null,
+                weight: weight !== undefined && weight !== null && weight !== '' ? parseFloat(weight) : null,
                 birth_date: birth_date ? new Date(birth_date) : null,
                 photo_url
             }
@@ -38,7 +42,7 @@ const register = async (req, res, next) => {
         res.status(201).json({ message: "Usuario registrado con éxito", token, user: userWithoutPassword });
 
     } catch (error) {
-        next(error); 
+        next(error);
     }
 };
 
@@ -47,7 +51,7 @@ const login = async (req, res, next) => {
         const { email, password } = req.body;
 
         const user = await prisma.user.findUnique({ where: { email } });
-        
+
         if (!user || user.active === 0) {
             return res.status(401).json({ error: "Credenciales inválidas o cuenta desactivada" });
         }
