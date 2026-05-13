@@ -1,4 +1,5 @@
 const { PrismaClient } = require('@prisma/client');
+const bcrypt = require('bcrypt');
 const prisma = new PrismaClient();
 
 const getAllUsers = async (req, res, next) => {
@@ -27,19 +28,6 @@ const getProfile = async (req, res, next) => {
     }
 };
 
-const updateProfile = async (req, res, next) => {
-    try {
-        const updatedUser = await prisma.user.update({
-            where: { id_user: req.user.id },
-            data: req.body
-        });
-        const { password, ...userData } = updatedUser;
-        res.json(userData);
-    } catch (error) {
-        next(error); 
-    }
-};
-
 const deleteUser = async (req, res, next) => {
     const { id } = req.params;
     try {
@@ -64,12 +52,54 @@ const deleteUser = async (req, res, next) => {
     }
 };
 
+const updateProfile = async (req, res, next) => {
+    try {
+        const { name, height, weight, goal, photo_url, password } = req.body;
+        
+        let dataToUpdate = {};
+        if (name) dataToUpdate.name = name;
+        if (height) dataToUpdate.height = height;
+        if (weight) dataToUpdate.weight = weight;
+        if (goal) dataToUpdate.goal = goal;
+        if (photo_url !== undefined) dataToUpdate.photo_url = photo_url;
+
+        if (password && password.trim() !== "") {
+            const salt = await bcrypt.genSalt(10);
+            dataToUpdate.password = await bcrypt.hash(password, salt);
+        }
+
+        const updatedUser = await prisma.user.update({
+            where: { id_user: req.user.id },
+            data: dataToUpdate
+        });
+        
+        const { password: pw, ...userData } = updatedUser;
+        res.json(userData);
+    } catch (error) {
+        next(error); 
+    }
+};
+
 const updateUserByAdmin = async (req, res, next) => {
     const { id } = req.params;
     try {
+        const { name, height, weight, goal, photo_url, active, role } = req.body;
+        
+        let dataToUpdate = {};
+        if (name) dataToUpdate.name = name;
+        if (height) dataToUpdate.height = height;
+        if (weight) dataToUpdate.weight = weight;
+        if (goal) dataToUpdate.goal = goal;
+        if (photo_url !== undefined) dataToUpdate.photo_url = photo_url;
+        if (role) dataToUpdate.role = role;
+        
+        if (active !== undefined) {
+            dataToUpdate.active = active;
+        }
+
         const updatedUser = await prisma.user.update({
             where: { id_user: parseInt(id) },
-            data: req.body
+            data: dataToUpdate
         });
         const { password, ...userData } = updatedUser;
         res.json(userData);

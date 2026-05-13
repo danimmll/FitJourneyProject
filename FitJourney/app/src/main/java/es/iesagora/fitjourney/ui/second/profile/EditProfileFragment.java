@@ -235,12 +235,7 @@ public class EditProfileFragment extends Fragment {
             binding.tilName.setError(null);
         }
 
-        if (goalStr.isEmpty()) {
-            binding.tLGoal.setError("Selecciona un objetivo principal");
-            return;
-        } else {
-            binding.tLGoal.setError(null);
-        }
+        binding.tLGoal.setError(null);
 
         String finalPhotoData;
         if (selectedLocalImageUri != null) {
@@ -257,7 +252,11 @@ public class EditProfileFragment extends Fragment {
 
         User updatedUser = new User();
         updatedUser.setName(name);
-        updatedUser.setGoal(goalStr);
+
+        if (!goalStr.isEmpty()) {
+            updatedUser.setGoal(goalStr);
+        }
+
         updatedUser.setPhotoUrl(finalPhotoData);
 
         if (!isAdminEdit && !newPasswordStr.isEmpty()) {
