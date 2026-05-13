@@ -182,6 +182,30 @@ public class ExerciseDetailFragment extends Fragment {
                 binding.ivDetailImage,
                 R.drawable.ic_ejercicios
         );
+
+        if (binding.adminPanel.getVisibility() == View.VISIBLE && binding.btnToggleActive != null) {
+            boolean isActive = exercise.getActive() != null && exercise.getActive() == 1;
+
+            binding.btnToggleActive.setText(isActive ? "Desactivar" : "Activar");
+            binding.btnToggleActive.setBackgroundColor(isActive ?
+                    android.graphics.Color.parseColor("#FF9800") : // Naranja para desactivar
+                    android.graphics.Color.parseColor("#4CAF50")); // Verde para activar
+
+            binding.btnToggleActive.setOnClickListener(v -> {
+                String action = isActive ? "desactivar" : "activar";
+                new AlertDialog.Builder(requireContext())
+                        .setTitle(action.toUpperCase() + " Ejercicio")
+                        .setMessage("¿Seguro que quieres " + action + " este ejercicio?")
+                        .setPositiveButton("Sí", (dialog, which) -> {
+                            viewModel.toggleExerciseStatus(exercise.getIdExercise(), () -> {
+                                Toast.makeText(getContext(), "Estado cambiado", Toast.LENGTH_SHORT).show();
+                                requireActivity().getOnBackPressedDispatcher().onBackPressed();
+                            });
+                        })
+                        .setNegativeButton("Cancelar", null)
+                        .show();
+            });
+        }
     }
 
     /**

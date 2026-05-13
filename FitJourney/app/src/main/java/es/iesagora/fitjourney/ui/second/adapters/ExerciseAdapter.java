@@ -15,6 +15,8 @@ import androidx.lifecycle.ViewModel;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.card.MaterialCardView;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,56 +30,32 @@ import es.iesagora.fitjourney.viewmodel.SecondViewModel;
  *
  * <p>Este adapter gestiona la visualización de cada ejercicio, incluyendo:</p>
  * <ul>
- *     <li>Nombre del ejercicio.</li>
- *     <li>Grupo muscular.</li>
- *     <li>Nivel de dificultad representado visualmente.</li>
- *     <li>Imagen del ejercicio (URL o Base64).</li>
- *     <li>Navegación al detalle del ejercicio.</li>
+ * <li>Nombre del ejercicio.</li>
+ * <li>Grupo muscular.</li>
+ * <li>Nivel de dificultad representado visualmente.</li>
+ * <li>Estado (Borde rojo si está inactivo para los administradores).</li>
+ * <li>Imagen del ejercicio (URL o Base64).</li>
+ * <li>Navegación al detalle del ejercicio.</li>
  * </ul>
- *
- * <p>También permite seleccionar un ejercicio y guardarlo en el ViewModel compartido.</p>
  */
 public class ExerciseAdapter extends RecyclerView.Adapter<ExerciseAdapter.ExerciseViewHolder> {
 
-    /** Lista de ejercicios a mostrar */
     private List<Exercise> exercises;
-
-    /** Contexto de la UI */
     private Context context;
-
-    /** ViewModel compartido para seleccionar ejercicios */
     private final SecondViewModel viewModel;
 
-    /**
-     * Constructor del adapter.
-     *
-     * @param context contexto de la aplicación
-     * @param viewModel ViewModel compartido para comunicación con el detalle
-     */
     public ExerciseAdapter(Context context, ViewModel viewModel) {
         this.context = context;
         this.exercises = new ArrayList<>();
         this.viewModel = (SecondViewModel) viewModel;
     }
 
-    /**
-     * Actualiza la lista de ejercicios mostrados.
-     *
-     * @param exercises nueva lista de ejercicios
-     */
     @SuppressLint("NotifyDataSetChanged")
     public void setExercises(List<Exercise> exercises) {
         this.exercises = exercises;
         notifyDataSetChanged();
     }
 
-    /**
-     * Infla el layout de cada item del RecyclerView.
-     *
-     * @param parent contenedor padre
-     * @param viewType tipo de vista
-     * @return ViewHolder del ejercicio
-     */
     @NonNull
     @Override
     public ExerciseViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -87,20 +65,6 @@ public class ExerciseAdapter extends RecyclerView.Adapter<ExerciseAdapter.Exerci
         return new ExerciseViewHolder(view);
     }
 
-    /**
-     * Vincula los datos del ejercicio con la vista.
-     *
-     * <p>Se encarga de:</p>
-     * <ul>
-     *     <li>Mostrar nombre y grupo muscular.</li>
-     *     <li>Representar la dificultad con barras visuales.</li>
-     *     <li>Cargar imagen (URL o Base64).</li>
-     *     <li>Gestionar navegación al detalle.</li>
-     * </ul>
-     *
-     * @param holder ViewHolder del item
-     * @param position posición del elemento
-     */
     @Override
     public void onBindViewHolder(@NonNull ExerciseViewHolder holder, int position) {
 
@@ -131,6 +95,18 @@ public class ExerciseAdapter extends RecyclerView.Adapter<ExerciseAdapter.Exerci
             holder.diffLine3.setBackgroundColor(colorActive);
         }
 
+        boolean isInactive = exercise.getActive() != null && exercise.getActive() == 0;
+
+        if (isInactive) {
+            holder.cardExercise.setStrokeColor(Color.parseColor("#E52D27"));
+            holder.cardExercise.setStrokeWidth(4);
+            holder.tvName.setTextColor(Color.parseColor("#E52D27"));
+        } else {
+            holder.cardExercise.setStrokeColor(ContextCompat.getColor(context, R.color.stroke));
+            holder.cardExercise.setStrokeWidth(2);
+            holder.tvName.setTextColor(ContextCompat.getColor(context, R.color.text));
+        }
+
         ImageUtils.loadInto(
                 context,
                 exercise.getImageUrl(),
@@ -146,21 +122,14 @@ public class ExerciseAdapter extends RecyclerView.Adapter<ExerciseAdapter.Exerci
         });
     }
 
-    /**
-     * Devuelve el número total de ejercicios en la lista.
-     *
-     * @return tamaño de la lista
-     */
     @Override
     public int getItemCount() {
         return exercises != null ? exercises.size() : 0;
     }
 
-    /**
-     * ViewHolder que representa cada tarjeta de ejercicio.
-     */
     public static class ExerciseViewHolder extends RecyclerView.ViewHolder {
 
+        MaterialCardView cardExercise;
         ImageView ivImage;
         TextView tvName;
         TextView tvMuscle;
@@ -168,13 +137,11 @@ public class ExerciseAdapter extends RecyclerView.Adapter<ExerciseAdapter.Exerci
         View diffLine2;
         View diffLine3;
 
-        /**
-         * Inicializa las vistas del item.
-         *
-         * @param itemView vista inflada del ejercicio
-         */
         public ExerciseViewHolder(@NonNull View itemView) {
             super(itemView);
+
+            // Enlazamos el CardView raíz
+            cardExercise = itemView.findViewById(R.id.cardExercise);
 
             ivImage = itemView.findViewById(R.id.ivExercise);
             tvName = itemView.findViewById(R.id.tvExerciseName);

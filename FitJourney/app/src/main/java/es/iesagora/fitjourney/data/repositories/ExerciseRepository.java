@@ -23,6 +23,8 @@ import retrofit2.Response;
  */
 public class ExerciseRepository {
 
+    private static final String ERROR_CONEXION_STRING = "Error de conexión: ";
+
     /**
      * Instancia de la API utilizada para realizar peticiones.
      */
@@ -91,7 +93,7 @@ public class ExerciseRepository {
             public void onFailure(@NonNull Call<List<Exercise>> call,
                                   @NonNull Throwable t) {
 
-                callBack.onResult(Resource.error("Error de conexión: " + t.getMessage()));
+                callBack.onResult(Resource.error(ERROR_CONEXION_STRING + t.getMessage()));
             }
         });
     }
@@ -122,7 +124,7 @@ public class ExerciseRepository {
             public void onFailure(@NonNull Call<Exercise> call,
                                   @NonNull Throwable t) {
 
-                callback.onResult(Resource.error("Error de conexión: " + t.getMessage()));
+                callback.onResult(Resource.error(ERROR_CONEXION_STRING + t.getMessage()));
             }
         });
     }
@@ -153,7 +155,7 @@ public class ExerciseRepository {
             public void onFailure(@NonNull Call<Void> call,
                                   @NonNull Throwable t) {
 
-                callback.onResult(Resource.error("Error de conexión: " + t.getMessage()));
+                callback.onResult(Resource.error(ERROR_CONEXION_STRING + t.getMessage()));
             }
         });
     }
@@ -184,7 +186,7 @@ public class ExerciseRepository {
             public void onFailure(@NonNull Call<Exercise> call,
                                   @NonNull Throwable t) {
 
-                callback.onResult(Resource.error("Error de conexión: " + t.getMessage()));
+                callback.onResult(Resource.error(ERROR_CONEXION_STRING + t.getMessage()));
             }
         });
     }
@@ -216,8 +218,32 @@ public class ExerciseRepository {
             public void onFailure(@NonNull Call<Void> call,
                                   @NonNull Throwable t) {
 
-                callback.onResult(Resource.error("Error de conexión: " + t.getMessage()));
+                callback.onResult(Resource.error(ERROR_CONEXION_STRING + t.getMessage()));
             }
         });
     }
+
+    /**
+     * Alterna el estado activo/inactivo de un ejercicio.
+     * * @param id Identificador del ejercicio.
+     * @param callback Callback con el resultado (devuelve el ejercicio actualizado).
+     */
+    public void toggleExerciseStatus(int id, CreateCallback callback) {
+        callback.onResult(Resource.loading());
+        api.toggleExerciseStatus(id).enqueue(new Callback<>() {
+            @Override
+            public void onResponse(@NonNull Call<Exercise> call, @NonNull Response<Exercise> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    callback.onResult(Resource.success(response.body()));
+                } else {
+                    callback.onResult(Resource.error("Error al cambiar estado: " + response.code()));
+                }
+            }
+            @Override
+            public void onFailure(@NonNull Call<Exercise> call, @NonNull Throwable t) {
+                callback.onResult(Resource.error(ERROR_CONEXION_STRING + t.getMessage()));
+            }
+        });
+    }
+
 }

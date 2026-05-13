@@ -1,74 +1,65 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/fondo">
+    android:background="@color/fondo"
+    android:fillViewport="true">
 
-    <FrameLayout
-        android:id="@+id/frameHero"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/guidelineCenter"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <ImageView
-            android:id="@+id/ivDetailImage"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:contentDescription="@string/exercise_image"
-            android:scaleType="centerCrop"
-            android:src="@drawable/ic_launcher_background" />
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@drawable/gradient_hero" />
-
-        <TextView
-            android:id="@+id/tvDetailName"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
-            android:layout_margin="24dp"
-            android:fontFamily="sans-serif-black"
-            android:lineSpacingExtra="2dp"
-            android:textAllCaps="true"
-            android:textColor="@color/text"
-            android:textSize="24sp"
-            tools:text="Barbell Bench Press" />
-    </FrameLayout>
-
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guidelineCenter"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.4" />
+        android:baselineAligned="false"
+        android:orientation="horizontal"
+        android:padding="24dp"
+        android:weightSum="2">
 
-    <androidx.core.widget.NestedScrollView
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:fillViewport="true"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/guidelineCenter"
-        app:layout_constraintTop_toTopOf="parent">
+        <FrameLayout
+            android:id="@+id/frameHero"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginEnd="16dp"
+            android:layout_weight="1">
+
+            <ImageView
+                android:id="@+id/ivDetailImage"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:contentDescription="@string/exercise_image"
+                android:scaleType="centerCrop"
+                tools:src="@drawable/ic_launcher_background" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/gradient_hero" />
+
+        </FrameLayout>
 
         <LinearLayout
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="24dp">
+            android:layout_marginStart="16dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tvDetailName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-black"
+                android:lineSpacingExtra="2dp"
+                android:textAllCaps="true"
+                android:textColor="@color/text"
+                android:textSize="28sp"
+                tools:text="Barbell Bench Press" />
 
             <LinearLayout
                 android:id="@+id/linearLayoutTags"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
                 android:orientation="horizontal">
 
                 <TextView
@@ -78,11 +69,11 @@
                     android:background="@drawable/rounded"
                     android:backgroundTint="@color/mainrosa"
                     android:letterSpacing="0.08"
-                    android:paddingHorizontal="12dp"
-                    android:paddingVertical="6dp"
+                    android:paddingHorizontal="16dp"
+                    android:paddingVertical="8dp"
                     android:textAllCaps="true"
                     android:textColor="@color/text"
-                    android:textSize="11sp"
+                    android:textSize="12sp"
                     android:textStyle="bold"
                     tools:text="Pecho" />
 
@@ -90,24 +81,25 @@
                     android:id="@+id/tvDetailDifficulty"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="10dp"
+                    android:layout_marginStart="8dp"
                     android:background="@drawable/rounded"
                     android:backgroundTint="@color/mainazul"
                     android:letterSpacing="0.08"
-                    android:paddingHorizontal="12dp"
-                    android:paddingVertical="6dp"
+                    android:paddingHorizontal="16dp"
+                    android:paddingVertical="8dp"
                     android:textAllCaps="true"
                     android:textColor="@color/text"
-                    android:textSize="11sp"
+                    android:textSize="12sp"
                     android:textStyle="bold"
                     tools:text="Avanzado" />
+
             </LinearLayout>
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnYoutube"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
-                android:layout_marginTop="24dp"
+                android:layout_marginTop="20dp"
                 android:backgroundTint="#E52D27"
                 android:letterSpacing="0.05"
                 android:text="VER VÍDEO EN YOUTUBE"
@@ -128,7 +120,7 @@
                 android:id="@+id/tvLabelInstructions"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
+                android:layout_marginTop="16dp"
                 android:drawablePadding="8dp"
                 android:fontFamily="sans-serif-black"
                 android:letterSpacing="0.1"
@@ -136,14 +128,15 @@
                 android:textAllCaps="true"
                 android:textColor="@color/mainrosa"
                 android:textSize="16sp"
-                android:drawableStart="@android:drawable/ic_menu_sort_by_size"
+                app:drawableStartCompat="@android:drawable/ic_menu_sort_by_size"
                 app:drawableTint="@color/mainrosa" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rvInstructions"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
+                android:layout_marginTop="16dp"
+                android:clipToPadding="false"
                 android:nestedScrollingEnabled="false"
                 tools:listitem="@layout/viewholder_instruction" />
 
@@ -152,40 +145,58 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="32dp"
-                android:orientation="horizontal"
+                android:orientation="vertical"
                 android:visibility="gone"
                 tools:visibility="visible">
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnEdit"
-                    android:layout_width="0dp"
-                    android:layout_height="50dp"
-                    android:layout_weight="1"
-                    android:layout_marginEnd="6dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
                     android:backgroundTint="@color/mainazul"
                     android:text="@string/edit"
+                    android:textAllCaps="true"
                     android:textColor="@color/text"
                     android:textStyle="bold"
                     app:cornerRadius="12dp"
                     app:icon="@android:drawable/ic_menu_edit"
+                    app:iconGravity="textStart"
+                    app:iconTint="@color/text" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnToggleActive"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:layout_marginTop="12dp"
+                    android:backgroundTint="#FF9800"
+                    android:text="Desactivar"
+                    android:textColor="@color/text"
+                    android:textStyle="bold"
+                    android:textAllCaps="true"
+                    app:cornerRadius="12dp"
+                    app:icon="@android:drawable/ic_secure"
+                    app:iconGravity="textStart"
                     app:iconTint="@color/text" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnDelete"
-                    android:layout_width="0dp"
-                    android:layout_height="50dp"
-                    android:layout_weight="1"
-                    android:layout_marginStart="6dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:layout_marginTop="12dp"
                     android:backgroundTint="#C62828"
                     android:text="@string/delete"
+                    android:textAllCaps="true"
                     android:textColor="@color/text"
                     android:textStyle="bold"
                     app:cornerRadius="12dp"
                     app:icon="@android:drawable/ic_menu_delete"
+                    app:iconGravity="textStart"
                     app:iconTint="@color/text" />
+
             </LinearLayout>
 
         </LinearLayout>
-    </androidx.core.widget.NestedScrollView>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
+
+</androidx.core.widget.NestedScrollView>

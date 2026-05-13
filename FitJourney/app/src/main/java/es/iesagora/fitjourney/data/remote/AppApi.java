@@ -11,6 +11,7 @@ import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.DELETE;
 import retrofit2.http.GET;
+import retrofit2.http.PATCH;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Path;
@@ -166,6 +167,9 @@ public interface AppApi {
      */
     @DELETE("exercises/{id}")
     Call<Void> deleteExercise(@Path("id") int id);
+
+    @PATCH("api/exercises/{id}/toggle")
+    Call<Exercise> toggleExerciseStatus(@Path("id") int id);
 
     // ── FAVORITOS ─────────────────────────────────────────────────────────────
 

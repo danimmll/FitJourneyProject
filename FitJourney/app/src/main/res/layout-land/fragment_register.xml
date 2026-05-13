@@ -279,7 +279,8 @@
                                         android:focusable="false"
                                         android:inputType="none"
                                         android:textColor="@color/text"
-                                        android:textColorHint="@color/textSecondary" />
+                                        android:textColorHint="@color/textSecondary"
+                                        tools:ignore="TooDeepLayout" />
                                 </com.google.android.material.textfield.TextInputLayout>
                             </LinearLayout>
 

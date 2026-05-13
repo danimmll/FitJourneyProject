@@ -155,11 +155,11 @@
 
         <LinearLayout
             android:id="@+id/adminPanel"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="24dp"
             android:layout_marginTop="32dp"
-            android:orientation="horizontal"
+            android:orientation="vertical"
             android:visibility="gone"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -168,9 +168,8 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnEdit"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="56dp"
-                android:layout_weight="1"
                 android:backgroundTint="@color/mainazul"
                 android:text="@string/edit"
                 android:textColor="@color/text"
@@ -182,10 +181,25 @@
                 app:iconTint="@color/text" />
 
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnDelete"
-                android:layout_width="0dp"
+                android:id="@+id/btnToggleActive"
+                android:layout_width="match_parent"
                 android:layout_height="56dp"
-                android:layout_weight="1"
+                android:layout_marginTop="12dp"
+                android:backgroundTint="#FF9800"
+                android:text="Desactivar"
+                android:textColor="@color/text"
+                android:textStyle="bold"
+                android:textAllCaps="true"
+                app:cornerRadius="12dp"
+                app:icon="@android:drawable/ic_secure"
+                app:iconGravity="textStart"
+                app:iconTint="@color/text" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnDelete"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:layout_marginTop="12dp"
                 android:backgroundTint="#C62828"
                 android:text="@string/delete"
                 android:textColor="@color/text"

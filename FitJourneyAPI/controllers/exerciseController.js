@@ -3,9 +3,11 @@ const prisma = new PrismaClient();
 
 const getExercises = async (req, res, next) => {
     try {
+        // Si es admin, no filtramos (ve todos). Si es usuario normal, solo los activos (active: 1)
+        const filter = req.user.role === 'admin' ? {} : { active: 1 };
+
         const exercises = await prisma.exercise.findMany({
-            where: { active: 1 },
-            orderBy: { name: 'asc' }
+            where: filter
         });
         res.json(exercises);
     } catch (error) {
@@ -110,4 +112,20 @@ const getExerciseById = async (req, res, next) => {
     }
 };
 
-module.exports = { getExercises, createExercise, updateExercise, deleteExercise, getExerciseById };
+const toggleExercise = async (req, res, next) => {
+    const { id } = req.params;
+    try {
+        const exercise = await prisma.exercise.findUnique({ where: { id_exercise: parseInt(id) } });
+        if (!exercise) return res.status(404).json({ message: 'Ejercicio no encontrado' });
+
+        const updated = await prisma.exercise.update({
+            where: { id_exercise: parseInt(id) },
+            data: { active: exercise.active === 1 ? 0 : 1 }
+        });
+        res.json(updated);
+    } catch (error) {
+        next(error);
+    }
+};
+
+module.exports = { getExercises, createExercise, updateExercise, deleteExercise, getExerciseById, toggleExercise };

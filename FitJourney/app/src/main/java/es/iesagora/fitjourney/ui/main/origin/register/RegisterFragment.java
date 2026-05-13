@@ -452,7 +452,6 @@ public class RegisterFragment extends Fragment {
             if (w < 20 || w > 300) {
                 throw new NumberFormatException();
             }
-            assert binding.tlWeight != null;
             binding.tlWeight.setError(null);
         } catch (Exception e) {
             assert binding.tlWeight != null;
