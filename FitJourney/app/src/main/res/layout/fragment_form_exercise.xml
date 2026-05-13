@@ -65,43 +65,20 @@
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/tilDifficulty"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:hint="@string/difficulty"
-            android:textColorHint="#B0B0B0"
             app:boxStrokeColor="@color/mainazul"
             app:hintTextColor="@color/mainazul"
             app:layout_constraintTop_toBottomOf="@id/tilMuscle">
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etDifficulty"
+            <AutoCompleteTextView
+                android:id="@+id/actvDifficulty"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="textCapWords"
-                android:textColor="@color/text" />
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/tilDescription"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:hint="@string/description"
-            android:textColorHint="#B0B0B0"
-            app:boxStrokeColor="@color/mainazul"
-            app:hintTextColor="@color/mainazul"
-            app:layout_constraintTop_toBottomOf="@id/tilDifficulty">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etDescription"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="top"
-                android:inputType="textMultiLine"
-                android:minLines="4"
+                android:inputType="none"
                 android:textColor="@color/text" />
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -115,7 +92,7 @@
             android:textColorHint="#B0B0B0"
             app:boxStrokeColor="@color/mainazul"
             app:hintTextColor="@color/mainazul"
-            app:layout_constraintTop_toBottomOf="@id/tilDescription">
+            app:layout_constraintTop_toBottomOf="@id/tilDifficulty">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etVideoUrl"
@@ -182,6 +159,28 @@
             </com.google.android.material.card.MaterialCardView>
         </LinearLayout>
 
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tilDescription"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:hint="@string/description"
+            android:textColorHint="#B0B0B0"
+            app:boxStrokeColor="@color/mainazul"
+            app:hintTextColor="@color/mainazul"
+            app:layout_constraintTop_toBottomOf="@id/layoutImage">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etDescription"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="top"
+                android:inputType="textMultiLine"
+                android:minLines="5"
+                android:textColor="@color/text" />
+        </com.google.android.material.textfield.TextInputLayout>
+
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnSave"
             android:layout_width="match_parent"
@@ -195,7 +194,7 @@
             android:textStyle="bold"
             app:cornerRadius="12dp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/layoutImage"
+            app:layout_constraintTop_toBottomOf="@id/tilDescription"
             app:layout_constraintVertical_bias="1.0" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

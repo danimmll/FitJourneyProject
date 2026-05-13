@@ -71,20 +71,19 @@
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/tilDifficulty"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:hint="@string/difficulty"
-                android:textColorHint="#B0B0B0"
                 app:boxStrokeColor="@color/mainazul"
                 app:hintTextColor="@color/mainazul">
 
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/etDifficulty"
+                <AutoCompleteTextView
+                    android:id="@+id/actvDifficulty"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="textCapWords"
+                    android:inputType="none"
                     android:textColor="@color/text" />
             </com.google.android.material.textfield.TextInputLayout>
 

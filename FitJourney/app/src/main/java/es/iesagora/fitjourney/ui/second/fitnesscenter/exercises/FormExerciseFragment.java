@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -22,13 +23,6 @@ import es.iesagora.fitjourney.databinding.FragmentFormExerciseBinding;
 import es.iesagora.fitjourney.utils.ImageUtils;
 import es.iesagora.fitjourney.viewmodel.SecondViewModel;
 
-/**
- * Fragment encargado de crear y editar ejercicios dentro del Fitness Center.
- *
- * <p>Este fragment permite al usuario administrador crear nuevos ejercicios o editar existentes,
- * gestionando información como nombre, grupo muscular, dificultad, descripción, imagen
- * (por URL o galería local) y enlace al videotutorial de YouTube.</p>
- */
 public class FormExerciseFragment extends Fragment {
 
     private FragmentFormExerciseBinding binding;
@@ -38,9 +32,10 @@ public class FormExerciseFragment extends Fragment {
     private Uri selectedLocalImageUri = null;
     private String currentImageBase64 = null;
 
-    /**
-     * Launcher para seleccionar imagen desde la galería usando el contrato GetContent.
-     */
+    private static final String PRINCIPIANTE_STRING = "Principiante";
+    private static final String INTERMEDIO_STRING = "Intermedio";
+    private static final String EXPERTO_STRING = "Experto";
+
     private final ActivityResultLauncher<String> getContent =
             registerForActivityResult(new ActivityResultContracts.GetContent(), uri -> {
                 if (uri != null) {
@@ -65,6 +60,8 @@ public class FormExerciseFragment extends Fragment {
 
         viewModel = new ViewModelProvider(requireActivity()).get(SecondViewModel.class);
 
+        setupDropdowns();
+
         if (getArguments() != null && getArguments().containsKey("exercise_data")) {
             exerciseToEdit = (Exercise) getArguments().getSerializable("exercise_data");
         }
@@ -79,9 +76,12 @@ public class FormExerciseFragment extends Fragment {
         setupListeners();
     }
 
-    /**
-     * Configura los eventos de los botones y los focos de los campos de texto.
-     */
+    private void setupDropdowns() {
+        String[] difficulties = {PRINCIPIANTE_STRING, INTERMEDIO_STRING, EXPERTO_STRING};
+        ArrayAdapter<String> adapterDifficulty = new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, difficulties);
+        binding.actvDifficulty.setAdapter(adapterDifficulty);
+    }
+
     private void setupListeners() {
         binding.btnSelectImage.setOnClickListener(v -> getContent.launch("image/*"));
         binding.ivPreview.setOnClickListener(v -> getContent.launch("image/*"));
@@ -100,19 +100,22 @@ public class FormExerciseFragment extends Fragment {
         binding.btnSave.setOnClickListener(v -> saveExercise());
     }
 
-    /**
-     * Configura el formulario en modo edición cargando los datos existentes del ejercicio.
-     */
     private void setupEditMode() {
         binding.tvFormTitle.setText(R.string.edit_exercise);
         binding.btnSave.setText(R.string.update);
 
         binding.etName.setText(exerciseToEdit.getName());
-        binding.etDifficulty.setText(exerciseToEdit.getDifficulty());
         binding.etDescription.setText(exerciseToEdit.getDescription());
 
-        String muscle = exerciseToEdit.getMuscleGroup();
-        binding.etMuscle.setText(muscle);
+        binding.etMuscle.setText(exerciseToEdit.getMuscleGroup());
+
+        String diff = exerciseToEdit.getDifficulty();
+        if (diff != null) {
+            if (diff.equals("1")) diff = PRINCIPIANTE_STRING;
+            else if (diff.equals("2")) diff = INTERMEDIO_STRING;
+            else if (diff.equals("3")) diff = EXPERTO_STRING;
+            binding.actvDifficulty.setText(diff, false);
+        }
 
         if (exerciseToEdit.getVideoUrl() != null) {
             binding.etVideoUrl.setText(exerciseToEdit.getVideoUrl());
@@ -131,25 +134,27 @@ public class FormExerciseFragment extends Fragment {
         }
     }
 
-    /**
-     * Valida y guarda un ejercicio (creación o actualización).
-     */
     private void saveExercise() {
         String name = Objects.requireNonNull(binding.etName.getText()).toString().trim();
-        String muscle = Objects.requireNonNull(binding.etMuscle.getText()).toString().trim();
-        String difficulty = Objects.requireNonNull(binding.etDifficulty.getText()).toString().trim();
         String description = Objects.requireNonNull(binding.etDescription.getText()).toString().trim();
         String imageUrlStr = Objects.requireNonNull(binding.etImageUrl.getText()).toString().trim();
+
+        String muscle = Objects.requireNonNull(binding.etMuscle.getText()).toString().trim();
+        String diffStr = binding.actvDifficulty.getText().toString().trim();
 
         String videoUrl = "";
         if (binding.etVideoUrl.getText() != null) {
             videoUrl = binding.etVideoUrl.getText().toString().trim();
         }
 
-        if (name.isEmpty() || muscle.isEmpty() || difficulty.isEmpty() || description.isEmpty()) {
+        if (name.isEmpty() || muscle.isEmpty() || diffStr.isEmpty() || description.isEmpty()) {
             Toast.makeText(getContext(), "Faltan datos obligatorios", Toast.LENGTH_SHORT).show();
             return;
         }
+
+        String difficultyId = "1";
+        if (diffStr.equals(INTERMEDIO_STRING)) difficultyId = "2";
+        else if (diffStr.equals(EXPERTO_STRING)) difficultyId = "3";
 
         String finalPhotoData;
 
@@ -167,7 +172,7 @@ public class FormExerciseFragment extends Fragment {
 
         Exercise newExercise = new Exercise();
         newExercise.setName(name);
-        newExercise.setDifficulty(difficulty);
+        newExercise.setDifficulty(difficultyId);
         newExercise.setDescription(description);
         newExercise.setMuscleGroup(muscle);
         newExercise.setImageUrl(finalPhotoData);

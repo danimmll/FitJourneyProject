@@ -168,7 +168,7 @@ public interface AppApi {
     @DELETE("exercises/{id}")
     Call<Void> deleteExercise(@Path("id") int id);
 
-    @PATCH("api/exercises/{id}/toggle")
+    @POST("api/exercises/{id}/toggle")
     Call<Exercise> toggleExerciseStatus(@Path("id") int id);
 
     // ── FAVORITOS ─────────────────────────────────────────────────────────────

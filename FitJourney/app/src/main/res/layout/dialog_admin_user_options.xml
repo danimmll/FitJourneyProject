@@ -53,7 +53,7 @@
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/btnBanUser"
+        android:id="@+id/btnToggleStatus"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="?attr/selectableItemBackground"
@@ -64,40 +64,20 @@
         android:paddingVertical="12dp">
 
         <ImageView
+            android:id="@+id/ivToggleIcon"
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:src="@android:drawable/ic_secure"
-            app:tint="#FFA500" /> <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:text="Banear / Suspender"
-        android:textColor="#FFA500"
-        android:textSize="16sp" />
-    </LinearLayout>
+            app:tint="#E52D27" />
 
-    <LinearLayout
-        android:id="@+id/btnDeleteUser"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="?attr/selectableItemBackground"
-        android:clickable="true"
-        android:focusable="true"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
-        android:paddingVertical="12dp">
-
-        <ImageView
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:src="@android:drawable/ic_menu_delete"
-            app:tint="#FF4C4C" /> <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:text="Eliminar Cuenta"
-        android:textColor="#FF4C4C"
-        android:textSize="16sp" />
+        <TextView
+            android:id="@+id/tvToggleText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:text="Suspender Usuario"
+            android:textColor="#E52D27"
+            android:textSize="16sp" />
     </LinearLayout>
 
 </LinearLayout>

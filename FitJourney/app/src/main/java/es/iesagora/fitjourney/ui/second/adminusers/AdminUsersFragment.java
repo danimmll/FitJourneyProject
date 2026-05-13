@@ -181,8 +181,7 @@ public class AdminUsersFragment extends Fragment {
         TextView tvTitle = dialogView.findViewById(R.id.tvOptionsTitle);
 
         View btnEdit = dialogView.findViewById(R.id.btnEditUser);
-        View btnBan = dialogView.findViewById(R.id.btnBanUser);
-        View btnDelete = dialogView.findViewById(R.id.btnDeleteUser);
+        View btnBan = dialogView.findViewById(R.id.btnToggleStatus);
 
         tvTitle.setText("Opciones: " + user.getName());
 
@@ -193,12 +192,7 @@ public class AdminUsersFragment extends Fragment {
 
         btnBan.setOnClickListener(v -> {
             dialog.dismiss();
-            banUser(user);
-        });
-
-        btnDelete.setOnClickListener(v -> {
-            dialog.dismiss();
-            confirmDeleteUser(user);
+            confirmDesactivateUser(user);
         });
 
         dialog.show();
@@ -218,19 +212,12 @@ public class AdminUsersFragment extends Fragment {
     }
 
     /**
-     * Lanza la acción de banear/suspender a un usuario.
-     */
-    private void banUser(User user) {
-        viewModel.banUser(user.getIdUser());
-    }
-
-    /**
      * Muestra un diálogo de confirmación antes de eliminar permanentemente a un usuario.
      */
-    private void confirmDeleteUser(User user) {
+    private void confirmDesactivateUser(User user) {
 
         new MaterialAlertDialogBuilder(requireContext())
-                .setTitle("Eliminar Usuario")
+                .setTitle("Desactivar Usuario")
                 .setMessage(
                         "¿Estás seguro de que deseas eliminar permanentemente a "
                                 + user.getName()
