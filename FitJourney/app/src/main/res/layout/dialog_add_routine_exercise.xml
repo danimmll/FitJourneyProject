@@ -1,43 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="24dp"
+    android:padding="20dp"
     android:background="?attr/colorSurface">
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Añadir Ejercicio"
-        android:textSize="20sp"
+        android:text="Buscar y añadir ejercicio"
+        android:textSize="18sp"
         android:textStyle="bold"
-        android:textColor="@color/text"
-        android:layout_marginBottom="16dp"/>
+        android:textColor="@color/text" />
 
-    <com.google.android.material.textfield.TextInputLayout
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+    <androidx.appcompat.widget.SearchView
+        android:id="@+id/searchExercise"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:boxStrokeColor="@color/mainrosa"
-        android:hint="Buscar Ejercicio">
+        android:layout_marginTop="10dp"
+        app:iconifiedByDefault="false"
+        app:queryHint="Buscar ejercicio..." />
 
-        <AutoCompleteTextView
-            android:id="@+id/actvExercise"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="text"
-            tools:ignore="LabelFor" />
-    </com.google.android.material.textfield.TextInputLayout>
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvExercisePicker"
+        android:layout_width="match_parent"
+        android:layout_height="140dp"
+        android:layout_marginTop="8dp"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        android:orientation="horizontal" />
+
+    <TextView
+        android:id="@+id/tvSelectedExercise"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:text="Seleccionado: ninguno"
+        android:textStyle="bold"
+        android:textColor="@color/mainrosa" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:baselineAligned="false"
         android:orientation="horizontal"
-        android:layout_marginTop="16dp">
+        android:layout_marginTop="12dp">
 
         <com.google.android.material.textfield.TextInputLayout
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
@@ -45,8 +52,8 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:layout_marginEnd="8dp"
-            app:boxStrokeColor="@color/mainrosa"
-            android:hint="Series">
+            android:hint="Series"
+            app:boxStrokeColor="@color/mainrosa">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etSets"
@@ -61,8 +68,8 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:layout_marginStart="8dp"
-            app:boxStrokeColor="@color/mainrosa"
-            android:hint="Reps">
+            android:hint="Reps"
+            app:boxStrokeColor="@color/mainrosa">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etReps"
@@ -75,9 +82,12 @@
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnConfirmAdd"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
+        android:layout_height="56dp"
+        android:layout_marginTop="14dp"
         android:text="AÑADIR A LA RUTINA"
         android:textColor="@color/white"
-        app:backgroundTint="@color/mainrosa"/>
+        android:textStyle="bold"
+        app:cornerRadius="12dp"
+        app:backgroundTint="@color/mainrosa" />
+
 </LinearLayout>

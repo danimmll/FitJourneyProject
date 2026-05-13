@@ -1,70 +1,68 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:padding="24dp"
+    android:orientation="horizontal"
+    android:padding="20dp"
+    android:baselineAligned="false"
+    android:weightSum="2"
     android:background="?attr/colorSurface">
 
-    <TextView
-        android:layout_width="match_parent"
+    <LinearLayout
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Añadir Ejercicio"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        android:textColor="@color/text"
-        android:layout_marginBottom="16dp"/>
+        android:layout_weight="1"
+        android:layout_marginEnd="12dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Buscar y añadir ejercicio"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="@color/text" />
+
+        <androidx.appcompat.widget.SearchView
+            android:id="@+id/searchExercise"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            app:iconifiedByDefault="false"
+            app:queryHint="Buscar ejercicio..." />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvExercisePicker"
+            android:layout_width="match_parent"
+            android:layout_height="140dp"
+            android:layout_marginTop="8dp"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            android:orientation="vertical" />
+
+    </LinearLayout>
 
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:baselineAligned="false">
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:layout_marginStart="12dp"
+        android:gravity="center_vertical"
+        android:orientation="vertical">
 
-        <!-- Columna izquierda: buscador + botón -->
-        <LinearLayout
-            android:layout_width="0dp"
+        <TextView
+            android:id="@+id/tvSelectedExercise"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical"
-            android:layout_marginEnd="12dp">
+            android:text="Seleccionado: ninguno"
+            android:textStyle="bold"
+            android:textColor="@color/mainrosa" />
 
-            <com.google.android.material.textfield.TextInputLayout
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:boxStrokeColor="@color/mainrosa"
-                android:hint="Buscar Ejercicio">
-
-                <AutoCompleteTextView
-                    android:id="@+id/actvExercise"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:inputType="text"
-                    tools:ignore="LabelFor"/>
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnConfirmAdd"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:text="AÑADIR A LA RUTINA"
-                android:textColor="@color/white"
-                app:backgroundTint="@color/mainrosa"/>
-
-        </LinearLayout>
-
-        <!-- Columna derecha: series + reps -->
         <LinearLayout
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
             android:orientation="horizontal"
-            android:baselineAligned="false"
-            android:layout_marginStart="12dp">
+            android:layout_marginTop="16dp">
 
             <com.google.android.material.textfield.TextInputLayout
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
@@ -72,14 +70,14 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:layout_marginEnd="8dp"
-                app:boxStrokeColor="@color/mainrosa"
-                android:hint="Series">
+                android:hint="Series"
+                app:boxStrokeColor="@color/mainrosa">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etSets"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="number"/>
+                    android:inputType="number" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
@@ -88,17 +86,27 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:layout_marginStart="8dp"
-                app:boxStrokeColor="@color/mainrosa"
-                android:hint="Reps">
+                android:hint="Reps"
+                app:boxStrokeColor="@color/mainrosa">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etReps"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="number"/>
+                    android:inputType="number" />
             </com.google.android.material.textfield.TextInputLayout>
-
         </LinearLayout>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnConfirmAdd"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginTop="24dp"
+            android:text="AÑADIR A LA RUTINA"
+            android:textColor="@color/white"
+            android:textStyle="bold"
+            app:cornerRadius="12dp"
+            app:backgroundTint="@color/mainrosa" />
 
     </LinearLayout>
 
