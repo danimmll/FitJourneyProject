@@ -8,7 +8,6 @@ const userRoutes = require('./routes/userRoutes');
 const exerciseRoutes = require('./routes/exerciseRoutes');
 const routineRoutes = require('./routes/routineRoutes');
 const workoutRoutes = require('./routes/workoutRoutes');
-const favoriteRoutes = require('./routes/favoriteRoutes');
 
 const errorHandler = require('./middlewares/errorHandler');
 
