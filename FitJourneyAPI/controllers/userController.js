@@ -58,9 +58,9 @@ const updateProfile = async (req, res, next) => {
         
         let dataToUpdate = {};
         if (name) dataToUpdate.name = name;
-        if (height) dataToUpdate.height = height;
-        if (weight) dataToUpdate.weight = weight;
-        if (goal) dataToUpdate.goal = goal;
+        if (height !== undefined && height !== null) dataToUpdate.height = Number(height);
+        if (weight !== undefined && weight !== null) dataToUpdate.weight = Number(weight);
+        if (goal !== undefined) dataToUpdate.goal = goal;
         if (photo_url !== undefined) dataToUpdate.photo_url = photo_url;
 
         if (password && password.trim() !== "") {
@@ -87,14 +87,18 @@ const updateUserByAdmin = async (req, res, next) => {
         
         let dataToUpdate = {};
         if (name) dataToUpdate.name = name;
-        if (height) dataToUpdate.height = height;
-        if (weight) dataToUpdate.weight = weight;
-        if (goal) dataToUpdate.goal = goal;
+        if (height !== undefined && height !== null) dataToUpdate.height = Number(height);
+        if (weight !== undefined && weight !== null) dataToUpdate.weight = Number(weight);
+        if (goal !== undefined) dataToUpdate.goal = goal;
         if (photo_url !== undefined) dataToUpdate.photo_url = photo_url;
         if (role) dataToUpdate.role = role;
         
-        if (active !== undefined) {
+        if (typeof active === "number" && (active === 0 || active === 1)) {
             dataToUpdate.active = active;
+        }
+
+        if (Object.keys(dataToUpdate).length === 0) {
+            return res.status(400).json({ error: "No se recibieron campos válidos para actualizar" });
         }
 
         const updatedUser = await prisma.user.update({

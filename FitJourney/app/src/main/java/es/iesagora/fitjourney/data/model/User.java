@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class User implements Serializable {
 
-    private int idUser;
+    private Integer idUser;
     private String email;
     private String name;
     private String password;
@@ -25,16 +25,17 @@ public class User implements Serializable {
     private String birthDate;
     private String photoUrl;
     private String role;
-    private int active;
+    private Integer active;
     private String registerDate;
 
     /**
      * Constructor personalizado — CORREGIDO: antes el cuerpo estaba vacío
      * y todos los campos llegaban a null al servidor.
      */
-    public User(String id, String name, String email, String pass,
+    public User(Integer idUser, String name, String email, String pass,
                 String birthDate, String gender, String goal,
-                int height, float weight) {
+                Double height, Double weight) {
+        this.idUser     = idUser;
         this.name       = name;
         this.email      = email;
         this.password   = pass;
