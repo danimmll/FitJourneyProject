@@ -7,24 +7,24 @@ const router = express.Router();
  * @swagger
  * tags:
  * - name: Usuarios
- * description: Controladores para la arquitectura y mutación de perfiles demográficos
+ * description: Gestión de perfiles de usuario
  */
 
 /**
  * @swagger
  * /api/users:
  * get:
- * summary: Expone el catálogo absoluto de usuarios (Superposición jerárquica)
+ * summary: Obtiene todos los usuarios activos (solo admin)
  * tags: [Usuarios]
  * security:
  * - bearerAuth: []
  * responses:
  * 200:
- * description: Carga de directorio generada exitosamente
+ * description: Lista de usuarios obtenida correctamente
  * 401:
- * description: Certificado de autenticación ausente o mutado
+ * description: Token no válido o ausente
  * 403:
- * description: Interceptado por política restrictiva (No administrador)
+ * description: Acceso denegado por rol
  */
 router.get('/', authenticateToken, isAdmin, getAllUsers);
 
@@ -32,19 +32,19 @@ router.get('/', authenticateToken, isAdmin, getAllUsers);
  * @swagger
  * /api/users/profile:
  * get:
- * summary: Carga en memoria el registro demográfico de la sesión en curso
+ * summary: Obtiene el perfil del usuario autenticado
  * tags: [Usuarios]
  * security:
  * - bearerAuth: []
  * responses:
  * 200:
- * description: Nodo de perfil extraído con precisión
+ * description: Perfil obtenido correctamente
  * 401:
- * description: Denegación en capa de seguridad
+ * description: Token no válido
  * 404:
- * description: Identificador de objeto ausente en la capa de datos
+ * description: Usuario no encontrado
  * put:
- * summary: Procesa transacciones de sobrescritura sobre atributos del perfil propio
+ * summary: Actualiza el perfil del usuario autenticado
  * tags: [Usuarios]
  * security:
  * - bearerAuth: []
@@ -57,7 +57,7 @@ router.get('/', authenticateToken, isAdmin, getAllUsers);
  * properties:
  * name:
  * type: string
- * example: "Nuevo Nombre"
+ * example: Nuevo Nombre
  * weight:
  * type: number
  * example: 75.5
@@ -66,15 +66,15 @@ router.get('/', authenticateToken, isAdmin, getAllUsers);
  * example: 180
  * photo_url:
  * type: string
- * example: "https://midominio.com/foto.jpg"
+ * example: https://midominio.com/foto.jpg
  * goal:
  * type: string
- * example: "Ganar masa muscular"
+ * example: Ganar masa muscular
  * responses:
  * 200:
- * description: Modificación de los vértices ejecutada
+ * description: Perfil actualizado correctamente
  * 401:
- * description: Sesión criptográfica no constatada
+ * description: Token no válido
  */
 router.get('/profile', authenticateToken, getProfile);
 router.put('/profile', authenticateToken, updateProfile);
@@ -83,7 +83,7 @@ router.put('/profile', authenticateToken, updateProfile);
  * @swagger
  * /api/users/{id}:
  * put:
- * summary: Permite a un administrador sobrescribir el perfil de cualquier usuario
+ * summary: Actualiza un usuario específico (solo admin)
  * tags: [Usuarios]
  * security:
  * - bearerAuth: []
@@ -95,13 +95,13 @@ router.put('/profile', authenticateToken, updateProfile);
  * type: integer
  * responses:
  * 200:
- * description: Perfil actualizado por el administrador
+ * description: Usuario actualizado por admin
  * 401:
  * description: Token inválido
  * 403:
  * description: Rol insuficiente
  * delete:
- * summary: Ejecuta rutina de borrado lógico preservando integridad referencial
+ * summary: Desactiva lógicamente un usuario (solo admin)
  * tags: [Usuarios]
  * security:
  * - bearerAuth: []
@@ -111,14 +111,14 @@ router.put('/profile', authenticateToken, updateProfile);
  * required: true
  * schema:
  * type: integer
- * description: Clave primaria (PK) correspondiente al modelo de usuario
+ * description: ID del usuario
  * responses:
  * 200:
- * description: Cambio de bandera a estado inactivo verificado
+ * description: Usuario desactivado correctamente
  * 401:
- * description: Capa de autorización vulnerada
+ * description: Token inválido
  * 403:
- * description: Conflicto de propiedades; el token no pertenece a la fila afectada
+ * description: Rol insuficiente
  */
 router.put('/:id', authenticateToken, isAdmin, updateUserByAdmin);
 router.delete('/:id', authenticateToken, isAdmin, deleteUser);
