@@ -68,7 +68,6 @@ app.use('/api/users', userRoutes);
 app.use('/api/exercises', exerciseRoutes);
 app.use('/api/routines', routineRoutes);
 app.use('/api/workouts', workoutRoutes);
-app.use('/api/favorites', favoriteRoutes);
 
 // Manejo de errores
 app.use(errorHandler);

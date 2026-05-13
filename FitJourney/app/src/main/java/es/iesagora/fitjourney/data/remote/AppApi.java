@@ -168,28 +168,6 @@ public interface AppApi {
     @DELETE("exercises/{id}")
     Call<Void> deleteExercise(@Path("id") int id);
 
-    @POST("api/exercises/{id}/toggle")
-    Call<Exercise> toggleExerciseStatus(@Path("id") int id);
-
-    // ── FAVORITOS ─────────────────────────────────────────────────────────────
-
-    /**
-     * Obtiene la lista de ejercicios que el usuario autenticado ha marcado como favoritos.
-     *
-     * @return Una lista de objetos Exercise correspondientes a los favoritos del usuario.
-     */
-    @GET("favorites")
-    Call<List<Exercise>> getUserFavorites();
-
-    /**
-     * Añade o elimina un ejercicio de la lista de favoritos del usuario (comportamiento de interruptor o "toggle").
-     *
-     * @param request Objeto que contiene el ID del ejercicio sobre el que aplicar el toggle.
-     * @return Un ResponseBody confirmando el cambio de estado.
-     */
-    @POST("favorites")
-    Call<ResponseBody> toggleFavorite(@Body FavoriteRequest request);
-
     // ── RUTINAS ───────────────────────────────────────────────────────────────
 
     /**

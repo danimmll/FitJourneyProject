@@ -95,18 +95,6 @@ public class ExerciseAdapter extends RecyclerView.Adapter<ExerciseAdapter.Exerci
             holder.diffLine3.setBackgroundColor(colorActive);
         }
 
-        boolean isInactive = exercise.getActive() != null && exercise.getActive() == 0;
-
-        if (isInactive) {
-            holder.cardExercise.setStrokeColor(Color.parseColor("#E52D27"));
-            holder.cardExercise.setStrokeWidth(4);
-            holder.tvName.setTextColor(Color.parseColor("#E52D27"));
-        } else {
-            holder.cardExercise.setStrokeColor(ContextCompat.getColor(context, R.color.stroke));
-            holder.cardExercise.setStrokeWidth(2);
-            holder.tvName.setTextColor(ContextCompat.getColor(context, R.color.text));
-        }
-
         ImageUtils.loadInto(
                 context,
                 exercise.getImageUrl(),
@@ -129,7 +117,6 @@ public class ExerciseAdapter extends RecyclerView.Adapter<ExerciseAdapter.Exerci
 
     public static class ExerciseViewHolder extends RecyclerView.ViewHolder {
 
-        MaterialCardView cardExercise;
         ImageView ivImage;
         TextView tvName;
         TextView tvMuscle;
@@ -139,9 +126,6 @@ public class ExerciseAdapter extends RecyclerView.Adapter<ExerciseAdapter.Exerci
 
         public ExerciseViewHolder(@NonNull View itemView) {
             super(itemView);
-
-            // Enlazamos el CardView raíz
-            cardExercise = itemView.findViewById(R.id.cardExercise);
 
             ivImage = itemView.findViewById(R.id.ivExercise);
             tvName = itemView.findViewById(R.id.tvExerciseName);

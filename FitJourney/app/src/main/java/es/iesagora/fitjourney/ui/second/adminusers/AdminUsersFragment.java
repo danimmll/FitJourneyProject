@@ -214,7 +214,7 @@ public class AdminUsersFragment extends Fragment {
         Navigation.findNavController(requireView())
                 .navigate(R.id.editProfileFragment, bundle);
     }
-    
+
     /**
      * Lanza la acción para eliminar la cuenta de un usuario.
      */

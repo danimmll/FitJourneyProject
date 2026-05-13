@@ -293,24 +293,6 @@ public class SecondViewModel extends AndroidViewModel {
     }
 
     /**
-     * Alterna el estado (activar/desactivar) de un ejercicio llamando al repositorio.
-     *
-     * @param idExercise Identificador del ejercicio.
-     * @param onSuccess Callback a ejecutar tras cambiar el estado correctamente.
-     */
-    public void toggleExerciseStatus(int idExercise, Runnable onSuccess) {
-        repository.toggleExerciseStatus(idExercise, result -> {
-            if (result.status == Resource.Status.SUCCESS) {
-                fetchExercises(); // Recargamos la lista global
-                onSuccess.run();  // Ejecutamos la acción de vuelta (ej: cerrar fragmento o actualizar UI)
-            } else if (result.status == Resource.Status.ERROR) {
-                // Notificamos el error en la UI si lo necesitas (puedes usar un Toast en el fragmento o crear un LiveData específico para errores de ejercicio)
-                Toast.makeText(getApplication(), result.message != null ? result.message : "Error al cambiar estado", Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
-
-    /**
      * Devuelve el estado de la carga del perfil del usuario.
      *
      * @return LiveData con estado y perfil.

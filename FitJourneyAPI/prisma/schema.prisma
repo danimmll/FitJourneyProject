@@ -25,8 +25,6 @@ model User {
 
   routines    Routine[]
   workouts    Workout[]
-  favorites   Favorite[]
-  incidencias Incidencia[]
 }
 
 model Exercise {
@@ -39,11 +37,9 @@ model Exercise {
   video_url    String?
   equipment    String?
   creation_date DateTime @default(now())
-  active       Int      @default(1)
 
   routineExercises RoutineExercise[]
   workoutDetails   WorkoutDetail[]
-  favorites        Favorite[]
 }
 
 model Routine {
@@ -55,7 +51,6 @@ model Routine {
 
   user     User @relation(fields: [id_user], references: [id_user])
   id_user  Int
-  active       Int      @default(1)
   is_public    Int      @default(1)
 
   exercises RoutineExercise[]
@@ -89,7 +84,6 @@ model Workout {
   duration_minutes Int?
   calories_burned  Float?
   notes            String?
-  active           Int      @default(1)
 
   details WorkoutDetail[]
 }
@@ -106,30 +100,4 @@ model WorkoutDetail {
   sets_performed   Int?
   reps_performed   String?
   max_weight_used  Float?
-}
-
-model Favorite {
-  id_favorite Int @id @default(autoincrement())
-
-  user     User @relation(fields: [id_user], references: [id_user], onDelete: Cascade)
-  id_user  Int
-
-  exercise Exercise @relation(fields: [id_exercise], references: [id_exercise], onDelete: Cascade)
-  id_exercise Int
-
-  saved_date DateTime @default(now())
-
-  @@unique([id_user, id_exercise])
-}
-
-model Incidencia {
-  id_incidencia Int      @id @default(autoincrement())
-  mensaje       String   
-  endpoint      String? 
-  metodo        String?  
-  
-  user          User?    @relation(fields: [id_user], references: [id_user], onDelete: SetNull)
-  id_user       Int?
-  
-  register_date DateTime @default(now())
 }

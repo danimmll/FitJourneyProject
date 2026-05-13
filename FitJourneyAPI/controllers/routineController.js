@@ -33,11 +33,8 @@ const createRoutine = async (req, res, next) => {
 
 const getUserRoutines = async (req, res, next) => {
     try {
-        // Trae TODAS las rutinas activas. 
-        // El filtro de "Privadas/Públicas" se encarga de hacerlo el Frontend (RoutinesFragment)
         const routines = await prisma.routine.findMany({
             where: {
-                active: 1,
                 OR: [
                     { id_user: req.user.id },
                     { is_public: 1 }
@@ -80,7 +77,7 @@ const getRoutineById = async (req, res, next) => {
             include: { exercises: { include: { exercise: true } } }
         });
 
-        if (!routine || routine.active === 0) {
+        if (!routine) {
             return res.status(404).json({ error: "Rutina no encontrada" });
         }
 

@@ -224,27 +224,4 @@ public class ExerciseRepository {
         });
     }
 
-    /**
-     * Alterna el estado activo/inactivo de un ejercicio.
-     * * @param id Identificador del ejercicio.
-     * @param callback Callback con el resultado (devuelve el ejercicio actualizado).
-     */
-    public void toggleExerciseStatus(int id, CreateCallback callback) {
-        callback.onResult(Resource.loading());
-        api.toggleExerciseStatus(id).enqueue(new Callback<>() {
-            @Override
-            public void onResponse(@NonNull Call<Exercise> call, @NonNull Response<Exercise> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    callback.onResult(Resource.success(response.body()));
-                } else {
-                    callback.onResult(Resource.error("Error al cambiar estado: " + response.code()));
-                }
-            }
-            @Override
-            public void onFailure(@NonNull Call<Exercise> call, @NonNull Throwable t) {
-                callback.onResult(Resource.error(ERROR_CONEXION_STRING + t.getMessage()));
-            }
-        });
-    }
-
 }

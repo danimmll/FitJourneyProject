@@ -1,5 +1,5 @@
 const express = require('express');
-const { getExercises, createExercise, updateExercise, deleteExercise, getExerciseById,toggleExercise } = require('../controllers/exerciseController');
+const { getExercises, createExercise, updateExercise, deleteExercise, getExerciseById } = require('../controllers/exerciseController');
 const { authenticateToken, isAdmin } = require('../middlewares/auth');
 const router = express.Router();
 
@@ -142,6 +142,5 @@ router.post('/', authenticateToken, isAdmin, createExercise);
 router.get('/:id', authenticateToken, getExerciseById);
 router.put('/:id', authenticateToken, isAdmin, updateExercise);
 router.delete('/:id', authenticateToken, isAdmin, deleteExercise);
-router.patch('/:id/toggle', authenticateToken, isAdmin, toggleExercise);
 
 module.exports = router;

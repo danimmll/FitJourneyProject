@@ -27,6 +27,7 @@ import es.iesagora.fitjourney.R;
 import es.iesagora.fitjourney.data.model.User;
 import es.iesagora.fitjourney.data.remote.Resource;
 import es.iesagora.fitjourney.data.repositories.PreferencesRepository;
+import es.iesagora.fitjourney.databinding.DialogConfirmDeleteBinding;
 import es.iesagora.fitjourney.databinding.FragmentEditProfileBinding;
 import es.iesagora.fitjourney.ui.main.MainActivity;
 import es.iesagora.fitjourney.utils.ImageUtils;
@@ -55,6 +56,7 @@ public class EditProfileFragment extends Fragment {
     private Uri selectedLocalImageUri = null;
     private String currentImageBase64 = null;
     private boolean passwordWasChanged = false;
+
 
     /**
      * Lanzador para abrir la galería y seleccionar una foto.
@@ -352,9 +354,8 @@ public class EditProfileFragment extends Fragment {
                     break;
                 case SUCCESS:
                     binding.progressBar.setVisibility(View.GONE);
-                    Toast.makeText(getContext(), "Cuenta desactivada", Toast.LENGTH_LONG).show();
-
-                    prefs.clearSession();
+                    Toast.makeText(getContext(), "Cuenta eliminada correctamente", Toast.LENGTH_LONG).show();
+                    viewModel.logout();
                     Intent intent = new Intent(requireActivity(), MainActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
@@ -372,16 +373,39 @@ public class EditProfileFragment extends Fragment {
      * usuario de desactivar su propia cuenta.
      */
     private void showDeleteConfirmationDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
-        builder.setTitle("¿Desactivar cuenta?");
-        builder.setMessage("Tu perfil se ocultará, pero tus datos permanecerán guardados. ¿Estás seguro?");
-        builder.setPositiveButton("Desactivar", (dialog, which) -> {
-            User userDesactivado = new User();
-            userDesactivado.setActive(0);
-            viewModel.updateProfile(userDesactivado);
+        String deletePasswordInput;
+        String currentPassword = binding.etCurrentPassword.getText() != null
+                ? binding.etCurrentPassword.getText().toString().trim()
+                : "";
+
+        if (currentPassword.isEmpty()) {
+            binding.tilCurrentPassword.setError("Introduce tu contraseña actual para borrar la cuenta");
+            binding.etCurrentPassword.requestFocus();
+            return;
+        }
+        binding.tilCurrentPassword.setError(null);
+
+        deletePasswordInput = currentPassword;
+        DialogConfirmDeleteBinding dialogBinding = DialogConfirmDeleteBinding.inflate(getLayoutInflater());
+
+        AlertDialog dialog = new AlertDialog.Builder(requireContext())
+                .setView(dialogBinding.getRoot())
+                .setCancelable(true)
+                .create();
+
+        dialogBinding.btnCancelDelete.setOnClickListener(v -> dialog.dismiss());
+        String finalDeletePasswordInput = deletePasswordInput;
+        dialogBinding.btnConfirmDelete.setOnClickListener(v -> {
+                    String email = currentUser != null ? currentUser.getEmail() : null;
+                    if (email == null || email.trim().isEmpty()) {
+                        Toast.makeText(getContext(), "No se pudo obtener el email de la cuenta", Toast.LENGTH_LONG).show();
+                        dialog.dismiss();
+                        return;
+                    }
+                    viewModel.deleteMyAccount(email, finalDeletePasswordInput);
+                    dialog.dismiss();
         });
-        builder.setNegativeButton("Cancelar", (dialog, which) -> dialog.cancel());
-        builder.show();
+        dialog.show();
     }
 
     /**
