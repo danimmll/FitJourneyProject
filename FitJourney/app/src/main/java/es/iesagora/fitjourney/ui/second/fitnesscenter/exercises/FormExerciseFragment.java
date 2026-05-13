@@ -26,8 +26,8 @@ import es.iesagora.fitjourney.viewmodel.SecondViewModel;
  * Fragment encargado de crear y editar ejercicios dentro del Fitness Center.
  *
  * <p>Este fragment permite al usuario administrador crear nuevos ejercicios o editar existentes,
- * gestionando información como nombre, grupo muscular, dificultad, descripción e imagen
- * tanto por URL como por galería local.</p>
+ * gestionando información como nombre, grupo muscular, dificultad, descripción, imagen
+ * (por URL o galería local) y enlace al videotutorial de YouTube.</p>
  */
 public class FormExerciseFragment extends Fragment {
 
@@ -35,10 +35,7 @@ public class FormExerciseFragment extends Fragment {
     private SecondViewModel viewModel;
     private Exercise exerciseToEdit = null;
 
-    /** Imagen seleccionada desde la galería (prioridad sobre la URL) */
     private Uri selectedLocalImageUri = null;
-
-    /** Mantiene la imagen Base64 previa en caso de que se esté editando y no se modifique */
     private String currentImageBase64 = null;
 
     /**
@@ -49,15 +46,15 @@ public class FormExerciseFragment extends Fragment {
                 if (uri != null) {
                     selectedLocalImageUri = uri;
                     currentImageBase64 = null;
-                    binding.etImageUrl.setText("");
-
+                    if (binding != null) {
+                        binding.etImageUrl.setText("");
+                    }
                     ImageUtils.loadInto(requireContext(), uri.toString(), binding.ivPreview, R.drawable.ic_ejercicios);
                 }
             });
 
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentFormExerciseBinding.inflate(inflater, container, false);
         return binding.getRoot();
     }
@@ -117,6 +114,10 @@ public class FormExerciseFragment extends Fragment {
         String muscle = exerciseToEdit.getMuscleGroup();
         binding.etMuscle.setText(muscle);
 
+        if (exerciseToEdit.getVideoUrl() != null) {
+            binding.etVideoUrl.setText(exerciseToEdit.getVideoUrl());
+        }
+
         String existingImage = exerciseToEdit.getImageUrl();
 
         if (existingImage != null && !existingImage.isEmpty()) {
@@ -139,6 +140,11 @@ public class FormExerciseFragment extends Fragment {
         String difficulty = Objects.requireNonNull(binding.etDifficulty.getText()).toString().trim();
         String description = Objects.requireNonNull(binding.etDescription.getText()).toString().trim();
         String imageUrlStr = Objects.requireNonNull(binding.etImageUrl.getText()).toString().trim();
+
+        String videoUrl = "";
+        if (binding.etVideoUrl.getText() != null) {
+            videoUrl = binding.etVideoUrl.getText().toString().trim();
+        }
 
         if (name.isEmpty() || muscle.isEmpty() || difficulty.isEmpty() || description.isEmpty()) {
             Toast.makeText(getContext(), "Faltan datos obligatorios", Toast.LENGTH_SHORT).show();
@@ -163,9 +169,9 @@ public class FormExerciseFragment extends Fragment {
         newExercise.setName(name);
         newExercise.setDifficulty(difficulty);
         newExercise.setDescription(description);
-
         newExercise.setMuscleGroup(muscle);
         newExercise.setImageUrl(finalPhotoData);
+        newExercise.setVideoUrl(videoUrl);
 
         if (exerciseToEdit == null) {
             viewModel.createExercise(newExercise, () -> {
@@ -174,7 +180,6 @@ public class FormExerciseFragment extends Fragment {
             });
         } else {
             int exId = exerciseToEdit.getIdExercise();
-
             newExercise.setIdExercise(exId);
 
             viewModel.updateExercise(exId, newExercise, () -> {

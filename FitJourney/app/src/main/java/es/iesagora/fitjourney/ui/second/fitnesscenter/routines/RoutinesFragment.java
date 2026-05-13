@@ -131,7 +131,7 @@ public class RoutinesFragment extends Fragment {
 
                 try {
                     Navigation.findNavController(requireView())
-                            .navigate(R.id.action_routinesFragment_to_routineDetailFragment, bundle);
+                            .navigate(R.id.routineDetailFragment, bundle);
                 } catch (IllegalArgumentException e) {
                     Toast.makeText(getContext(), "Falta crear el fragmento de detalles en nav_second.xml", Toast.LENGTH_SHORT).show();
                 }

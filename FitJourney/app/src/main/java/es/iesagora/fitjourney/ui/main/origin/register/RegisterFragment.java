@@ -437,8 +437,10 @@ public class RegisterFragment extends Fragment {
         boolean valid = true;
 
         try {
-            int h = Integer.parseInt(Objects.requireNonNull(binding.etHeight.getText()).toString().trim());
-            if (h < 50 || h > 250) throw new Exception();
+            double h = Double.parseDouble(Objects.requireNonNull(binding.etHeight.getText()).toString().trim());
+            if (h < 50 || h > 250) {
+                throw new NumberFormatException();
+            }
             binding.tlHeight.setError(null);
         } catch (Exception e) {
             binding.tlHeight.setError("Inválido");
@@ -446,9 +448,9 @@ public class RegisterFragment extends Fragment {
         }
 
         try {
-            float w = Float.parseFloat(Objects.requireNonNull(binding.etWeight.getText()).toString().trim());
+            double w = Double.parseDouble(Objects.requireNonNull(binding.etWeight.getText()).toString().trim());
             if (w < 20 || w > 300) {
-                throw new Exception();
+                throw new NumberFormatException();
             }
             assert binding.tlWeight != null;
             binding.tlWeight.setError(null);

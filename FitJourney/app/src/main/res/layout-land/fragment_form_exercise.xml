@@ -119,10 +119,29 @@
             android:orientation="vertical">
 
             <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilVideoUrl"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="URL del vídeo de YouTube (opcional)"
+                android:textColorHint="#B0B0B0"
+                app:boxStrokeColor="@color/mainazul"
+                app:hintTextColor="@color/mainazul">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etVideoUrl"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textUri"
+                    android:textColor="@color/text" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/tilImageUrl"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
                 android:hint="URL de la imagen (opcional)"
                 android:textColorHint="#B0B0B0"
                 app:boxStrokeColor="@color/mainazul"
