@@ -12,6 +12,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
@@ -24,6 +25,7 @@ import java.util.ArrayList;
 
 import es.iesagora.fitjourney.R;
 import es.iesagora.fitjourney.data.model.User;
+import es.iesagora.fitjourney.databinding.DialogAdminUserOptionsBinding;
 import es.iesagora.fitjourney.databinding.FragmentAdminUsersBinding;
 import es.iesagora.fitjourney.ui.second.adapters.AdminUsersAdapter;
 import es.iesagora.fitjourney.viewmodel.SecondViewModel;
@@ -168,31 +170,33 @@ public class AdminUsersFragment extends Fragment {
      */
     @SuppressLint("SetTextI18n")
     private void showUserOptionsDialog(User user) {
-
-        @SuppressLint("InflateParams")
-        View dialogView = getLayoutInflater().inflate(
-                R.layout.dialog_admin_user_options,
-                null
-        );
+        DialogAdminUserOptionsBinding dialogBinding = DialogAdminUserOptionsBinding.inflate(getLayoutInflater());
 
         BottomSheetDialog dialog = new BottomSheetDialog(requireContext());
-        dialog.setContentView(dialogView);
 
-        TextView tvTitle = dialogView.findViewById(R.id.tvOptionsTitle);
+        dialog.setContentView(dialogBinding.getRoot());
 
-        View btnEdit = dialogView.findViewById(R.id.btnEditUser);
-        View btnBan = dialogView.findViewById(R.id.btnToggleStatus);
+        dialogBinding.tvOptionsTitle.setText("Opciones para " + user.getName());
 
-        tvTitle.setText("Opciones: " + user.getName());
+        boolean isActive = user.getActive() != null && user.getActive() == 1;
 
-        btnEdit.setOnClickListener(v -> {
+        if (!isActive) {
+            dialogBinding.btnToggleStatus.setVisibility(View.GONE);
+        }
+
+        dialogBinding.btnEditUser.setOnClickListener(v -> {
             dialog.dismiss();
             navigateToEditUser(user);
         });
 
-        btnBan.setOnClickListener(v -> {
+        dialogBinding.btnToggleStatus.setOnClickListener(v -> {
             dialog.dismiss();
-            confirmDesactivateUser(user);
+            new AlertDialog.Builder(requireContext())
+                    .setTitle("SUSPENDER USUARIO")
+                    .setMessage("¿Estás seguro de que quieres suspender a " + user.getName() + "?")
+                    .setPositiveButton("Sí", (d, which) -> deleteUser(user))
+                    .setNegativeButton("Cancelar", null)
+                    .show();
         });
 
         dialog.show();
@@ -210,29 +214,11 @@ public class AdminUsersFragment extends Fragment {
         Navigation.findNavController(requireView())
                 .navigate(R.id.editProfileFragment, bundle);
     }
-
-    /**
-     * Muestra un diálogo de confirmación antes de eliminar permanentemente a un usuario.
-     */
-    private void confirmDesactivateUser(User user) {
-
-        new MaterialAlertDialogBuilder(requireContext())
-                .setTitle("Desactivar Usuario")
-                .setMessage(
-                        "¿Estás seguro de que deseas eliminar permanentemente a "
-                                + user.getName()
-                                + "? Esta acción no se puede deshacer."
-                )
-                .setPositiveButton("Eliminar", (dialog, which) -> deleteUser(user))
-                .setNegativeButton("Cancelar", null)
-                .show();
-    }
-
+    
     /**
      * Lanza la acción para eliminar la cuenta de un usuario.
      */
     private void deleteUser(User user) {
-        // Solo lanza la acción; el observer en setupAdminObservers() gestiona la respuesta
         viewModel.deleteUserByAdmin(user.getIdUser());
     }
 
