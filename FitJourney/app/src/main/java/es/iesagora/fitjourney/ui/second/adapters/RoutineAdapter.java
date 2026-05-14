@@ -15,6 +15,7 @@ import java.util.List;
 
 import es.iesagora.fitjourney.R;
 import es.iesagora.fitjourney.data.model.Routine;
+import es.iesagora.fitjourney.utils.ImageUtils;
 
 public class RoutineAdapter extends RecyclerView.Adapter<RoutineAdapter.ViewHolder> {
 
@@ -50,8 +51,16 @@ public class RoutineAdapter extends RecyclerView.Adapter<RoutineAdapter.ViewHold
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Routine routine = routines.get(position);
+
+        // Asignamos el nombre
         holder.tvName.setText(routine.getName());
-        holder.tvDesc.setText(routine.getDescription());
+
+        ImageUtils.loadInto(
+                holder.itemView.getContext(),
+                routine.getPhotoUrl(),
+                holder.ivImage,
+                R.drawable.img_construccion
+        );
 
         if (isAdmin || routine.getIdUser() == currentUserId) {
             holder.btnDelete.setVisibility(View.VISIBLE);
@@ -60,6 +69,7 @@ public class RoutineAdapter extends RecyclerView.Adapter<RoutineAdapter.ViewHold
             holder.btnDelete.setVisibility(View.GONE);
         }
 
+        // Clic en la tarjeta entera
         holder.itemView.setOnClickListener(v -> listener.onRoutineClick(routine));
     }
 
@@ -70,13 +80,13 @@ public class RoutineAdapter extends RecyclerView.Adapter<RoutineAdapter.ViewHold
 
     static class ViewHolder extends RecyclerView.ViewHolder {
         TextView tvName;
-        TextView tvDesc;
+        ImageView ivImage;
         ImageView btnDelete;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             tvName = itemView.findViewById(R.id.tvRoutineName);
-            tvDesc = itemView.findViewById(R.id.tvRoutineDesc);
+            ivImage = itemView.findViewById(R.id.ivRoutineImage);
             btnDelete = itemView.findViewById(R.id.btnDeleteRoutine);
         }
     }

@@ -1,11 +1,11 @@
 package es.iesagora.fitjourney.ui.second.fitnesscenter.routines;
 
+import android.annotation.SuppressLint;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -18,9 +18,6 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
-import com.google.android.material.button.MaterialButton;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputEditText;
 
@@ -42,7 +39,6 @@ import es.iesagora.fitjourney.viewmodel.SecondViewModel;
 
 /**
  * Fragment encargado de la creación de nuevas rutinas de entrenamiento.
- *
  * Permite al usuario crear una rutina con nombre, descripción,
  * imagen asociada (vía URL o galería) y una lista de ejercicios seleccionados del catálogo.
  */
@@ -131,7 +127,7 @@ public class FormRoutineFragment extends Fragment {
 
         final Exercise[] selectedExercise = {null};
 
-        SelectExerciseAdapter pickerAdapter = new SelectExerciseAdapter(exercise -> {
+        @SuppressLint("SetTextI18n") SelectExerciseAdapter pickerAdapter = new SelectExerciseAdapter(exercise -> {
             selectedExercise[0] = exercise;
             dialogBinding.tvSelectedExercise.setText("Seleccionado: " + exercise.getName());
         });
@@ -248,11 +244,13 @@ public class FormRoutineFragment extends Fragment {
             binding.btnSaveRoutine.setEnabled(true);
 
             if (resource.status == Resource.Status.SUCCESS) {
-                if (resource.message != null && resource.message.toLowerCase().contains("creada")) {
-                    toast("Rutina guardada correctamente");
-                    viewModel.getRoutineActionStatus().setValue(null);
-                    Navigation.findNavController(requireView()).navigateUp();
-                }
+                toast("¡Rutina creada con éxito!");
+
+                viewModel.getRoutineActionStatus().setValue(null);
+                viewModel.fetchRoutines();
+
+                Navigation.findNavController(requireView()).popBackStack();
+
             } else if (resource.status == Resource.Status.ERROR) {
                 toast(resource.message);
                 viewModel.getRoutineActionStatus().setValue(null);
