@@ -366,7 +366,7 @@ public class EditProfileFragment extends Fragment {
                     binding.progressBar.setVisibility(View.GONE);
                     binding.btnDeleteAccount.setEnabled(true);
 
-                    binding.tilCurrentPassword.setError("Contraseña incorrecta");
+                    binding.tilCurrentPassword.setError("Error al desactivar cuenta: " + resource.message);
 
                     LiveData<Resource<String>> deleteStatus = viewModel.getDeleteAccountStatus();
                     if (deleteStatus instanceof MutableLiveData) {
@@ -387,7 +387,7 @@ public class EditProfileFragment extends Fragment {
                 : "";
 
         if (currentPassword.isEmpty()) {
-            binding.tilCurrentPassword.setError("Introduce tu contraseña actual para borrar la cuenta");
+            binding.tilCurrentPassword.setError("Introduce tu contraseña actual para desactivar la cuenta");
             binding.etCurrentPassword.requestFocus();
             return;
         }
@@ -406,7 +406,9 @@ public class EditProfileFragment extends Fragment {
             dialog.dismiss();
             String email = currentUser != null ? currentUser.getEmail() : null;
             if (email != null && !email.trim().isEmpty()) {
-                viewModel.deactivateUser(email, currentPassword);
+                viewModel.deactivateMyAccount(email, currentPassword);
+            } else {
+                Toast.makeText(getContext(), "Error: No se encontró el email", Toast.LENGTH_SHORT).show();
             }
         });
 

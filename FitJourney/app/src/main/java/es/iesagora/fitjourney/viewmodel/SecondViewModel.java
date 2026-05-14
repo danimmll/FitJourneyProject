@@ -521,12 +521,12 @@ public class SecondViewModel extends AndroidViewModel {
     }
 
     /**
-     * Desactiva (borrado lógico) la cuenta del propio usuario.
+     * Desactiva lógicamente la cuenta del propio usuario.
      *
      * @param email    Email de confirmación.
      * @param password Contraseña de confirmación.
      */
-    public void deactivateUser(String email, String password) {
+    public void deactivateMyAccount(String email, String password) {
         deleteAccountLiveData.setValue(Resource.loading());
         userRepository.deactivateUser(email, password, deleteAccountLiveData::setValue);
     }

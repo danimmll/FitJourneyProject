@@ -114,7 +114,7 @@ public interface AppApi {
      * @param request Objeto con las credenciales para confirmar la desactivación.
      * @return Un ResponseBody confirmando la desactivación.
      */
-    @POST("api/users/deactivate")
+    @POST("users/deactivate")
     Call<ResponseBody> deactivateUser(@Body LoginRequest request);
 
     /**

@@ -136,6 +136,4 @@ const deactivateMyAccount = async (req, res, next) => {
     }
 };
 
-// ... no olvides exportarlo al final: module.exports = { ..., deactivateMyAccount };
-
 module.exports = { getAllUsers, getProfile, updateProfile, deleteUser, updateUserByAdmin, deactivateMyAccount };
