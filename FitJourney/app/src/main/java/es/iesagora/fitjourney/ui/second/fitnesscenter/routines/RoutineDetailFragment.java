@@ -46,9 +46,6 @@ public class RoutineDetailFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // Flecha de atrás de la toolbar
-        binding.toolbar.setNavigationOnClickListener(v -> Navigation.findNavController(v).navigateUp());
-
         viewModel = new ViewModelProvider(requireActivity()).get(SecondViewModel.class);
 
         if (getArguments() != null) {
