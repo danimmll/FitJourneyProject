@@ -519,4 +519,16 @@ public class SecondViewModel extends AndroidViewModel {
         userRepository.banUser(userId, banUserLiveData::setValue);
         return banUserLiveData;
     }
+
+    /**
+     * Desactiva (borrado lógico) la cuenta del propio usuario.
+     *
+     * @param email    Email de confirmación.
+     * @param password Contraseña de confirmación.
+     */
+    public void deactivateUser(String email, String password) {
+        deleteAccountLiveData.setValue(Resource.loading());
+        userRepository.deactivateUser(email, password, deleteAccountLiveData::setValue);
+    }
+
 }

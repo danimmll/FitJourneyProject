@@ -397,6 +397,29 @@ public class UserRepository {
         });
     }
 
+    public void deactivateUser(String email, String password, DeleteCallback callback) {
+
+        callback.onResult(Resource.loading());
+        LoginRequest request = new LoginRequest(email, password);
+
+        api.deactivateUser(request).enqueue(new Callback<>() {
+            @Override
+            public void onResponse(@NonNull Call<ResponseBody> call,
+                                   @NonNull Response<ResponseBody> response) {
+                if (response.isSuccessful()) {
+                    callback.onResult(Resource.success("Cuenta eliminada correctamente"));
+                } else {
+                    callback.onResult(Resource.error(getError(response)));
+                }
+            }
+            @Override
+            public void onFailure(@NonNull Call<ResponseBody> call,
+                                  @NonNull Throwable t) {
+                callback.onResult(Resource.error(ERROR_CONEXION + t.getMessage()));
+            }
+        });
+    }
+
     /**
      * Extrae y traduce mensajes de error del servidor.
      */

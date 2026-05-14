@@ -351,18 +351,27 @@ public class EditProfileFragment extends Fragment {
             switch (resource.status) {
                 case LOADING:
                     binding.progressBar.setVisibility(View.VISIBLE);
+                    binding.btnDeleteAccount.setEnabled(false);
                     break;
                 case SUCCESS:
                     binding.progressBar.setVisibility(View.GONE);
-                    Toast.makeText(getContext(), "Cuenta eliminada correctamente", Toast.LENGTH_LONG).show();
                     viewModel.logout();
+
                     Intent intent = new Intent(requireActivity(), MainActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
+                    requireActivity().finish();
                     break;
                 case ERROR:
                     binding.progressBar.setVisibility(View.GONE);
-                    Toast.makeText(getContext(), "Error: " + resource.message, Toast.LENGTH_LONG).show();
+                    binding.btnDeleteAccount.setEnabled(true);
+
+                    binding.tilCurrentPassword.setError("Contraseña incorrecta");
+
+                    LiveData<Resource<String>> deleteStatus = viewModel.getDeleteAccountStatus();
+                    if (deleteStatus instanceof MutableLiveData) {
+                        ((MutableLiveData<Resource<String>>) deleteStatus).setValue(null);
+                    }
                     break;
             }
         });
@@ -373,7 +382,6 @@ public class EditProfileFragment extends Fragment {
      * usuario de desactivar su propia cuenta.
      */
     private void showDeleteConfirmationDialog() {
-        String deletePasswordInput;
         String currentPassword = binding.etCurrentPassword.getText() != null
                 ? binding.etCurrentPassword.getText().toString().trim()
                 : "";
@@ -385,7 +393,6 @@ public class EditProfileFragment extends Fragment {
         }
         binding.tilCurrentPassword.setError(null);
 
-        deletePasswordInput = currentPassword;
         DialogConfirmDeleteBinding dialogBinding = DialogConfirmDeleteBinding.inflate(getLayoutInflater());
 
         AlertDialog dialog = new AlertDialog.Builder(requireContext())
@@ -394,17 +401,15 @@ public class EditProfileFragment extends Fragment {
                 .create();
 
         dialogBinding.btnCancelDelete.setOnClickListener(v -> dialog.dismiss());
-        String finalDeletePasswordInput = deletePasswordInput;
+
         dialogBinding.btnConfirmDelete.setOnClickListener(v -> {
-                    String email = currentUser != null ? currentUser.getEmail() : null;
-                    if (email == null || email.trim().isEmpty()) {
-                        Toast.makeText(getContext(), "No se pudo obtener el email de la cuenta", Toast.LENGTH_LONG).show();
-                        dialog.dismiss();
-                        return;
-                    }
-                    viewModel.deleteMyAccount(email, finalDeletePasswordInput);
-                    dialog.dismiss();
+            dialog.dismiss();
+            String email = currentUser != null ? currentUser.getEmail() : null;
+            if (email != null && !email.trim().isEmpty()) {
+                viewModel.deactivateUser(email, currentPassword);
+            }
         });
+
         dialog.show();
     }
 

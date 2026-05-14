@@ -454,7 +454,6 @@ public class RegisterFragment extends Fragment {
             }
             binding.tlWeight.setError(null);
         } catch (Exception e) {
-            assert binding.tlWeight != null;
             binding.tlWeight.setError("Inválido");
             valid = false;
         }

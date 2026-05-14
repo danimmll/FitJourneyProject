@@ -112,4 +112,30 @@ const updateUserByAdmin = async (req, res, next) => {
     }
 };
 
-module.exports = { getAllUsers, getProfile, updateProfile, deleteUser, updateUserByAdmin };
+const deactivateMyAccount = async (req, res, next) => {
+    try {
+        const { password } = req.body;
+        
+        const user = await prisma.user.findUnique({
+            where: { id_user: req.user.id }
+        });
+
+        if (!user) return res.status(404).json({ error: "Usuario no encontrado" });
+
+        const validPassword = await bcrypt.compare(password, user.password);
+        if (!validPassword) return res.status(401).json({ error: "Contraseña incorrecta" });
+
+        await prisma.user.update({
+            where: { id_user: req.user.id },
+            data: { active: 0 }
+        });
+
+        res.json({ message: "Cuenta desactivada correctamente" });
+    } catch (error) {
+        next(error);
+    }
+};
+
+// ... no olvides exportarlo al final: module.exports = { ..., deactivateMyAccount };
+
+module.exports = { getAllUsers, getProfile, updateProfile, deleteUser, updateUserByAdmin, deactivateMyAccount };

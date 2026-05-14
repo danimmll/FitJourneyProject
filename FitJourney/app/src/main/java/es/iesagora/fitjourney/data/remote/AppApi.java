@@ -109,6 +109,15 @@ public interface AppApi {
     Call<ResponseBody> deleteUserByAdmin(@Path("id") int userId);
 
     /**
+     * Desactiva la cuenta del usuario actual.
+     *
+     * @param request Objeto con las credenciales para confirmar la desactivación.
+     * @return Un ResponseBody confirmando la desactivación.
+     */
+    @POST("api/users/deactivate")
+    Call<ResponseBody> deactivateUser(@Body LoginRequest request);
+
+    /**
      * Desactiva (banea) la cuenta de un usuario impidiendo su acceso, modificando su estado activo.
      * Requiere permisos de Administrador.
      *
