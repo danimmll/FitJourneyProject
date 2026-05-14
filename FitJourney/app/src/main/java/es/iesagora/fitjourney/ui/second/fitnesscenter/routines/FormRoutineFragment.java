@@ -79,6 +79,11 @@ public class FormRoutineFragment extends Fragment {
             viewModel.fetchExercises();
         }
 
+        if (getArguments() != null && getArguments().containsKey("routine_data")) {
+            Routine routineToEdit = (Routine) getArguments().getSerializable("routine_data");
+            fillFieldsForEdit(routineToEdit);
+        }
+
         setupRecyclerView();
         setupListeners();
         setupObservers();
@@ -290,6 +295,56 @@ public class FormRoutineFragment extends Fragment {
         routine.setIsPublic(isPublic ? 1 : 0);
 
         viewModel.createRoutine(routine);
+    }
+
+    private void updateRoutine(int routineId) {
+        String name = binding.etRoutineName.getText() != null ? binding.etRoutineName.getText().toString().trim() : "";
+        String desc = binding.etRoutineDesc.getText() != null ? binding.etRoutineDesc.getText().toString().trim() : "";
+        String imageUrl = binding.etRoutineImage.getText() != null ? binding.etRoutineImage.getText().toString().trim() : "";
+
+        if (name.isEmpty()) {
+            binding.tilRoutineName.setError("El nombre es obligatorio");
+            return;
+        }
+
+        String finalPhotoData = null;
+
+        if (selectedLocalImageUri != null) {
+            finalPhotoData = ImageUtils.uriToBase64(requireContext().getContentResolver(), selectedLocalImageUri);
+            if (finalPhotoData == null) {
+                toast("Error al procesar la imagen seleccionada");
+                return;
+            }
+        } else if (!imageUrl.isEmpty()) {
+            finalPhotoData = imageUrl;
+        }
+
+        Routine routine = new Routine();
+        routine.setIdRoutine(routineId);
+        routine.setName(name);
+        routine.setDescription(desc.isEmpty() ? null : desc);
+        routine.setPhotoUrl(finalPhotoData);
+        routine.setExercises(addedExercises);
+
+        boolean isPublic = binding.switchPublic.isChecked();
+        routine.setIsPublic(isPublic ? 1 : 0);
+
+        viewModel.updateRoutine(routineId, routine);
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    private void fillFieldsForEdit(Routine routine) {
+        binding.etRoutineName.setText(routine.getName());
+        binding.etRoutineDesc.setText(routine.getDescription());
+        binding.etRoutineImage.setText(routine.getPhotoUrl());
+        binding.switchPublic.setChecked(routine.getIsPublic() == 1);
+
+        addedExercises.clear();
+        addedExercises.addAll(routine.getExercises());
+        adapter.notifyDataSetChanged();
+        updateEmptyState();
+
+        binding.btnSaveRoutine.setOnClickListener(v -> updateRoutine(routine.getIdRoutine()));
     }
 
     private void toast(String msg) {

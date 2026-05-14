@@ -4,7 +4,6 @@ import static android.content.ContentValues.TAG;
 
 import android.app.Application;
 import android.util.Log;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
@@ -35,112 +34,26 @@ import es.iesagora.fitjourney.data.repositories.WorkoutRepository;
  */
 public class SecondViewModel extends AndroidViewModel {
 
-    /**
-     * Repositorio de ejercicios.
-     */
     private final ExerciseRepository repository;
-
-    /**
-     * Repositorio de usuarios.
-     */
     private final UserRepository userRepository;
-
-    /**
-     * Repositorio de preferencias locales.
-     */
     private final PreferencesRepository preferencesRepository;
-
-    /**
-     * Repositorio de entrenamientos.
-     */
     private final WorkoutRepository workoutRepository;
-
-    /**
-     * Repositorio de rutinas.
-     */
     private final RoutineRepository routineRepository;
 
-    /**
-     * Lista de ejercicios con estado (loading/success/error).
-     */
-    private final MutableLiveData<Resource<List<Exercise>>> exercisesLiveData =
-            new MutableLiveData<>();
+    private final MutableLiveData<Resource<List<Exercise>>> exercisesLiveData = new MutableLiveData<>();
+    private final MutableLiveData<Exercise> exerciseSelected = new MutableLiveData<>();
+    private final MutableLiveData<Resource<Exercise>> singleExerciseLiveData = new MutableLiveData<>();
+    private final MutableLiveData<Resource<AccessResponse>> profileLiveData = new MutableLiveData<>();
+    private final MutableLiveData<Resource<List<Workout>>> workoutHistoryLiveData = new MutableLiveData<>();
+    private final MutableLiveData<Resource<User>> updateProfileLiveData = new MutableLiveData<>();
+    private final MutableLiveData<Resource<String>> deleteAccountLiveData = new MutableLiveData<>();
+    private final MutableLiveData<Resource<List<Routine>>> routinesLiveData = new MutableLiveData<>();
+    private final MutableLiveData<Resource<String>> routineActionLiveData = new MutableLiveData<>();
+    private final MutableLiveData<Resource<Routine>> singleRoutineLiveData = new MutableLiveData<>();
+    private final MutableLiveData<Resource<List<User>>> allUsersLiveData = new MutableLiveData<>();
+    private final MutableLiveData<Resource<String>> deleteUserLiveData = new MutableLiveData<>();
+    private final MutableLiveData<Resource<String>> banUserLiveData = new MutableLiveData<>();
 
-    /**
-     * Ejercicio actualmente seleccionado.
-     */
-    private final MutableLiveData<Exercise> exerciseSelected =
-            new MutableLiveData<>();
-
-    /**
-     * Ejercicio obtenido por ID.
-     */
-    private final MutableLiveData<Resource<Exercise>> singleExerciseLiveData =
-            new MutableLiveData<>();
-
-    /**
-     * Perfil del usuario autenticado.
-     */
-    private final MutableLiveData<Resource<AccessResponse>> profileLiveData =
-            new MutableLiveData<>();
-
-    /**
-     * Historial de entrenamientos.
-     */
-    private final MutableLiveData<Resource<List<Workout>>> workoutHistoryLiveData =
-            new MutableLiveData<>();
-
-    /**
-     * Estado de actualización del perfil (propio o editado por admin).
-     */
-    private final MutableLiveData<Resource<User>> updateProfileLiveData =
-            new MutableLiveData<>();
-
-    /**
-     * Estado de eliminación de cuenta.
-     */
-    private final MutableLiveData<Resource<String>> deleteAccountLiveData =
-            new MutableLiveData<>();
-
-    /**
-     * Lista de rutinas.
-     */
-    private final MutableLiveData<Resource<List<Routine>>> routinesLiveData =
-            new MutableLiveData<>();
-
-    /**
-     * Estado de acciones sobre rutinas (crear/eliminar).
-     */
-    private final MutableLiveData<Resource<String>> routineActionLiveData =
-            new MutableLiveData<>();
-
-    /**
-     * Rutina obtenida por ID.
-     */
-    private final MutableLiveData<Resource<Routine>> singleRoutineLiveData =
-            new MutableLiveData<>();
-
-    /**
-     * Lista de todos los usuarios (solo administradores).
-     */
-    private final MutableLiveData<Resource<List<User>>> allUsersLiveData =
-            new MutableLiveData<>();
-
-    /**
-     * Estado de eliminación de un usuario por un administrador.
-     */
-    private final MutableLiveData<Resource<String>> deleteUserLiveData =
-            new MutableLiveData<>();
-
-    /**
-     * Estado de baneo de un usuario por un administrador.
-     */
-    private final MutableLiveData<Resource<String>> banUserLiveData =
-            new MutableLiveData<>();
-
-    /**
-     * Lista completa de ejercicios (sin filtrar).
-     */
     private List<Exercise> fullExerciseList = new ArrayList<>();
 
     /**
@@ -336,7 +249,6 @@ public class SecondViewModel extends AndroidViewModel {
      */
     public void updateUserByAdmin(int userId, User user) {
         updateProfileLiveData.setValue(Resource.loading());
-
         userRepository.updateUserByAdmin(userId, user, updateProfileLiveData::setValue);
     }
 
@@ -468,6 +380,21 @@ public class SecondViewModel extends AndroidViewModel {
     }
 
     /**
+     * Actualiza una rutina existente en el servidor.
+     *
+     * @param id Identificador de la rutina a actualizar.
+     * @param routine Objeto con los nuevos datos de la rutina.
+     */
+    public void updateRoutine(int id, Routine routine) {
+        routineActionLiveData.setValue(Resource.loading());
+
+        routineRepository.updateRoutine(id, routine, result -> {
+            routineActionLiveData.setValue(result);
+            if (result.status == Resource.Status.SUCCESS) fetchRoutines();
+        });
+    }
+
+    /**
      * Solicita al servidor el directorio completo de usuarios (Solo administradores).
      *
      * @return LiveData con el estado y la lista de usuarios.
@@ -530,5 +457,4 @@ public class SecondViewModel extends AndroidViewModel {
         deleteAccountLiveData.setValue(Resource.loading());
         userRepository.deactivateUser(email, password, deleteAccountLiveData::setValue);
     }
-
 }

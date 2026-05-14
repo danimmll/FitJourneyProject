@@ -91,4 +91,64 @@ const getRoutineById = async (req, res, next) => {
     }
 };
 
-module.exports = { createRoutine, getUserRoutines, deleteRoutine, getRoutineById };
+const updateRoutine = async (req, res, next) => {
+    const { id } = req.params;
+    const { name, description, photo_url, is_public, exercises } = req.body;
+
+    try {
+        const routineId = parseInt(id);
+
+        const existingRoutine = await prisma.routine.findUnique({ where: { id_routine: routineId } });
+
+        if (!existingRoutine) {
+            return res.status(404).json({ error: "Rutina no encontrada" });
+        }
+
+        if (existingRoutine.id_user !== req.user.id && req.user.role !== 'admin') {
+            return res.status(403).json({ error: "No tienes permiso para editar esta rutina" });
+        }
+
+        const updatedRoutine = await prisma.$transaction(async (tx) => {
+            
+            const routine = await tx.routine.update({
+                where: { id_routine: routineId },
+                data: {
+                    name,
+                    description,
+                    photo_url: photo_url || null,
+                    is_public: is_public !== undefined ? is_public : existingRoutine.is_public
+                }
+            });
+
+            await tx.routineExercise.deleteMany({
+                where: { id_routine: routineId }
+            });
+
+            if (exercises && exercises.length > 0) {
+                const exercisesToInsert = exercises.map(ex => ({
+                    id_routine: routineId,
+                    id_exercise: ex.id_exercise,
+                    target_sets: ex.target_sets,
+                    target_reps: ex.target_reps,
+                    target_weight: ex.target_weight || null
+                }));
+
+                await tx.routineExercise.createMany({
+                    data: exercisesToInsert
+                });
+            }
+
+            return await tx.routine.findUnique({
+                where: { id_routine: routineId },
+                include: { exercises: { include: { exercise: true } } }
+            });
+        });
+
+        res.json({ message: "Rutina actualizada correctamente", data: updatedRoutine });
+
+    } catch (error) {
+        next(error);
+    }
+};
+
+module.exports = { createRoutine, getUserRoutines, deleteRoutine, getRoutineById, updateRoutine };

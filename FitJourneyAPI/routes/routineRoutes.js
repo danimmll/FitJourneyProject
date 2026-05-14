@@ -1,5 +1,5 @@
 const express = require('express');
-const { createRoutine, getUserRoutines, deleteRoutine, getRoutineById } = require('../controllers/routineController');
+const { createRoutine, getUserRoutines, deleteRoutine, getRoutineById,updateRoutine } = require('../controllers/routineController');
 const { authenticateToken } = require('../middlewares/auth');
 const router = express.Router();
 
@@ -116,5 +116,6 @@ router.post('/', authenticateToken, createRoutine);
  */
 router.get('/:id', authenticateToken, getRoutineById);
 router.delete('/:id', authenticateToken, deleteRoutine);
+router.put('/:id', authenticateToken, updateRoutine);
 
 module.exports = router;

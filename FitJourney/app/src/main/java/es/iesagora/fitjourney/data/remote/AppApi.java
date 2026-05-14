@@ -11,7 +11,6 @@ import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.DELETE;
 import retrofit2.http.GET;
-import retrofit2.http.PATCH;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Path;
@@ -214,6 +213,16 @@ public interface AppApi {
      */
     @GET("routines/{id}")
     Call<Routine> getRoutineById(@Path("id") int id);
+
+    /**
+     * Actualiza una rutina existente.
+     *
+     * @param id ID de la rutina a modificar.
+     * @param routine Objeto Routine con los datos actualizados.
+     * @return Call con un ResponseBody (o el tipo que espere tu backend).
+     */
+    @PUT("routines/{id}")
+    Call<ResponseBody> updateRoutine(@Path("id") int id, @Body Routine routine);
 
     // ── WORKOUTS ──────────────────────────────────────────────────────────────
 

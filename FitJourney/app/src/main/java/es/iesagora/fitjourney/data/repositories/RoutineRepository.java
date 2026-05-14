@@ -28,9 +28,6 @@ import retrofit2.Response;
  */
 public class RoutineRepository {
 
-    /**
-     * Instancia de la API utilizada para realizar peticiones.
-     */
     private final AppApi api;
 
     private static final String ERROR_CONEXION = "Error de conexión: ";
@@ -38,6 +35,7 @@ public class RoutineRepository {
     private static final String ERROR_CARGAR = "Error al cargar rutinas";
     private static final String ERROR_ELIMINAR = "Error al eliminar la rutina";
     private static final String ERROR_DETALLE = "Error al cargar la rutina";
+    private static final String ERROR_ACTUALIZAR = "Error al actualizar la rutina";
     private static final String ERROR_FIELD = "error";
     private final Gson gson = new Gson();
 
@@ -50,7 +48,7 @@ public class RoutineRepository {
 
     /**
      * Callback para operaciones sin retorno estructurado.
-     * (crear o eliminar rutinas)
+     * (crear, actualizar o eliminar rutinas)
      */
     public interface ActionCallback {
         void onResult(Resource<String> result);
@@ -78,14 +76,11 @@ public class RoutineRepository {
      * @param callback Callback con el resultado.
      */
     public void getRoutines(RoutineListCallback callback) {
-
         callback.onResult(Resource.loading());
 
         api.getUserRoutines().enqueue(new Callback<>() {
             @Override
-            public void onResponse(@NonNull Call<List<Routine>> call,
-                                   @NonNull Response<List<Routine>> response) {
-
+            public void onResponse(@NonNull Call<List<Routine>> call, @NonNull Response<List<Routine>> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     callback.onResult(Resource.success(response.body()));
                 } else {
@@ -94,9 +89,7 @@ public class RoutineRepository {
             }
 
             @Override
-            public void onFailure(@NonNull Call<List<Routine>> call,
-                                  @NonNull Throwable t) {
-
+            public void onFailure(@NonNull Call<List<Routine>> call, @NonNull Throwable t) {
                 callback.onResult(Resource.error(ERROR_CONEXION + t.getMessage()));
             }
         });
@@ -109,14 +102,11 @@ public class RoutineRepository {
      * @param callback Callback con el resultado.
      */
     public void createRoutine(Routine routine, ActionCallback callback) {
-
         callback.onResult(Resource.loading());
 
         api.createRoutine(routine).enqueue(new Callback<>() {
             @Override
-            public void onResponse(@NonNull Call<ResponseBody> call,
-                                   @NonNull Response<ResponseBody> response) {
-
+            public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
                 if (response.isSuccessful()) {
                     callback.onResult(Resource.success("Rutina creada con éxito"));
                 } else {
@@ -125,9 +115,34 @@ public class RoutineRepository {
             }
 
             @Override
-            public void onFailure(@NonNull Call<ResponseBody> call,
-                                  @NonNull Throwable t) {
+            public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable t) {
+                callback.onResult(Resource.error(ERROR_CONEXION + t.getMessage()));
+            }
+        });
+    }
 
+    /**
+     * Actualiza una rutina existente.
+     *
+     * @param id ID de la rutina a modificar.
+     * @param routine Objeto Routine con los datos actualizados.
+     * @param callback Callback con el resultado de la operación.
+     */
+    public void updateRoutine(int id, Routine routine, ActionCallback callback) {
+        callback.onResult(Resource.loading());
+
+        api.updateRoutine(id, routine).enqueue(new Callback<>() {
+            @Override
+            public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
+                if (response.isSuccessful()) {
+                    callback.onResult(Resource.success("Rutina actualizada con éxito"));
+                } else {
+                    callback.onResult(Resource.error(getError(response, ERROR_ACTUALIZAR)));
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable t) {
                 callback.onResult(Resource.error(ERROR_CONEXION + t.getMessage()));
             }
         });
@@ -140,14 +155,11 @@ public class RoutineRepository {
      * @param callback Callback con el resultado.
      */
     public void deleteRoutine(int id, ActionCallback callback) {
-
         callback.onResult(Resource.loading());
 
         api.deleteRoutine(id).enqueue(new Callback<>() {
             @Override
-            public void onResponse(@NonNull Call<ResponseBody> call,
-                                   @NonNull Response<ResponseBody> response) {
-
+            public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
                 if (response.isSuccessful()) {
                     callback.onResult(Resource.success("Rutina eliminada correctamente"));
                 } else {
@@ -156,9 +168,7 @@ public class RoutineRepository {
             }
 
             @Override
-            public void onFailure(@NonNull Call<ResponseBody> call,
-                                  @NonNull Throwable t) {
-
+            public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable t) {
                 callback.onResult(Resource.error(ERROR_CONEXION + t.getMessage()));
             }
         });
@@ -171,14 +181,11 @@ public class RoutineRepository {
      * @param callback Callback con el resultado.
      */
     public void getRoutineById(int id, SingleRoutineCallback callback) {
-
         callback.onResult(Resource.loading());
 
         api.getRoutineById(id).enqueue(new Callback<>() {
             @Override
-            public void onResponse(@NonNull Call<Routine> call,
-                                   @NonNull Response<Routine> response) {
-
+            public void onResponse(@NonNull Call<Routine> call, @NonNull Response<Routine> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     callback.onResult(Resource.success(response.body()));
                 } else {
@@ -187,9 +194,7 @@ public class RoutineRepository {
             }
 
             @Override
-            public void onFailure(@NonNull Call<Routine> call,
-                                  @NonNull Throwable t) {
-
+            public void onFailure(@NonNull Call<Routine> call, @NonNull Throwable t) {
                 callback.onResult(Resource.error(ERROR_CONEXION + t.getMessage()));
             }
         });
