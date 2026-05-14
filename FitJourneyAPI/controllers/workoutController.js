@@ -91,31 +91,32 @@ const getWorkoutHistory = async (req, res, next) => {
 
 const deleteWorkout = async (req, res, next) => {
     const { id } = req.params;
-
     try {
-        const workoutId = parseInt(id, 10);
+        const workoutId = parseInt(id);
 
         const workout = await prisma.workout.findUnique({
-            where: {
-                id_workout: workoutId
-            }
+            where: { id_workout: workoutId },
+            include: { routine: true }
         });
 
-        if (!workout || workout.id_user !== req.user.id) {
-            return res.status(403).json({
-                error: "No tienes permiso para eliminar este entrenamiento o no existe"
-            });
+        if (!workout) {
+            return res.status(404).json({ error: "Entrenamiento no encontrado" });
         }
 
-        await prisma.workout.delete({
-            where: {
-                id_workout: workoutId
-            }
-        });
+        if (workout.id_user !== req.user.id) {
+            return res.status(403).json({ error: "No tienes permiso. Solo puedes borrar tus propios entrenamientos." });
+        }
 
-        res.json({
-            message: "Entrenamiento eliminado físicamente del historial"
-        });
+        await prisma.$transaction([
+            prisma.workoutDetail.deleteMany({
+                where: { id_workout: workoutId }
+            }),
+            prisma.workout.delete({
+                where: { id_workout: workoutId }
+            })
+        ]);
+
+        res.json({ message: "Entrenamiento eliminado correctamente de tu historial" });
 
     } catch (error) {
         next(error);

@@ -41,6 +41,7 @@
             tools:text="14 May 2026" />
 
         <LinearLayout
+            android:id="@+id/layoutWorkoutInfo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
@@ -80,6 +81,20 @@
                 android:textSize="14sp"
                 tools:text="320 kcal" />
         </LinearLayout>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnDeleteWorkout"
+            style="@style/Widget.Material3.Button.IconButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:contentDescription="Eliminar entrenamiento"
+            app:backgroundTint="@android:color/transparent"
+            app:icon="@android:drawable/ic_menu_delete"
+            app:iconTint="@android:color/holo_red_light"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/layoutWorkoutInfo"
+            tools:ignore="SpeakableTextPresentCheck" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </com.google.android.material.card.MaterialCardView>

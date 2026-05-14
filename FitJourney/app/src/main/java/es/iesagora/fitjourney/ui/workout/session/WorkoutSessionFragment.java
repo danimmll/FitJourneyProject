@@ -71,11 +71,9 @@ public class WorkoutSessionFragment extends Fragment {
             requireActivity().finish();
         }
 
-        // 1. Interceptar la flecha de la Toolbar
         binding.toolbarWorkout.setNavigationOnClickListener(v -> showExitConfirmationDialog());
         binding.btnFinishWorkout.setOnClickListener(v -> finishWorkout());
 
-        // 2. Interceptar el botón físico de ir hacia atrás del móvil
         requireActivity().getOnBackPressedDispatcher().addCallback(getViewLifecycleOwner(), new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
@@ -97,7 +95,7 @@ public class WorkoutSessionFragment extends Fragment {
             if (resource == null) return;
             if (resource.status == Resource.Status.SUCCESS) {
                 Toast.makeText(getContext(), "¡Entrenamiento guardado!", Toast.LENGTH_SHORT).show();
-                requireActivity().finish(); // Cierra el entreno solo si se ha guardado correctamente
+                requireActivity().finish();
             } else if (resource.status == Resource.Status.ERROR) {
                 Toast.makeText(getContext(), resource.message, Toast.LENGTH_SHORT).show();
             }
@@ -137,7 +135,6 @@ public class WorkoutSessionFragment extends Fragment {
             if (re.getExercise() != null) {
                 tvName.setText(re.getExercise().getName() + " ⓘ");
 
-                // Hacer clic en el nombre del ejercicio muestra sus detalles
                 tvName.setOnClickListener(v -> showExerciseInfo(re.getExercise()));
             }
 
@@ -171,7 +168,7 @@ public class WorkoutSessionFragment extends Fragment {
     }
 
     private void finishWorkout() {
-        isTimerRunning = false; // Paramos el reloj
+        isTimerRunning = false;
 
         Workout workout = new Workout();
         workout.setIdRoutine(routineId);

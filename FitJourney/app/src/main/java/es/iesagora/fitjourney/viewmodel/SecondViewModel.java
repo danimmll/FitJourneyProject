@@ -484,4 +484,14 @@ public class SecondViewModel extends AndroidViewModel {
             }
         });
     }
+
+    public void deleteWorkout(int idWorkout) {
+        workoutActionLiveData.setValue(Resource.loading());
+        workoutRepository.deleteWorkout(idWorkout, result -> {
+            workoutActionLiveData.setValue(result);
+            if (result.status == Resource.Status.SUCCESS) {
+                fetchWorkoutHistory();
+            }
+        });
+    }
 }
