@@ -27,6 +27,11 @@ import retrofit2.Response;
  */
 public class WorkoutRepository {
 
+    // --- CONSTANTES DE TEXTO ---
+    private static final String ERROR_CONEXION = "Error de conexión: ";
+    private static final String KEY_MESSAGE = "message";
+    private static final String KEY_ERROR = "error";
+
     /**
      * Instancia de la API utilizada para realizar peticiones.
      */
@@ -86,7 +91,7 @@ public class WorkoutRepository {
             public void onFailure(@NonNull Call<List<Workout>> call,
                                   @NonNull Throwable t) {
 
-                callback.onResult(Resource.error("Error de conexión: " + t.getMessage()));
+                callback.onResult(Resource.error(ERROR_CONEXION + t.getMessage()));
             }
         });
     }
@@ -117,7 +122,7 @@ public class WorkoutRepository {
             public void onFailure(@NonNull Call<ResponseBody> call,
                                   @NonNull Throwable t) {
 
-                callback.onResult(Resource.error("Error de conexión: " + t.getMessage()));
+                callback.onResult(Resource.error(ERROR_CONEXION + t.getMessage()));
             }
         });
     }
@@ -148,7 +153,7 @@ public class WorkoutRepository {
             public void onFailure(@NonNull Call<ResponseBody> call,
                                   @NonNull Throwable t) {
 
-                callback.onResult(Resource.error("Error de conexión: " + t.getMessage()));
+                callback.onResult(Resource.error(ERROR_CONEXION + t.getMessage()));
             }
         });
     }
@@ -167,10 +172,10 @@ public class WorkoutRepository {
                 String json = response.errorBody().string();
                 JsonObject obj = gson.fromJson(json, JsonObject.class);
 
-                if (obj.has("message") && !obj.get("message").isJsonNull()) {
-                    return obj.get("message").getAsString();
-                } else if (obj.has("error") && !obj.get("error").isJsonNull()) {
-                    return obj.get("error").getAsString();
+                if (obj.has(KEY_MESSAGE) && !obj.get(KEY_MESSAGE).isJsonNull()) {
+                    return obj.get(KEY_MESSAGE).getAsString();
+                } else if (obj.has(KEY_ERROR) && !obj.get(KEY_ERROR).isJsonNull()) {
+                    return obj.get(KEY_ERROR).getAsString();
                 }
             }
         } catch (Exception ignored) {}

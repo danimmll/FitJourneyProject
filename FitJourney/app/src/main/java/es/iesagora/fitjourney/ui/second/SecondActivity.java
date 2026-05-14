@@ -52,7 +52,8 @@ public class SecondActivity extends AppCompatActivity {
         appBarConfiguration = new AppBarConfiguration.Builder(
                 R.id.homeFragment,
                 R.id.exercisesFragment,
-                R.id.profileFragment
+                R.id.profileFragment,
+                R.id.workoutHistoryFragment
         ).build();
 
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);

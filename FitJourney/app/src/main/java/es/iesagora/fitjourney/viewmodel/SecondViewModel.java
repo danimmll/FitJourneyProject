@@ -53,6 +53,7 @@ public class SecondViewModel extends AndroidViewModel {
     private final MutableLiveData<Resource<List<User>>> allUsersLiveData = new MutableLiveData<>();
     private final MutableLiveData<Resource<String>> deleteUserLiveData = new MutableLiveData<>();
     private final MutableLiveData<Resource<String>> banUserLiveData = new MutableLiveData<>();
+    private final MutableLiveData<Resource<String>> workoutActionLiveData = new MutableLiveData<>();
 
     private List<Exercise> fullExerciseList = new ArrayList<>();
 
@@ -456,5 +457,31 @@ public class SecondViewModel extends AndroidViewModel {
     public void deactivateMyAccount(String email, String password) {
         deleteAccountLiveData.setValue(Resource.loading());
         userRepository.deactivateUser(email, password, deleteAccountLiveData::setValue);
+    }
+
+    /**
+     * Devuelve el estado de la última acción realizada sobre un entrenamiento (como guardarlo).
+     *
+     * @return MutableLiveData del estado de la acción.
+     */
+    public MutableLiveData<Resource<String>> getWorkoutActionStatus() {
+        return workoutActionLiveData;
+    }
+
+    /**
+     * Envía un entrenamiento finalizado al servidor para guardarlo en el historial.
+     *
+     * @param workout Objeto Workout que contiene el ID de la rutina, duración y detalles de ejercicios.
+     */
+    public void createWorkout(Workout workout) {
+        workoutActionLiveData.setValue(Resource.loading());
+
+        workoutRepository.createWorkout(workout, result -> {
+            workoutActionLiveData.setValue(result);
+
+            if (result.status == Resource.Status.SUCCESS) {
+                fetchWorkoutHistory();
+            }
+        });
     }
 }

@@ -1,26 +1,18 @@
 package es.iesagora.fitjourney.ui.workout;
 
 import android.os.Bundle;
-
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
-
-import es.iesagora.fitjourney.R;
+import es.iesagora.fitjourney.databinding.ActivityWorkoutBinding;
 
 public class WorkoutActivity extends AppCompatActivity {
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        ActivityWorkoutBinding binding;
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_workout);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });
+
+        binding = ActivityWorkoutBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
     }
 }
