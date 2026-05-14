@@ -67,6 +67,8 @@ public class Workout implements Serializable {
      */
     private Routine routine;
 
+    private User user;
+
     /**
      * Lista de ejercicios realizados durante el entrenamiento.
      */

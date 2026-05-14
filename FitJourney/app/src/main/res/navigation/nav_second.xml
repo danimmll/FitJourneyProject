@@ -117,5 +117,15 @@
         android:name="es.iesagora.fitjourney.ui.second.fitnesscenter.routines.RoutineDetailFragment"
         android:label=""
         tools:layout="@layout/fragment_routine_detail" />
+    <fragment
+        android:id="@+id/workoutHistoryFragment"
+        android:name="es.iesagora.fitjourney.ui.second.workouthistory.WorkoutHistoryFragment"
+        android:label=""
+        tools:layout="@layout/fragment_workout_history" />
+    <fragment
+        android:id="@+id/workoutHistoryDetailFragment"
+        android:name="es.iesagora.fitjourney.WorkoutHistoryDetailFragment"
+        android:label=""
+        tools:layout="@layout/fragment_workout_history_detail" />
 
 </navigation>

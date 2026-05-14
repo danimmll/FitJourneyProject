@@ -1,5 +1,6 @@
 package es.iesagora.fitjourney.ui.second.fitnesscenter.exercises;
 
+import android.annotation.SuppressLint;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.net.Uri;
@@ -127,18 +128,31 @@ public class ExerciseDetailFragment extends Fragment {
 
     /**
      * Muestra un diálogo de confirmación antes de eliminar un ejercicio.
+     * Utiliza el diseño personalizado DialogConfirmDeleteBinding.
      */
+    @SuppressLint("SetTextI18n")
     private void showDeleteDialog() {
-        new AlertDialog.Builder(requireContext())
-                .setTitle("¿Eliminar Ejercicio?")
-                .setMessage("Esta acción no se puede deshacer.")
-                .setPositiveButton("Eliminar", (dialog, which) ->
-                        viewModel.deleteExercise(currentExercise.getIdExercise(), () -> {
-                            Toast.makeText(getContext(), "Ejercicio eliminado", Toast.LENGTH_SHORT).show();
-                            requireActivity().getOnBackPressedDispatcher().onBackPressed();
-                        }))
-                .setNegativeButton("Cancelar", null)
-                .show();
+        es.iesagora.fitjourney.databinding.DialogConfirmDeleteBinding dialogBinding =
+                es.iesagora.fitjourney.databinding.DialogConfirmDeleteBinding.inflate(getLayoutInflater());
+
+        androidx.appcompat.app.AlertDialog dialog = new com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
+                .setView(dialogBinding.getRoot())
+                .create();
+
+        dialogBinding.tvDeleteTitle.setText("Eliminar Ejercicio");
+        dialogBinding.tvDeleteMessage.setText("¿Estás seguro de que quieres borrar el ejercicio '" + currentExercise.getName() + "'? Esta acción no se puede deshacer.");
+
+        dialogBinding.btnCancelDelete.setOnClickListener(v -> dialog.dismiss());
+
+        dialogBinding.btnConfirmDelete.setOnClickListener(v -> {
+            dialog.dismiss();
+            viewModel.deleteExercise(currentExercise.getIdExercise(), () -> {
+                Toast.makeText(getContext(), "Ejercicio eliminado", Toast.LENGTH_SHORT).show();
+                requireActivity().getOnBackPressedDispatcher().onBackPressed();
+            });
+        });
+
+        dialog.show();
     }
 
     /**

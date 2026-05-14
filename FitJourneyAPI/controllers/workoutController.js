@@ -14,17 +14,30 @@ const createWorkout = async (req, res, next) => {
                 calories_burned,
                 notes,
                 details: {
-                    create: details && details.length > 0 ? details.map(d => ({
-                        id_exercise: d.id_exercise,
-                        sets_performed: d.sets_performed,
-                        reps_performed: d.reps_performed,
-                        max_weight_used: d.max_weight_used
-                    })) : []
+                    create: details && details.length > 0
+                        ? details.map(d => ({
+                            id_exercise: d.id_exercise,
+                            sets_performed: d.sets_performed,
+                            reps_performed: d.reps_performed,
+                            max_weight_used: d.max_weight_used
+                        }))
+                        : []
+                }
+            },
+            include: {
+                routine: true,
+                details: {
+                    include: {
+                        exercise: true
+                    }
                 }
             }
         });
 
-        res.status(201).json({ message: "¡Entrenamiento registrado con éxito!", workout });
+        res.status(201).json({
+            message: "¡Entrenamiento registrado con éxito!",
+            workout
+        });
     } catch (error) {
         next(error);
     }
@@ -32,26 +45,45 @@ const createWorkout = async (req, res, next) => {
 
 const getWorkoutHistory = async (req, res, next) => {
     try {
-        const history = await prisma.workout.findMany({
-            where: { 
-                id_user: req.user.id, 
-                active: 1 
-            },
-            orderBy: { 
-                workout_date: 'desc' 
-            },
+        let whereCondition = {
+            active: 1
+        };
+
+        if (req.user.role !== 'admin') {
+            whereCondition.id_user = req.user.id;
+        }
+
+        const workouts = await prisma.workout.findMany({
+            where: whereCondition,
             include: {
-                routine: { 
-                    select: { name: true } 
+                routine: {
+                    select: {
+                        name: true
+                    }
                 },
-                details: { 
-                    include: { 
-                        exercise: { select: { name: true, image_url: true } } 
-                    } 
+                details: {
+                    include: {
+                        exercise: {
+                            select: {
+                                name: true,
+                                image_url: true
+                            }
+                        }
+                    }
+                },
+                user: {
+                    select: {
+                        name: true,
+                        email: true
+                    }
                 }
+            },
+            orderBy: {
+                workout_date: 'desc'
             }
         });
-        res.json(history);
+
+        res.json(workouts);
     } catch (error) {
         next(error);
     }
@@ -59,23 +91,32 @@ const getWorkoutHistory = async (req, res, next) => {
 
 const deleteWorkout = async (req, res, next) => {
     const { id } = req.params;
+
     try {
         const workoutId = parseInt(id, 10);
 
-        const workout = await prisma.workout.findUnique({ 
-            where: { id_workout: workoutId } 
+        const workout = await prisma.workout.findUnique({
+            where: {
+                id_workout: workoutId
+            }
         });
 
         if (!workout || workout.id_user !== req.user.id) {
-            return res.status(403).json({ error: "No tienes permiso para eliminar este entrenamiento o no existe" });
+            return res.status(403).json({
+                error: "No tienes permiso para eliminar este entrenamiento o no existe"
+            });
         }
 
-        // Borrado físico real
         await prisma.workout.delete({
-            where: { id_workout: workoutId }
+            where: {
+                id_workout: workoutId
+            }
         });
 
-        res.json({ message: "Entrenamiento eliminado físicamente del historial" });
+        res.json({
+            message: "Entrenamiento eliminado físicamente del historial"
+        });
+
     } catch (error) {
         next(error);
     }
@@ -83,29 +124,62 @@ const deleteWorkout = async (req, res, next) => {
 
 const getWorkoutById = async (req, res, next) => {
     const { id } = req.params;
+
     try {
         const workoutId = parseInt(id, 10);
 
         const workout = await prisma.workout.findUnique({
-            where: { id_workout: workoutId },
+            where: {
+                id_workout: workoutId
+            },
             include: {
-                routine: { select: { name: true } },
-                details: { 
-                    include: { 
-                        exercise: { select: { name: true, image_url: true } } 
-                    } 
+                routine: {
+                    select: {
+                        name: true
+                    }
+                },
+                details: {
+                    include: {
+                        exercise: {
+                            select: {
+                                name: true,
+                                image_url: true
+                            }
+                        }
+                    }
+                },
+                user: {
+                    select: {
+                        name: true,
+                        email: true
+                    }
                 }
             }
         });
 
-        if (!workout || workout.active === 0 || workout.id_user !== req.user.id) {
-            return res.status(404).json({ error: "Entrenamiento no encontrado o acceso denegado" });
+        if (
+            !workout ||
+            workout.active === 0 ||
+            (
+                req.user.role !== 'admin' &&
+                workout.id_user !== req.user.id
+            )
+        ) {
+            return res.status(404).json({
+                error: "Entrenamiento no encontrado o acceso denegado"
+            });
         }
 
         res.json(workout);
+
     } catch (error) {
         next(error);
     }
 };
 
-module.exports = { createWorkout, getWorkoutHistory, deleteWorkout, getWorkoutById };
+module.exports = {
+    createWorkout,
+    getWorkoutHistory,
+    deleteWorkout,
+    getWorkoutById
+};

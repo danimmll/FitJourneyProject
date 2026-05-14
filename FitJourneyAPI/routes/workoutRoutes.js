@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+
 const workoutCtrl = require('../controllers/workoutController');
 const { authenticateToken } = require('../middlewares/auth');
 const { validateWorkout } = require('../middlewares/validators');
@@ -7,32 +8,41 @@ const { validateWorkout } = require('../middlewares/validators');
 /**
  * @swagger
  * tags:
- *   - name: Historial
- *     description: Operadores dedicados a la telemetría histórica de las iteraciones de usuario
+ *   - name: Workouts
+ *     description: Gestión del historial y registro de entrenamientos
  */
 
 /**
  * @swagger
  * /api/workouts/history:
  *   get:
- *     summary: Provee un registro cronológico descendente de las sesiones consumadas
- *     tags: [Historial]
+ *     summary: Obtener historial de entrenamientos
+ *     description: |
+ *       - Los usuarios normales solo pueden ver sus propios entrenamientos.
+ *       - Los administradores pueden visualizar el historial completo de todos los usuarios.
+ *     tags: [Workouts]
  *     security:
  *       - bearerAuth: []
  *     responses:
  *       200:
- *         description: Transmisión íntegra de la serie de tiempo telemetrada
+ *         description: Historial obtenido correctamente
  *       401:
- *         description: Firma de encriptación no homologada
+ *         description: Token inválido o no proporcionado
+ *       403:
+ *         description: Acceso denegado
  */
-router.get('/history', authenticateToken, workoutCtrl.getWorkoutHistory);
+router.get(
+    '/history',
+    authenticateToken,
+    workoutCtrl.getWorkoutHistory
+);
 
 /**
  * @swagger
  * /api/workouts:
  *   post:
- *     summary: Consolida las métricas finales de una iteración temporal de esfuerzo
- *     tags: [Historial]
+ *     summary: Registrar un nuevo entrenamiento
+ *     tags: [Workouts]
  *     security:
  *       - bearerAuth: []
  *     requestBody:
@@ -44,7 +54,7 @@ router.get('/history', authenticateToken, workoutCtrl.getWorkoutHistory);
  *             properties:
  *               id_routine:
  *                 type: integer
- *                 description: Vínculo referencial a la tabla Rutinas (Nullable para modo libre)
+ *                 nullable: true
  *                 example: 10
  *               duration_minutes:
  *                 type: integer
@@ -54,7 +64,7 @@ router.get('/history', authenticateToken, workoutCtrl.getWorkoutHistory);
  *                 example: 450.5
  *               notes:
  *                 type: string
- *                 example: "Curva de esfuerzo máxima alcanzada en el tercer cuadrante"
+ *                 example: "Buen rendimiento en entrenamiento de pecho"
  *               details:
  *                 type: array
  *                 items:
@@ -68,24 +78,34 @@ router.get('/history', authenticateToken, workoutCtrl.getWorkoutHistory);
  *                       example: 4
  *                     reps_performed:
  *                       type: string
- *                       example: "10,10,8,8"
+ *                       example: "12,10,10,8"
  *                     max_weight_used:
  *                       type: number
- *                       example: 80.5
+ *                       example: 80
  *     responses:
  *       201:
- *         description: Log grabado e indexado en capa profunda
+ *         description: Entrenamiento registrado correctamente
+ *       400:
+ *         description: Datos inválidos
  *       401:
- *         description: Identidad del solicitante es anónima o corrompida
+ *         description: Usuario no autenticado
  */
-router.post('/', authenticateToken, validateWorkout, workoutCtrl.createWorkout);
+router.post(
+    '/',
+    authenticateToken,
+    validateWorkout,
+    workoutCtrl.createWorkout
+);
 
 /**
  * @swagger
  * /api/workouts/{id}:
  *   get:
- *     summary: Focaliza una extracción puntual sobre una ocurrencia de log transaccional
- *     tags: [Historial]
+ *     summary: Obtener un entrenamiento por ID
+ *     description: |
+ *       - Los usuarios normales solo pueden acceder a sus entrenamientos.
+ *       - Los administradores pueden consultar cualquier entrenamiento.
+ *     tags: [Workouts]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -94,19 +114,32 @@ router.post('/', authenticateToken, validateWorkout, workoutCtrl.createWorkout);
  *         required: true
  *         schema:
  *           type: integer
- *         description: ID numérico incremental del Log de Actividad
+ *         description: ID del entrenamiento
  *     responses:
  *       200:
- *         description: Reconstrucción granular de la sesión generada
+ *         description: Entrenamiento encontrado
  *       401:
- *         description: Carga interrumpida por credencial vacía
+ *         description: Token inválido
  *       403:
- *         description: Barrera de encapsulamiento; prohibida la lectura a logs foráneos
+ *         description: Acceso denegado
  *       404:
- *         description: Referencia a la entidad nula
+ *         description: Entrenamiento no encontrado
+ */
+router.get(
+    '/:id',
+    authenticateToken,
+    workoutCtrl.getWorkoutById
+);
+
+/**
+ * @swagger
+ * /api/workouts/{id}:
  *   delete:
- *     summary: Anula transacciones cronológicas consolidadas erróneamente
- *     tags: [Historial]
+ *     summary: Eliminar un entrenamiento
+ *     description: |
+ *       El usuario solo puede eliminar entrenamientos propios,
+ *       salvo que tenga rol de administrador.
+ *     tags: [Workouts]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -115,16 +148,21 @@ router.post('/', authenticateToken, validateWorkout, workoutCtrl.createWorkout);
  *         required: true
  *         schema:
  *           type: integer
- *         description: Clave de la sesión que requiere anulación
+ *         description: ID del entrenamiento
  *     responses:
  *       200:
- *         description: Borrado de histórico verificado con comprobación de cascada
+ *         description: Entrenamiento eliminado correctamente
  *       401:
- *         description: Abortado al no encontrar el token RSA
+ *         description: Token inválido
  *       403:
- *         description: Excepción arrojada en análisis de propiedad de la fila
+ *         description: No autorizado para eliminar este entrenamiento
+ *       404:
+ *         description: Entrenamiento no encontrado
  */
-router.get('/:id', authenticateToken, workoutCtrl.getWorkoutById);
-router.delete('/:id', authenticateToken, workoutCtrl.deleteWorkout);
+router.delete(
+    '/:id',
+    authenticateToken,
+    workoutCtrl.deleteWorkout
+);
 
 module.exports = router;
