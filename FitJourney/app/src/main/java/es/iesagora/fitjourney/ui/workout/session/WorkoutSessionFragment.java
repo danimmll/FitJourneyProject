@@ -27,10 +27,12 @@ import es.iesagora.fitjourney.R;
 import es.iesagora.fitjourney.data.model.Exercise;
 import es.iesagora.fitjourney.data.model.Routine;
 import es.iesagora.fitjourney.data.model.RoutineExercise;
+import es.iesagora.fitjourney.data.model.User;
 import es.iesagora.fitjourney.data.model.Workout;
 import es.iesagora.fitjourney.data.model.WorkoutDetail;
 import es.iesagora.fitjourney.data.remote.Resource;
 import es.iesagora.fitjourney.databinding.FragmentWorkoutSessionBinding;
+import es.iesagora.fitjourney.utils.FitnessCalculator;
 import es.iesagora.fitjourney.viewmodel.SecondViewModel;
 
 public class WorkoutSessionFragment extends Fragment {
@@ -74,12 +76,13 @@ public class WorkoutSessionFragment extends Fragment {
         binding.toolbarWorkout.setNavigationOnClickListener(v -> showExitConfirmationDialog());
         binding.btnFinishWorkout.setOnClickListener(v -> finishWorkout());
 
-        requireActivity().getOnBackPressedDispatcher().addCallback(getViewLifecycleOwner(), new OnBackPressedCallback(true) {
-            @Override
-            public void handleOnBackPressed() {
-                showExitConfirmationDialog();
-            }
-        });
+        requireActivity().getOnBackPressedDispatcher().addCallback(getViewLifecycleOwner(),
+                new OnBackPressedCallback(true) {
+                    @Override
+                    public void handleOnBackPressed() {
+                        showExitConfirmationDialog();
+                    }
+                });
     }
 
     private void setupObservers() {
@@ -110,7 +113,8 @@ public class WorkoutSessionFragment extends Fragment {
                     secondsElapsed++;
                     int mins = secondsElapsed / 60;
                     int secs = secondsElapsed % 60;
-                    binding.tvWorkoutTimer.setText(String.format(Locale.getDefault(), "%02d:%02d", mins, secs));
+                    binding.tvWorkoutTimer.setText(
+                            String.format(Locale.getDefault(), "%02d:%02d", mins, secs));
                     timerHandler.postDelayed(this, 1000);
                 }
             }
@@ -124,17 +128,17 @@ public class WorkoutSessionFragment extends Fragment {
         inputViews.clear();
 
         for (RoutineExercise re : routine.getExercises()) {
-            View exerciseView = getLayoutInflater().inflate(R.layout.viewholder_workout_input, binding.llExercisesContainer, false);
+            View exerciseView = getLayoutInflater().inflate(
+                    R.layout.viewholder_workout_input, binding.llExercisesContainer, false);
 
-            TextView tvName = exerciseView.findViewById(R.id.tvWorkoutExerciseName);
+            TextView tvName   = exerciseView.findViewById(R.id.tvWorkoutExerciseName);
             TextView tvTarget = exerciseView.findViewById(R.id.tvTargetGoal);
-            TextInputEditText etSets = exerciseView.findViewById(R.id.etActualSets);
-            TextInputEditText etReps = exerciseView.findViewById(R.id.etActualReps);
+            TextInputEditText etSets   = exerciseView.findViewById(R.id.etActualSets);
+            TextInputEditText etReps   = exerciseView.findViewById(R.id.etActualReps);
             TextInputEditText etWeight = exerciseView.findViewById(R.id.etActualWeight);
 
             if (re.getExercise() != null) {
                 tvName.setText(re.getExercise().getName() + " ⓘ");
-
                 tvName.setOnClickListener(v -> showExerciseInfo(re.getExercise()));
             }
 
@@ -144,7 +148,6 @@ public class WorkoutSessionFragment extends Fragment {
                 etWeight.setText(String.valueOf(re.getTargetWeight()));
             }
             tvTarget.setText(targetText);
-
             etSets.setText(String.valueOf(re.getTargetSets()));
             etReps.setText(String.valueOf(re.getTargetReps()));
 
@@ -156,7 +159,7 @@ public class WorkoutSessionFragment extends Fragment {
     private void showExerciseInfo(Exercise exercise) {
         if (exercise == null) return;
 
-        String description = exercise.getDescription() != null && !exercise.getDescription().isEmpty()
+        String description = (exercise.getDescription() != null && !exercise.getDescription().isEmpty())
                 ? exercise.getDescription()
                 : "No hay instrucciones detalladas para este ejercicio.";
 
@@ -170,28 +173,85 @@ public class WorkoutSessionFragment extends Fragment {
     private void finishWorkout() {
         isTimerRunning = false;
 
+        int durationMinutes = Math.max(1, secondsElapsed / 60);
+        float durationHours = durationMinutes / 60f;
+
+        float userWeightKg = getUserWeight();
+        float exerciseCount = !inputViews.isEmpty() ? inputViews.size() : 1f;
+        float timePerExerciseHours = durationHours / exerciseCount;
+
         Workout workout = new Workout();
         workout.setIdRoutine(routineId);
-        workout.setDurationMinutes(Math.max(1, secondsElapsed / 60));
+        workout.setDurationMinutes(durationMinutes);
 
         List<WorkoutDetail> details = new ArrayList<>();
+        float totalCalories = 0f;
+
         for (ExerciseInputWrapper wrapper : inputViews) {
             WorkoutDetail d = new WorkoutDetail();
             d.setIdExercise(wrapper.re.getIdExercise());
 
-            String sSets = wrapper.etSets.getText() != null ? wrapper.etSets.getText().toString().trim() : "";
-            String sReps = wrapper.etReps.getText() != null ? wrapper.etReps.getText().toString().trim() : "";
+            String sSets   = wrapper.etSets.getText()   != null ? wrapper.etSets.getText().toString().trim()   : "";
+            String sReps   = wrapper.etReps.getText()   != null ? wrapper.etReps.getText().toString().trim()   : "";
             String sWeight = wrapper.etWeight.getText() != null ? wrapper.etWeight.getText().toString().trim() : "";
 
-            d.setSetsPerformed(sSets.isEmpty() ? 0 : Integer.parseInt(sSets));
-            d.setRepsPerformed(String.valueOf(sReps.isEmpty() ? 0 : Integer.parseInt(sReps)));
-            d.setMaxWeightUsed(sWeight.isEmpty() ? 0.0 : Double.parseDouble(sWeight));
+            int    sets   = sSets.isEmpty()   ? 0    : Integer.parseInt(sSets);
+            int    reps   = sReps.isEmpty()   ? 0    : Integer.parseInt(sReps);
+            double weight = sWeight.isEmpty() ? 0.0  : Double.parseDouble(sWeight);
 
+            d.setSetsPerformed(sets);
+            d.setRepsPerformed(String.valueOf(reps));
+            d.setMaxWeightUsed(weight);
             details.add(d);
+
+            float met = getMETForExercise(wrapper.re.getExercise(), sets, reps, (float) weight, userWeightKg);
+            totalCalories += FitnessCalculator.calculateCaloriesBurned(met, userWeightKg, timePerExerciseHours);
         }
+
         workout.setDetails(details);
+        workout.setCaloriesBurned((double) totalCalories);
 
         viewModel.createWorkout(workout);
+    }
+
+    /**
+     * Obtiene el peso del usuario desde el perfil cargado en el ViewModel.
+     * Devuelve 70 kg como valor por defecto si no hay datos disponibles.
+     */
+    private float getUserWeight() {
+        if (viewModel.getProfile().getValue() != null
+                && viewModel.getProfile().getValue().data != null) {
+            User user = viewModel.getProfile().getValue().data.getUser();
+            if (user != null && user.getWeight() != null) {
+                return user.getWeight().floatValue();
+            }
+        }
+        return 70f;
+    }
+
+
+    private float getMETForExercise(Exercise exercise, int sets, int reps,
+                                    float weightKg, float bodyWeightKg) {
+        if (exercise == null || exercise.getExerciseType() == null) {
+            return 6.0f;
+        }
+
+        switch (exercise.getExerciseType()) {
+            case "Cardio":
+                return FitnessCalculator.calculateCardioMET(8.0f, 8.0f, 0f);
+
+            case "Estiramiento":
+                return FitnessCalculator.calculateStretchingMET(false, "Normal", "Intermedio");
+
+            case "Hipertrofia":
+            default:
+                float bw = bodyWeightKg > 0 ? bodyWeightKg : 70f;
+                // Si no se registró peso, usar el 50% del peso corporal como estimación
+                float lifted = weightKg > 0 ? weightKg : bw * 0.5f;
+                int s = sets > 0 ? sets : 3;
+                int r = reps > 0 ? reps : 10;
+                return FitnessCalculator.calculateStrengthMET(lifted, bw, s, r, 90);
+        }
     }
 
     private void showExitConfirmationDialog() {
@@ -220,8 +280,13 @@ public class WorkoutSessionFragment extends Fragment {
         TextInputEditText etSets;
         TextInputEditText etReps;
         TextInputEditText etWeight;
-        ExerciseInputWrapper(RoutineExercise re, TextInputEditText s, TextInputEditText r, TextInputEditText w) {
-            this.re = re; this.etSets = s; this.etReps = r; this.etWeight = w;
+
+        ExerciseInputWrapper(RoutineExercise re, TextInputEditText s,
+                             TextInputEditText r, TextInputEditText w) {
+            this.re = re;
+            this.etSets = s;
+            this.etReps = r;
+            this.etWeight = w;
         }
     }
 }

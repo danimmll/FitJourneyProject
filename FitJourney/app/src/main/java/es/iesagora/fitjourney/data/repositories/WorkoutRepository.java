@@ -27,59 +27,39 @@ import retrofit2.Response;
  */
 public class WorkoutRepository {
 
-    // --- CONSTANTES DE TEXTO ---
     private static final String ERROR_CONEXION = "Error de conexión: ";
-    private static final String KEY_MESSAGE = "message";
-    private static final String KEY_ERROR = "error";
+    private static final String KEY_MESSAGE    = "message";
+    private static final String KEY_ERROR      = "error";
 
-    /**
-     * Instancia de la API utilizada para realizar peticiones.
-     */
     private final AppApi api;
-
-    /**
-     * Gson utilizado para parsear mensajes de error del servidor.
-     */
     private final Gson gson = new Gson();
 
-    /**
-     * Callback para obtener listas de entrenamientos.
-     */
     public interface WorkoutListCallback {
         void onResult(Resource<List<Workout>> result);
     }
 
-    /**
-     * Callback para acciones sobre entrenamientos
-     * (crear o eliminar).
-     */
     public interface WorkoutActionCallback {
         void onResult(Resource<String> result);
     }
 
-    /**
-     * Constructor del repositorio.
-     *
-     * @param context Contexto de la aplicación.
-     */
+    public interface WorkoutSingleCallback {
+        void onResult(Resource<Workout> result);
+    }
+
     public WorkoutRepository(Context context) {
         api = RetrofitClient.getInstance(context);
     }
 
     /**
      * Obtiene el historial de entrenamientos del usuario.
-     *
-     * @param callback Callback con la lista de entrenamientos.
      */
     public void getWorkoutHistory(WorkoutListCallback callback) {
-
         callback.onResult(Resource.loading());
 
         api.getWorkoutHistory().enqueue(new Callback<>() {
             @Override
             public void onResponse(@NonNull Call<List<Workout>> call,
                                    @NonNull Response<List<Workout>> response) {
-
                 if (response.isSuccessful() && response.body() != null) {
                     callback.onResult(Resource.success(response.body()));
                 } else {
@@ -90,7 +70,28 @@ public class WorkoutRepository {
             @Override
             public void onFailure(@NonNull Call<List<Workout>> call,
                                   @NonNull Throwable t) {
+                callback.onResult(Resource.error(ERROR_CONEXION + t.getMessage()));
+            }
+        });
+    }
 
+    public void getWorkoutById(int id, WorkoutSingleCallback callback) {
+        callback.onResult(Resource.loading());
+
+        api.getWorkoutById(id).enqueue(new Callback<>() {
+            @Override
+            public void onResponse(@NonNull Call<Workout> call,
+                                   @NonNull Response<Workout> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    callback.onResult(Resource.success(response.body()));
+                } else {
+                    callback.onResult(Resource.error(getError(response)));
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<Workout> call,
+                                  @NonNull Throwable t) {
                 callback.onResult(Resource.error(ERROR_CONEXION + t.getMessage()));
             }
         });
@@ -98,19 +99,14 @@ public class WorkoutRepository {
 
     /**
      * Crea un nuevo entrenamiento.
-     *
-     * @param workout Datos del entrenamiento.
-     * @param callback Callback con el resultado.
      */
     public void createWorkout(Workout workout, WorkoutActionCallback callback) {
-
         callback.onResult(Resource.loading());
 
         api.createWorkout(workout).enqueue(new Callback<>() {
             @Override
             public void onResponse(@NonNull Call<ResponseBody> call,
                                    @NonNull Response<ResponseBody> response) {
-
                 if (response.isSuccessful()) {
                     callback.onResult(Resource.success("Entrenamiento guardado con éxito"));
                 } else {
@@ -121,7 +117,6 @@ public class WorkoutRepository {
             @Override
             public void onFailure(@NonNull Call<ResponseBody> call,
                                   @NonNull Throwable t) {
-
                 callback.onResult(Resource.error(ERROR_CONEXION + t.getMessage()));
             }
         });
@@ -129,19 +124,14 @@ public class WorkoutRepository {
 
     /**
      * Elimina un entrenamiento existente.
-     *
-     * @param idWorkout ID del entrenamiento.
-     * @param callback Callback con el resultado.
      */
     public void deleteWorkout(int idWorkout, WorkoutActionCallback callback) {
-
         callback.onResult(Resource.loading());
 
         api.deleteWorkout(idWorkout).enqueue(new Callback<>() {
             @Override
             public void onResponse(@NonNull Call<ResponseBody> call,
                                    @NonNull Response<ResponseBody> response) {
-
                 if (response.isSuccessful()) {
                     callback.onResult(Resource.success("Entrenamiento eliminado"));
                 } else {
@@ -152,26 +142,16 @@ public class WorkoutRepository {
             @Override
             public void onFailure(@NonNull Call<ResponseBody> call,
                                   @NonNull Throwable t) {
-
                 callback.onResult(Resource.error(ERROR_CONEXION + t.getMessage()));
             }
         });
     }
 
-    /**
-     * Extrae el mensaje de error del servidor.
-     *
-     * @param response Respuesta HTTP.
-     * @return Mensaje de error formateado.
-     */
     private String getError(Response<?> response) {
-
         try {
             if (response.errorBody() != null) {
-
                 String json = response.errorBody().string();
                 JsonObject obj = gson.fromJson(json, JsonObject.class);
-
                 if (obj.has(KEY_MESSAGE) && !obj.get(KEY_MESSAGE).isJsonNull()) {
                     return obj.get(KEY_MESSAGE).getAsString();
                 } else if (obj.has(KEY_ERROR) && !obj.get(KEY_ERROR).isJsonNull()) {
@@ -179,7 +159,6 @@ public class WorkoutRepository {
                 }
             }
         } catch (Exception ignored) {}
-
         return "Error del servidor (" + response.code() + ")";
     }
 }

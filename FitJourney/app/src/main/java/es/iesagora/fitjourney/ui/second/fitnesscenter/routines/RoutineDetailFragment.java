@@ -86,9 +86,12 @@ public class RoutineDetailFragment extends Fragment {
                 bundle.putSerializable("exercise_data", exercise);
 
                 try {
-                    Navigation.findNavController(requireView()).navigate(R.id.exerciseDetailFragment, bundle);
+                    Navigation.findNavController(requireView())
+                            .navigate(R.id.action_routineDetail_to_exerciseDetail, bundle);
                 } catch (IllegalArgumentException e) {
-                    Toast.makeText(getContext(), "Falta la acción para ir al detalle del ejercicio en nav_second.xml", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(),
+                            "Error de navegación: comprueba nav_second.xml",
+                            Toast.LENGTH_SHORT).show();
                 }
             });
 

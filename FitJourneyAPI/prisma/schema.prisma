@@ -36,6 +36,7 @@ model Exercise {
   image_url    String?
   video_url    String?
   equipment    String?
+  exercise_type String
   creation_date DateTime @default(now())
 
   routineExercises RoutineExercise[]

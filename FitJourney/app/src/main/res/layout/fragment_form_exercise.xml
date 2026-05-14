@@ -63,6 +63,7 @@
                 android:textColor="@color/text" />
         </com.google.android.material.textfield.TextInputLayout>
 
+        <!-- Dificultad -->
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/tilDifficulty"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
@@ -82,6 +83,26 @@
                 android:textColor="@color/text" />
         </com.google.android.material.textfield.TextInputLayout>
 
+        <!-- NUEVO: Tipo de ejercicio — determina el MET usado al calcular calorías -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tilExerciseType"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:hint="Tipo de ejercicio"
+            app:boxStrokeColor="@color/mainazul"
+            app:hintTextColor="@color/mainazul"
+            app:layout_constraintTop_toBottomOf="@id/tilDifficulty">
+
+            <AutoCompleteTextView
+                android:id="@+id/actvExerciseType"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="none"
+                android:textColor="@color/text" />
+        </com.google.android.material.textfield.TextInputLayout>
+
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/tilVideoUrl"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
@@ -92,7 +113,7 @@
             android:textColorHint="#B0B0B0"
             app:boxStrokeColor="@color/mainazul"
             app:hintTextColor="@color/mainazul"
-            app:layout_constraintTop_toBottomOf="@id/tilDifficulty">
+            app:layout_constraintTop_toBottomOf="@id/tilExerciseType">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etVideoUrl"

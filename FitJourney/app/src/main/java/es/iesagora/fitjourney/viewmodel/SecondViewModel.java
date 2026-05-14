@@ -54,6 +54,7 @@ public class SecondViewModel extends AndroidViewModel {
     private final MutableLiveData<Resource<String>> deleteUserLiveData = new MutableLiveData<>();
     private final MutableLiveData<Resource<String>> banUserLiveData = new MutableLiveData<>();
     private final MutableLiveData<Resource<String>> workoutActionLiveData = new MutableLiveData<>();
+    private final MutableLiveData<Resource<Workout>> singleWorkoutLiveData = new MutableLiveData<>();
 
     private List<Exercise> fullExerciseList = new ArrayList<>();
 
@@ -493,5 +494,14 @@ public class SecondViewModel extends AndroidViewModel {
                 fetchWorkoutHistory();
             }
         });
+    }
+
+    public LiveData<Resource<Workout>> getSingleWorkout() {
+        return singleWorkoutLiveData;
+    }
+
+    public void fetchWorkoutById(int id) {
+        singleWorkoutLiveData.setValue(Resource.loading());
+        workoutRepository.getWorkoutById(id, singleWorkoutLiveData::setValue);
     }
 }

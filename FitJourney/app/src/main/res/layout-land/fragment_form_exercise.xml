@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.core.widget.NestedScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -7,38 +8,41 @@
     android:background="@color/fondo"
     android:fillViewport="true">
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:baselineAligned="false"
-        android:orientation="horizontal"
-        android:padding="24dp"
-        android:weightSum="2">
+        android:padding="24dp">
 
+        <TextView
+            android:id="@+id/tvFormTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/new_exercise"
+            android:textColor="@color/text"
+            android:textSize="30sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <!-- COLUMNA IZQUIERDA -->
         <LinearLayout
+            android:id="@+id/leftColumn"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
             android:layout_marginEnd="12dp"
-            android:layout_weight="1"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/tvFormTitle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/new_exercise"
-                android:textColor="@color/text"
-                android:textSize="28sp"
-                android:textStyle="bold" />
+            android:orientation="vertical"
+            app:layout_constraintEnd_toStartOf="@id/rightColumn"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvFormTitle"
+            app:layout_constraintWidth_percent="0.5">
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/tilName"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
                 android:hint="@string/exercise_name"
-                android:textColorHint="#B0B0B0"
                 app:boxStrokeColor="@color/mainazul"
                 app:hintTextColor="@color/mainazul">
 
@@ -57,7 +61,6 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:hint="@string/muscle_group"
-                android:textColorHint="#B0B0B0"
                 app:boxStrokeColor="@color/mainazul"
                 app:hintTextColor="@color/mainazul">
 
@@ -88,42 +91,30 @@
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/tilDescription"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:id="@+id/tilExerciseType"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:hint="@string/description"
-                android:textColorHint="#B0B0B0"
+                android:hint="Tipo de ejercicio"
                 app:boxStrokeColor="@color/mainazul"
                 app:hintTextColor="@color/mainazul">
 
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/etDescription"
+                <AutoCompleteTextView
+                    android:id="@+id/actvExerciseType"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:gravity="top"
-                    android:inputType="textMultiLine"
-                    android:minLines="4"
+                    android:inputType="none"
                     android:textColor="@color/text" />
             </com.google.android.material.textfield.TextInputLayout>
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
-            android:layout_weight="1"
-            android:orientation="vertical">
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/tilVideoUrl"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
                 android:hint="URL del vídeo de YouTube (opcional)"
-                android:textColorHint="#B0B0B0"
                 app:boxStrokeColor="@color/mainazul"
                 app:hintTextColor="@color/mainazul">
 
@@ -142,7 +133,6 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:hint="URL de la imagen (opcional)"
-                android:textColorHint="#B0B0B0"
                 app:boxStrokeColor="@color/mainazul"
                 app:hintTextColor="@color/mainazul">
 
@@ -154,11 +144,25 @@
                     android:textColor="@color/text" />
             </com.google.android.material.textfield.TextInputLayout>
 
+        </LinearLayout>
+
+        <!-- COLUMNA DERECHA -->
+        <LinearLayout
+            android:id="@+id/rightColumn"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:layout_marginStart="12dp"
+            android:orientation="vertical"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/leftColumn"
+            app:layout_constraintTop_toBottomOf="@id/tvFormTitle"
+            app:layout_constraintWidth_percent="0.5">
+
             <LinearLayout
                 android:id="@+id/layoutImage"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
                 android:gravity="center"
                 android:orientation="vertical">
 
@@ -172,9 +176,9 @@
                     app:icon="@android:drawable/ic_menu_gallery" />
 
                 <com.google.android.material.card.MaterialCardView
-                    android:layout_width="160dp"
-                    android:layout_height="160dp"
-                    android:layout_marginTop="12dp"
+                    android:layout_width="260dp"
+                    android:layout_height="260dp"
+                    android:layout_marginTop="16dp"
                     app:cardCornerRadius="14dp"
                     app:cardElevation="0dp"
                     app:strokeColor="@color/mainazul"
@@ -190,11 +194,31 @@
                 </com.google.android.material.card.MaterialCardView>
             </LinearLayout>
 
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilDescription"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:hint="@string/description"
+                app:boxStrokeColor="@color/mainazul"
+                app:hintTextColor="@color/mainazul">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etDescription"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="top"
+                    android:inputType="textMultiLine"
+                    android:minLines="8"
+                    android:textColor="@color/text" />
+            </com.google.android.material.textfield.TextInputLayout>
+
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnSave"
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
-                android:layout_marginTop="24dp"
+                android:layout_marginTop="28dp"
                 android:backgroundTint="@color/mainrosa"
                 android:text="@string/save"
                 android:textColor="@color/text"
@@ -204,5 +228,6 @@
 
         </LinearLayout>
 
-    </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
 </androidx.core.widget.NestedScrollView>

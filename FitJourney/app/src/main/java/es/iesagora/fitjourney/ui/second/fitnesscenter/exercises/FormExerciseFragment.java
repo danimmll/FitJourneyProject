@@ -33,8 +33,11 @@ public class FormExerciseFragment extends Fragment {
     private String currentImageBase64 = null;
 
     private static final String PRINCIPIANTE_STRING = "Principiante";
-    private static final String INTERMEDIO_STRING = "Intermedio";
-    private static final String EXPERTO_STRING = "Experto";
+    private static final String INTERMEDIO_STRING   = "Intermedio";
+    private static final String EXPERTO_STRING      = "Experto";
+    private static final String TYPE_HIPERTROFIA   = "Hipertrofia";
+    private static final String TYPE_CARDIO        = "Cardio";
+    private static final String TYPE_ESTIRAMIENTO  = "Estiramiento";
 
     private final ActivityResultLauncher<String> getContent =
             registerForActivityResult(new ActivityResultContracts.GetContent(), uri -> {
@@ -77,9 +80,16 @@ public class FormExerciseFragment extends Fragment {
     }
 
     private void setupDropdowns() {
+        // Dropdown de dificultad
         String[] difficulties = {PRINCIPIANTE_STRING, INTERMEDIO_STRING, EXPERTO_STRING};
-        ArrayAdapter<String> adapterDifficulty = new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, difficulties);
+        ArrayAdapter<String> adapterDifficulty = new ArrayAdapter<>(
+                requireContext(), android.R.layout.simple_dropdown_item_1line, difficulties);
         binding.actvDifficulty.setAdapter(adapterDifficulty);
+
+        String[] types = {TYPE_HIPERTROFIA, TYPE_CARDIO, TYPE_ESTIRAMIENTO};
+        ArrayAdapter<String> adapterType = new ArrayAdapter<>(
+                requireContext(), android.R.layout.simple_dropdown_item_1line, types);
+        binding.actvExerciseType.setAdapter(adapterType);
     }
 
     private void setupListeners() {
@@ -88,7 +98,8 @@ public class FormExerciseFragment extends Fragment {
 
         binding.etImageUrl.setOnFocusChangeListener((v, hasFocus) -> {
             if (!hasFocus) {
-                String url = binding.etImageUrl.getText() != null ? binding.etImageUrl.getText().toString().trim() : "";
+                String url = binding.etImageUrl.getText() != null
+                        ? binding.etImageUrl.getText().toString().trim() : "";
                 if (!url.isEmpty()) {
                     selectedLocalImageUri = null;
                     currentImageBase64 = null;
@@ -106,15 +117,18 @@ public class FormExerciseFragment extends Fragment {
 
         binding.etName.setText(exerciseToEdit.getName());
         binding.etDescription.setText(exerciseToEdit.getDescription());
-
         binding.etMuscle.setText(exerciseToEdit.getMuscleGroup());
 
         String diff = exerciseToEdit.getDifficulty();
         if (diff != null) {
-            if (diff.equals("1")) diff = PRINCIPIANTE_STRING;
+            if (diff.equals("1"))      diff = PRINCIPIANTE_STRING;
             else if (diff.equals("2")) diff = INTERMEDIO_STRING;
             else if (diff.equals("3")) diff = EXPERTO_STRING;
             binding.actvDifficulty.setText(diff, false);
+        }
+
+        if (exerciseToEdit.getExerciseType() != null) {
+            binding.actvExerciseType.setText(exerciseToEdit.getExerciseType(), false);
         }
 
         if (exerciseToEdit.getVideoUrl() != null) {
@@ -122,25 +136,24 @@ public class FormExerciseFragment extends Fragment {
         }
 
         String existingImage = exerciseToEdit.getImageUrl();
-
         if (existingImage != null && !existingImage.isEmpty()) {
             if (existingImage.startsWith("http")) {
                 binding.etImageUrl.setText(existingImage);
             } else {
                 currentImageBase64 = existingImage;
             }
-
             ImageUtils.loadInto(requireContext(), existingImage, binding.ivPreview, R.drawable.ic_ejercicios);
         }
     }
 
     private void saveExercise() {
-        String name = Objects.requireNonNull(binding.etName.getText()).toString().trim();
+        String name        = Objects.requireNonNull(binding.etName.getText()).toString().trim();
         String description = Objects.requireNonNull(binding.etDescription.getText()).toString().trim();
         String imageUrlStr = Objects.requireNonNull(binding.etImageUrl.getText()).toString().trim();
+        String muscle      = Objects.requireNonNull(binding.etMuscle.getText()).toString().trim();
+        String diffStr     = binding.actvDifficulty.getText().toString().trim();
 
-        String muscle = Objects.requireNonNull(binding.etMuscle.getText()).toString().trim();
-        String diffStr = binding.actvDifficulty.getText().toString().trim();
+        String exerciseType = binding.actvExerciseType.getText().toString().trim();
 
         String videoUrl = "";
         if (binding.etVideoUrl.getText() != null) {
@@ -152,12 +165,19 @@ public class FormExerciseFragment extends Fragment {
             return;
         }
 
+        if (!exerciseType.isEmpty()
+                && !exerciseType.equals(TYPE_HIPERTROFIA)
+                && !exerciseType.equals(TYPE_CARDIO)
+                && !exerciseType.equals(TYPE_ESTIRAMIENTO)) {
+            Toast.makeText(getContext(), "Tipo de ejercicio no válido", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         String difficultyId = "1";
         if (diffStr.equals(INTERMEDIO_STRING)) difficultyId = "2";
         else if (diffStr.equals(EXPERTO_STRING)) difficultyId = "3";
 
         String finalPhotoData;
-
         if (selectedLocalImageUri != null) {
             finalPhotoData = ImageUtils.uriToBase64(requireContext().getContentResolver(), selectedLocalImageUri);
             if (finalPhotoData == null) {
@@ -177,6 +197,7 @@ public class FormExerciseFragment extends Fragment {
         newExercise.setMuscleGroup(muscle);
         newExercise.setImageUrl(finalPhotoData);
         newExercise.setVideoUrl(videoUrl);
+        newExercise.setExerciseType(exerciseType.isEmpty() ? null : exerciseType);
 
         if (exerciseToEdit == null) {
             viewModel.createExercise(newExercise, () -> {
@@ -186,7 +207,6 @@ public class FormExerciseFragment extends Fragment {
         } else {
             int exId = exerciseToEdit.getIdExercise();
             newExercise.setIdExercise(exId);
-
             viewModel.updateExercise(exId, newExercise, () -> {
                 viewModel.selectExercise(newExercise);
                 requireActivity().getOnBackPressedDispatcher().onBackPressed();

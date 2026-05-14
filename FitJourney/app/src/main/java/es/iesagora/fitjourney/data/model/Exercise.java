@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
  * Modelo que representa un ejercicio dentro de la aplicación.
  * Guarda toda la información necesaria de un ejercicio físico:
  * nombre, grupo muscular, dificultad, descripción, imágenes,
- * vídeos, equipamiento y estado.
+ * vídeos, equipamiento, tipo y estado.
  * Esta clase se utiliza para recibir y enviar datos entre
  * la API, el repositorio y las pantallas de la app.
  */
@@ -38,7 +38,7 @@ public class Exercise implements Serializable {
 
     /**
      * Nivel de dificultad del ejercicio.
-     * Puede ser: Fácil, Medio o Difícil.
+     * Puede ser: Principiante, Intermedio o Experto.
      */
     private String difficulty;
 
@@ -74,4 +74,12 @@ public class Exercise implements Serializable {
      * 0 = Inactivo
      */
     private Integer active;
+
+    /**
+     * Valores posibles: "Hipertrofia", "Cardio", "Estiramiento"
+     * - Hipertrofia → FitnessCalculator.calculateStrengthMET(...)
+     * - Cardio      → FitnessCalculator.calculateCardioMET(...)
+     * - Estiramiento→ FitnessCalculator.calculateStretchingMET(...)
+     */
+    private String exerciseType;
 }

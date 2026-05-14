@@ -97,31 +97,42 @@
             app:nullable="true"
             android:defaultValue="@null" />
     </fragment>
+
     <fragment
         android:id="@+id/formWorkoutFragment"
         android:name="es.iesagora.fitjourney.ui.second.fitnesscenter.workouts.FormWorkoutFragment"
         android:label=""
         tools:layout="@layout/fragment_form_workout" />
+
     <fragment
         android:id="@+id/formRoutineFragment"
         android:name="es.iesagora.fitjourney.ui.second.fitnesscenter.routines.FormRoutineFragment"
         android:label=""
         tools:layout="@layout/fragment_form_routine" />
+
     <fragment
         android:id="@+id/adminUsersFragment"
         android:name="es.iesagora.fitjourney.ui.second.adminusers.AdminUsersFragment"
         android:label=""
         tools:layout="@layout/fragment_admin_users" />
+
     <fragment
         android:id="@+id/routineDetailFragment"
         android:name="es.iesagora.fitjourney.ui.second.fitnesscenter.routines.RoutineDetailFragment"
         android:label=""
-        tools:layout="@layout/fragment_routine_detail" />
+        tools:layout="@layout/fragment_routine_detail">
+
+        <action
+            android:id="@+id/action_routineDetail_to_exerciseDetail"
+            app:destination="@id/exerciseDetailFragment" />
+    </fragment>
+
     <fragment
         android:id="@+id/workoutHistoryFragment"
         android:name="es.iesagora.fitjourney.ui.second.workouthistory.WorkoutHistoryFragment"
         android:label=""
         tools:layout="@layout/fragment_workout_history" />
+
     <fragment
         android:id="@+id/workoutHistoryDetailFragment"
         android:name="es.iesagora.fitjourney.ui.second.workouthistory.WorkoutHistoryDetailFragment"
