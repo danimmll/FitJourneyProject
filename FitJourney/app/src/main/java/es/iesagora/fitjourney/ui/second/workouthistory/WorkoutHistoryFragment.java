@@ -8,8 +8,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import es.iesagora.fitjourney.data.remote.Resource;
+import es.iesagora.fitjourney.R;
 import es.iesagora.fitjourney.databinding.FragmentWorkoutHistoryBinding;
 import es.iesagora.fitjourney.ui.second.adapters.WorkoutHistoryAdapter;
 import es.iesagora.fitjourney.viewmodel.SecondViewModel;
@@ -31,12 +32,20 @@ public class WorkoutHistoryFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         viewModel = new ViewModelProvider(requireActivity()).get(SecondViewModel.class);
 
-        adapter = new WorkoutHistoryAdapter();
+        adapter = new WorkoutHistoryAdapter(workout -> {
+            Bundle bundle = new Bundle();
+            bundle.putInt("workout_id", workout.getIdWorkout());
+            try {
+                Navigation.findNavController(requireView()).navigate(R.id.workoutHistoryDetailFragment, bundle);
+            } catch (Exception ignored) {
+            }
+        });
+
         binding.rvWorkoutHistory.setLayoutManager(new LinearLayoutManager(getContext()));
         binding.rvWorkoutHistory.setAdapter(adapter);
 
         setupObservers();
-        viewModel.fetchWorkoutHistory(); // Cargamos los datos
+        viewModel.fetchWorkoutHistory();
     }
 
     private void setupObservers() {
@@ -51,8 +60,10 @@ public class WorkoutHistoryFragment extends Fragment {
                     if (resource.data != null && !resource.data.isEmpty()) {
                         adapter.setWorkouts(resource.data);
                         binding.tvEmptyHistory.setVisibility(View.GONE);
+                        binding.rvWorkoutHistory.setVisibility(View.VISIBLE);
                     } else {
                         binding.tvEmptyHistory.setVisibility(View.VISIBLE);
+                        binding.rvWorkoutHistory.setVisibility(View.GONE);
                     }
                     break;
                 case ERROR:
@@ -60,5 +71,11 @@ public class WorkoutHistoryFragment extends Fragment {
                     break;
             }
         });
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        binding = null;
     }
 }

@@ -13,11 +13,21 @@ import java.util.List;
 import java.util.Locale;
 import es.iesagora.fitjourney.R;
 import es.iesagora.fitjourney.data.model.Workout;
+import es.iesagora.fitjourney.utils.FitnessCalculator;
 
 public class WorkoutHistoryAdapter extends RecyclerView.Adapter<WorkoutHistoryAdapter.ViewHolder> {
 
     private List<Workout> workouts = new ArrayList<>();
     private final SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM yyyy", Locale.getDefault());
+    private final OnWorkoutClickListener listener;
+
+    public interface OnWorkoutClickListener {
+        void onWorkoutClick(Workout workout);
+    }
+
+    public WorkoutHistoryAdapter(OnWorkoutClickListener listener) {
+        this.listener = listener;
+    }
 
     @SuppressLint("NotifyDataSetChanged")
     public void setWorkouts(List<Workout> workouts) {
@@ -39,32 +49,45 @@ public class WorkoutHistoryAdapter extends RecyclerView.Adapter<WorkoutHistoryAd
 
         String routineName = (workout.getRoutine() != null) ? workout.getRoutine().getName() : "Entrenamiento Libre";
 
-        if (workout.getUser() != null && workout.getUser().getName() != null) {
+        double weight = 70.0;
+        if (workout.getUser() != null && workout.getUser().getWeight() != null) {
+            weight = workout.getUser().getWeight();
             routineName += " (" + workout.getUser().getName() + ")";
         }
 
         holder.tvName.setText(routineName);
-        holder.tvDuration.setText(workout.getDurationMinutes() + " min");
+
+        int duration = workout.getDurationMinutes() != null ? workout.getDurationMinutes() : 0;
+        holder.tvDuration.setText(duration + " min");
+
+        double calories = FitnessCalculator.calculateCaloriesBurned(6.0F, (float) weight,duration);
+        holder.tvCalories.setText((int)calories + " kcal");
 
         if (workout.getWorkoutDate() != null) {
             holder.tvDate.setText(dateFormat.format(workout.getWorkoutDate()));
         }
+
+        holder.itemView.setOnClickListener(v -> {
+            if (listener != null) listener.onWorkoutClick(workout);
+        });
     }
 
     @Override
     public int getItemCount() {
-        return workouts.size();
+        return workouts != null ? workouts.size() : 0;
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
         TextView tvName;
         TextView tvDate;
         TextView tvDuration;
+        TextView tvCalories;
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             tvName = itemView.findViewById(R.id.tvHistoryRoutineName);
             tvDate = itemView.findViewById(R.id.tvHistoryDate);
             tvDuration = itemView.findViewById(R.id.tvHistoryDuration);
+            tvCalories = itemView.findViewById(R.id.tvHistoryCalories);
         }
     }
 }

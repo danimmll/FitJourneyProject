@@ -60,9 +60,25 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="4dp"
+                android:layout_marginEnd="16dp"
                 android:textColor="@color/textSecondary"
                 android:textSize="14sp"
                 tools:text="45 min" />
+
+            <ImageView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:src="@drawable/ic_fire"
+                app:tint="@color/mainrosa" />
+
+            <TextView
+                android:id="@+id/tvHistoryCalories"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:textColor="@color/textSecondary"
+                android:textSize="14sp"
+                tools:text="320 kcal" />
         </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>

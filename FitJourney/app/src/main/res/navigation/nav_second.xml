@@ -124,7 +124,7 @@
         tools:layout="@layout/fragment_workout_history" />
     <fragment
         android:id="@+id/workoutHistoryDetailFragment"
-        android:name="es.iesagora.fitjourney.WorkoutHistoryDetailFragment"
+        android:name="es.iesagora.fitjourney.ui.second.workouthistory.WorkoutHistoryDetailFragment"
         android:label=""
         tools:layout="@layout/fragment_workout_history_detail" />
 

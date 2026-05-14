@@ -12,17 +12,7 @@
         android:layout_height="wrap_content"
         app:elevation="0dp"
         android:background="@android:color/transparent"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <com.google.android.material.appbar.MaterialToolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            app:title="Historial de Entrenamientos"
-            app:titleCentered="true"
-            app:titleTextColor="@color/mainrosa" />
-
-    </com.google.android.material.appbar.AppBarLayout>
+        app:layout_constraintTop_toTopOf="parent"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvWorkoutHistory"
