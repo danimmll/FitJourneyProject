@@ -19,7 +19,6 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-import com.google.android.material.textfield.TextInputEditText;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,11 +36,6 @@ import es.iesagora.fitjourney.ui.second.adapters.SelectExerciseAdapter;
 import es.iesagora.fitjourney.utils.ImageUtils;
 import es.iesagora.fitjourney.viewmodel.SecondViewModel;
 
-/**
- * Fragment encargado de la creación de nuevas rutinas de entrenamiento.
- * Permite al usuario crear una rutina con nombre, descripción,
- * imagen asociada (vía URL o galería) y una lista de ejercicios seleccionados del catálogo.
- */
 public class FormRoutineFragment extends Fragment {
 
     private FragmentFormRoutineBinding binding;
@@ -51,6 +45,10 @@ public class FormRoutineFragment extends Fragment {
 
     private final List<RoutineExercise> addedExercises = new ArrayList<>();
     private AddedExerciseAdapter adapter;
+
+    private static final String TYPE_HIPERTROFIA = "Hipertrofia";
+    private static final String TYPE_CARDIO = "Cardio";
+    private static final String TYPE_ESTIRAMIENTO = "Estiramiento";
 
     private final ActivityResultLauncher<String> getContent =
             registerForActivityResult(new ActivityResultContracts.GetContent(), uri -> {
@@ -81,6 +79,7 @@ public class FormRoutineFragment extends Fragment {
 
         if (getArguments() != null && getArguments().containsKey("routine_data")) {
             Routine routineToEdit = (Routine) getArguments().getSerializable("routine_data");
+            assert routineToEdit != null;
             fillFieldsForEdit(routineToEdit);
         }
 
@@ -119,10 +118,6 @@ public class FormRoutineFragment extends Fragment {
         binding.btnSaveRoutine.setOnClickListener(v -> saveRoutine());
     }
 
-    /**
-     * Muestra el diálogo para buscar un ejercicio del catálogo con un buscador dinámico
-     * e introducir series y repeticiones.
-     */
     private void showAddExerciseDialog() {
         List<Exercise> allExercises = getExerciseCatalog();
         if (allExercises == null) return;
@@ -135,6 +130,15 @@ public class FormRoutineFragment extends Fragment {
         @SuppressLint("SetTextI18n") SelectExerciseAdapter pickerAdapter = new SelectExerciseAdapter(exercise -> {
             selectedExercise[0] = exercise;
             dialogBinding.tvSelectedExercise.setText("Seleccionado: " + exercise.getName());
+
+            String type = exercise.getExerciseType() != null ? exercise.getExerciseType() : TYPE_HIPERTROFIA;
+            if (type.equals(TYPE_CARDIO) || type.equals(TYPE_ESTIRAMIENTO)) {
+                dialogBinding.tilReps.setVisibility(View.GONE);
+                dialogBinding.tilSets.setHint("Series/Rondas");
+            } else {
+                dialogBinding.tilReps.setVisibility(View.VISIBLE);
+                dialogBinding.tilSets.setHint("Series");
+            }
         });
 
         dialogBinding.rvExercisePicker.setLayoutManager(new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false));
@@ -143,9 +147,7 @@ public class FormRoutineFragment extends Fragment {
 
         dialogBinding.searchExercise.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
-            public boolean onQueryTextSubmit(String query) {
-                return false;
-            }
+            public boolean onQueryTextSubmit(String query) { return false; }
 
             @Override
             public boolean onQueryTextChange(String newText) {
@@ -171,7 +173,7 @@ public class FormRoutineFragment extends Fragment {
                 toast("Por favor, selecciona un ejercicio deslizando en la lista.");
                 return;
             }
-            onConfirmAddExercise(selectedExercise[0], dialogBinding.etSets, dialogBinding.etReps, dialog);
+            onConfirmAddExercise(selectedExercise[0], dialogBinding, dialog);
         });
     }
 
@@ -184,37 +186,38 @@ public class FormRoutineFragment extends Fragment {
         return resource.data;
     }
 
-    private void onConfirmAddExercise(Exercise selectedExercise, TextInputEditText etSets, TextInputEditText etReps, AlertDialog dialog) {
-        String setsStr = etSets.getText() != null ? etSets.getText().toString() : "";
-        String repsStr = etReps.getText() != null ? etReps.getText().toString() : "";
+    private void onConfirmAddExercise(Exercise selectedExercise, DialogAddRoutineExerciseBinding dialogBinding, AlertDialog dialog) {
+        String type = selectedExercise.getExerciseType() != null ? selectedExercise.getExerciseType() : TYPE_HIPERTROFIA;
+        boolean isHipertrofia = type.equals(TYPE_HIPERTROFIA);
 
-        if (setsStr.isEmpty() || repsStr.isEmpty()) {
-            toast("Rellena las series y repeticiones");
+        String setsStr = dialogBinding.etSets.getText() != null ? dialogBinding.etSets.getText().toString().trim() : "";
+        String repsStr = dialogBinding.etReps.getText() != null ? dialogBinding.etReps.getText().toString().trim() : "";
+
+        if (setsStr.isEmpty() || (isHipertrofia && repsStr.isEmpty())) {
+            toast("Rellena los campos obligatorios");
             return;
         }
 
-        int[] parsed = parseSetsAndReps(setsStr, repsStr);
-        if (parsed == null) return;
+        int sets;
+        int reps = 0;
 
-        int sets = parsed[0];
-        int reps = parsed[1];
+        try {
+            sets = Integer.parseInt(setsStr);
+            if (isHipertrofia) {
+                reps = Integer.parseInt(repsStr);
+            }
+        } catch (NumberFormatException e) {
+            toast("Introduce números válidos");
+            return;
+        }
 
-        if (sets <= 0 || reps <= 0) {
-            toast("Series y repeticiones deben ser mayores que 0");
+        if (sets <= 0 || (isHipertrofia && reps <= 0)) {
+            toast("Los valores deben ser mayores que 0");
             return;
         }
 
         addRoutineExercise(selectedExercise, sets, reps);
         dialog.dismiss();
-    }
-
-    private int[] parseSetsAndReps(String setsStr, String repsStr) {
-        try {
-            return new int[]{ Integer.parseInt(setsStr), Integer.parseInt(repsStr) };
-        } catch (NumberFormatException e) {
-            toast("Series y repeticiones deben ser números válidos");
-            return null;
-        }
     }
 
     private void addRoutineExercise(Exercise exercise, int sets, int reps) {
@@ -250,12 +253,9 @@ public class FormRoutineFragment extends Fragment {
 
             if (resource.status == Resource.Status.SUCCESS) {
                 toast("¡Rutina creada con éxito!");
-
                 viewModel.getRoutineActionStatus().setValue(null);
                 viewModel.fetchRoutines();
-
                 Navigation.findNavController(requireView()).popBackStack();
-
             } else if (resource.status == Resource.Status.ERROR) {
                 toast(resource.message);
                 viewModel.getRoutineActionStatus().setValue(null);
@@ -290,9 +290,7 @@ public class FormRoutineFragment extends Fragment {
         routine.setDescription(desc.isEmpty() ? null : desc);
         routine.setPhotoUrl(finalPhotoData);
         routine.setExercises(addedExercises);
-
-        boolean isPublic = binding.switchPublic.isChecked();
-        routine.setIsPublic(isPublic ? 1 : 0);
+        routine.setIsPublic(binding.switchPublic.isChecked() ? 1 : 0);
 
         viewModel.createRoutine(routine);
     }
@@ -312,7 +310,7 @@ public class FormRoutineFragment extends Fragment {
         if (selectedLocalImageUri != null) {
             finalPhotoData = ImageUtils.uriToBase64(requireContext().getContentResolver(), selectedLocalImageUri);
             if (finalPhotoData == null) {
-                toast("Error al procesar la imagen seleccionada");
+                toast("Error al procesar la imagen");
                 return;
             }
         } else if (!imageUrl.isEmpty()) {
@@ -325,9 +323,7 @@ public class FormRoutineFragment extends Fragment {
         routine.setDescription(desc.isEmpty() ? null : desc);
         routine.setPhotoUrl(finalPhotoData);
         routine.setExercises(addedExercises);
-
-        boolean isPublic = binding.switchPublic.isChecked();
-        routine.setIsPublic(isPublic ? 1 : 0);
+        routine.setIsPublic(binding.switchPublic.isChecked() ? 1 : 0);
 
         viewModel.updateRoutine(routineId, routine);
     }
