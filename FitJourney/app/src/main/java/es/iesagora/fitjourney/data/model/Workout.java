@@ -1,5 +1,7 @@
 package es.iesagora.fitjourney.data.model;
 
+import com.google.gson.annotations.SerializedName;
+
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
@@ -24,50 +26,53 @@ public class Workout implements Serializable {
     /**
      * Identificador único del entrenamiento.
      */
+    @SerializedName("id_workout")
     private int idWorkout;
 
     /**
      * Identificador del usuario que realizó el entrenamiento.
      */
+    @SerializedName("id_user")
     private int idUser;
 
     /**
      * Identificador de la rutina utilizada en el entrenamiento.
      */
+    @SerializedName("id_routine")
     private int idRoutine;
 
     /**
      * Fecha en la que se realizó el entrenamiento.
      */
+    @SerializedName("workout_date")
     private Date workoutDate;
 
     /**
      * Duración total del entrenamiento en minutos.
      */
+    @SerializedName("duration_minutes")
     private Integer durationMinutes;
 
     /**
      * Cantidad estimada de calorías quemadas.
      */
+    @SerializedName("calories_burned")
     private Double caloriesBurned;
 
     /**
      * Notas u observaciones añadidas por el usuario.
      */
+    @SerializedName("notes")
     private String notes;
-
-    /**
-     * Estado del entrenamiento.
-     * 1 = Activo
-     * 0 = Inactivo
-     */
-    private int active;
 
     /**
      * Información completa de la rutina asociada.
      */
     private Routine routine;
 
+    /**
+     * Información completa del usuario asociado.
+     */
     private User user;
 
     /**

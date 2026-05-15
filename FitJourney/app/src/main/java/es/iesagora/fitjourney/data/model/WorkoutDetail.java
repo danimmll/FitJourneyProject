@@ -1,5 +1,6 @@
 package es.iesagora.fitjourney.data.model;
 
+import com.google.gson.annotations.SerializedName;
 import java.io.Serializable;
 
 import lombok.AllArgsConstructor;
@@ -10,46 +11,53 @@ import lombok.NoArgsConstructor;
  * Modelo que representa el detalle de un ejercicio realizado
  * dentro de un entrenamiento.
  * Esta clase almacena la información específica de ejecución
- * de cada ejercicio, como las series realizadas, repeticiones
- * y peso máximo utilizado.
- * También contiene la información completa del ejercicio asociado.
+ * de cada ejercicio, diferenciando entre hipertrofia, cardio
+ * y estiramientos.
  */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class WorkoutDetail implements Serializable {
 
-    /**
-     * Identificador único del detalle del entrenamiento.
-     */
+    @SerializedName("id_workout_detail")
     private int idDetail;
 
-    /**
-     * Identificador del entrenamiento al que pertenece.
-     */
+    @SerializedName("id_workout")
     private int idWorkout;
 
-    /**
-     * Identificador del ejercicio realizado.
-     */
+    @SerializedName("id_exercise")
     private int idExercise;
 
     /**
-     * Número de series realizadas durante el ejercicio.
+     * Número de series (sets) completadas.
      */
+    @SerializedName("sets_performed")
     private Integer setsPerformed;
 
-    /**
-     * Repeticiones realizadas.
-     * Puede almacenarse como texto para permitir formatos
-     * personalizados como "12-10-8" o similares.
-     */
-    private String repsPerformed;
 
     /**
-     * Peso máximo utilizado durante el ejercicio.
+     * Repeticiones realizadas. Guardado como "12,10,8".
      */
-    private Double maxWeightUsed;
+    @SerializedName("reps_string")
+    private String repsString;
+
+    /**
+     * Peso máximo utilizado durante el ejercicio de fuerza.
+     */
+    @SerializedName("max_weight")
+    private Double maxWeight;
+
+    /**
+     * Minutos que ha durado el ejercicio de cardio o estiramiento.
+     */
+    @SerializedName("duration_minutes")
+    private Double durationMinutes;
+
+    /**
+     * Velocidad media en km/h (Solo para ejercicios de Cardio).
+     */
+    @SerializedName("speed_kmh")
+    private Double speedKmh;
 
     /**
      * Información completa del ejercicio asociado.

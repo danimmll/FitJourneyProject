@@ -1,5 +1,7 @@
 package es.iesagora.fitjourney.data.model;
 
+import com.google.gson.annotations.SerializedName;
+
 import java.io.Serializable;
 
 import lombok.AllArgsConstructor;
@@ -14,18 +16,84 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class User implements Serializable {
 
+    /**
+     * Identificador único del usuario.
+     */
+    @SerializedName("id_user")
     private Integer idUser;
+
+    /**
+     * Correo electrónico del usuario.
+     */
+    @SerializedName("email")
     private String email;
+
+    /**
+     * Nombre completo del usuario.
+     */
+    @SerializedName("name")
     private String name;
+
+    /**
+     * Contraseña cifrada del usuario.
+     */
+    @SerializedName("password")
     private String password;
+
+    /**
+     * Género del usuario.
+     */
+    @SerializedName("gender")
     private String gender;
+
+    /**
+     * Objetivo físico del usuario.
+     */
+    @SerializedName("goal")
     private String goal;
+
+    /**
+     * Altura del usuario en centímetros.
+     */
+    @SerializedName("height")
     private Double height;
+
+    /**
+     * Peso del usuario en kilogramos.
+     */
+    @SerializedName("weight")
     private Double weight;
+
+    /**
+     * Fecha de nacimiento del usuario.
+     */
+    @SerializedName("birth_date")
     private String birthDate;
+
+    /**
+     * URL de la foto de perfil del usuario.
+     */
+    @SerializedName("photo_url")
     private String photoUrl;
+
+    /**
+     * Rol del usuario dentro de la aplicación.
+     */
+    @SerializedName("role")
     private String role;
+
+    /**
+     * Estado del usuario.
+     * 1 = Activo
+     * 0 = Inactivo
+     */
+    @SerializedName("active")
     private Integer active;
+
+    /**
+     * Fecha de registro del usuario.
+     */
+    @SerializedName("register_date")
     private String registerDate;
 
     /**
@@ -39,11 +107,11 @@ public class User implements Serializable {
         this.name       = name;
         this.email      = email;
         this.password   = pass;
-        this.birthDate = birthDate;
+        this.birthDate  = birthDate;
         this.gender     = gender;
         this.goal       = goal;
-        this.height     = (double) height;
-        this.weight     = (double) weight;
+        this.height     = height;
+        this.weight     = weight;
     }
 
     /**

@@ -90,15 +90,21 @@ model Workout {
 }
 
 model WorkoutDetail {
-  id_detail Int @id @default(autoincrement())
+  id_workout_detail Int      @id @default(autoincrement())
+  id_workout        Int
+  id_exercise       Int
+  
+  sets_performed    Int      @default(0)
 
-  workout   Workout @relation(fields: [id_workout], references: [id_workout], onDelete: Cascade)
-  id_workout Int
+  reps_string       String?  @db.VarChar(50) 
+  max_weight        Float?
 
-  exercise  Exercise @relation(fields: [id_exercise], references: [id_exercise], onDelete: Cascade)
-  id_exercise Int
+  duration_minutes  Float?   
+  speed_kmh         Float?  
 
-  sets_performed   Int?
-  reps_performed   String?
-  max_weight_used  Float?
+  workout           Workout  @relation(fields: [id_workout], references: [id_workout], onDelete: Cascade)
+  exercise          Exercise @relation(fields: [id_exercise], references: [id_exercise], onDelete: Restrict)
+
+  @@index([id_workout], map: "id_workout")
+  @@index([id_exercise], map: "id_exercise")
 }

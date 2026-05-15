@@ -1,5 +1,7 @@
 package es.iesagora.fitjourney.data.model;
 
+import com.google.gson.annotations.SerializedName;
+
 import java.io.Serializable;
 import java.util.List;
 
@@ -24,41 +26,46 @@ public class Routine implements Serializable {
     /**
      * Identificador único de la rutina.
      */
+    @SerializedName("id_routine")
     private int idRoutine;
 
     /**
      * Nombre de la rutina.
      * Ejemplo: "Rutina Full Body", "Pierna Avanzada", etc.
      */
+    @SerializedName("name")
     private String name;
 
     /**
      * Descripción o explicación de la rutina.
      */
+    @SerializedName("description")
     private String description;
 
     /**
      * URL de la imagen asociada a la rutina.
      */
+    @SerializedName("photo_url")
     private String photoUrl;
 
     /**
      * Fecha de creación de la rutina.
      */
+    @SerializedName("creation_date")
     private String creationDate;
 
     /**
      * Identificador del usuario que creó la rutina.
      */
+    @SerializedName("id_user")
     private int idUser;
 
     /**
-     * Estado de la rutina.
-     * 1 = Activa
-     * 0 = Inactiva
+     * Indica si la rutina es pública.
+     * 1 = Pública
+     * 0 = Privada
      */
-    private int active;
-
+    @SerializedName("is_public")
     private int isPublic;
 
     /**

@@ -3,10 +3,7 @@ const prisma = new PrismaClient();
 
 const createWorkout = async (req, res, next) => {
     try {
-        // 1. Extraemos TODO lo que podría mandar Android
         const { id_routine, duration_minutes, calories_burned, notes, workoutDetails, workout_details, details } = req.body;
-
-        // 2. Pillamos el array venga con el nombre que venga
         const arrayDetalles = workoutDetails || workout_details || details || [];
 
         const workout = await prisma.workout.create({
@@ -19,11 +16,13 @@ const createWorkout = async (req, res, next) => {
                 notes,
                 details: {
                     create: arrayDetalles.length > 0
-                        ? arrayDetalles.map((d, index) => ({
+                        ? arrayDetalles.map((d) => ({
                             id_exercise: d.id_exercise,
-                            sets_performed: d.sets || d.sets_performed || 1,
-                            reps_performed: d.reps || d.reps_performed || 0,
-                            max_weight_used: d.weight || d.max_weight_used || 0
+                            sets_performed: d.sets_performed || d.sets || d.setsPerformed || 1,
+                            reps_string: d.reps_string || d.repsString || null,
+                            max_weight: d.max_weight || d.maxWeight || null,
+                            duration_minutes: d.duration_minutes || d.durationMinutes || null,
+                            speed_kmh: d.speed_kmh || d.speedKmh || null
                         }))
                         : []
                 }
@@ -43,21 +42,20 @@ const createWorkout = async (req, res, next) => {
             data: workout
         });
     } catch (error) {
-        console.error("Error al crear workout:", error);
         next(error);
     }
 };
 
 const getWorkoutHistory = async (req, res, next) => {
     try {
-        let whereCondition = {};
+        let condicionBusqueda = {};
 
         if (req.user.role !== 'admin') {
-            whereCondition.id_user = req.user.id;
+            condicionBusqueda.id_user = req.user.id;
         }
 
         const workouts = await prisma.workout.findMany({
-            where: whereCondition,
+            where: condicionBusqueda,
             include: {
                 routine: {
                     select: { name: true }
@@ -67,7 +65,8 @@ const getWorkoutHistory = async (req, res, next) => {
                         exercise: {
                             select: {
                                 name: true,
-                                image_url: true
+                                image_url: true,
+                                exercise_type: true
                             }
                         }
                     }
@@ -93,10 +92,10 @@ const getWorkoutHistory = async (req, res, next) => {
 const deleteWorkout = async (req, res, next) => {
     const { id } = req.params;
     try {
-        const workoutId = parseInt(id);
+        const idEntrenamiento = parseInt(id);
 
         const workout = await prisma.workout.findUnique({
-            where: { id_workout: workoutId },
+            where: { id_workout: idEntrenamiento },
             include: { routine: true }
         });
 
@@ -110,10 +109,10 @@ const deleteWorkout = async (req, res, next) => {
 
         await prisma.$transaction([
             prisma.workoutDetail.deleteMany({
-                where: { id_workout: workoutId }
+                where: { id_workout: idEntrenamiento }
             }),
             prisma.workout.delete({
-                where: { id_workout: workoutId }
+                where: { id_workout: idEntrenamiento }
             })
         ]);
 
@@ -128,10 +127,10 @@ const getWorkoutById = async (req, res, next) => {
     const { id } = req.params;
 
     try {
-        const workoutId = parseInt(id, 10);
+        const idEntrenamiento = parseInt(id, 10);
 
         const workout = await prisma.workout.findUnique({
-            where: { id_workout: workoutId },
+            where: { id_workout: idEntrenamiento },
             include: {
                 routine: {
                     select: { name: true }
@@ -141,7 +140,8 @@ const getWorkoutById = async (req, res, next) => {
                         exercise: {
                             select: {
                                 name: true,
-                                image_url: true
+                                image_url: true,
+                                exercise_type: true
                             }
                         }
                     }
