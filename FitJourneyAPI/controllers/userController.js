@@ -64,7 +64,7 @@ const updateProfile = async (req, res, next) => {
         if (photo_url !== undefined) dataToUpdate.photo_url = photo_url;
 
         if (password && password.trim() !== "") {
-            const salt = await bcrypt.genSalt(10);
+            const salt = await bcrypt.genSalt(12);
             dataToUpdate.password = await bcrypt.hash(password, salt);
         }
 
