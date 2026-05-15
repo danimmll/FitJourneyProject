@@ -67,7 +67,9 @@ public class WorkoutHistoryAdapter extends RecyclerView.Adapter<WorkoutHistoryAd
         }
 
         int duration = workout.getDurationMinutes() != null ? workout.getDurationMinutes() : 0;
-        holder.tvDuration.setText(duration + " min");
+        double cals = workout.getCaloriesBurned() != null ? workout.getCaloriesBurned() : 0.0;
+
+        holder.tvDuration.setText(duration + " min • " + Math.round(cals) + " kcal");
 
         holder.itemView.setOnClickListener(v -> {
             if (listener != null) listener.onItemClick(workout);
@@ -84,7 +86,9 @@ public class WorkoutHistoryAdapter extends RecyclerView.Adapter<WorkoutHistoryAd
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
-        TextView tvRoutineName, tvDate, tvDuration;
+        TextView tvRoutineName;
+        TextView tvDate;
+        TextView tvDuration;
         MaterialButton btnDelete;
 
         ViewHolder(View view) {

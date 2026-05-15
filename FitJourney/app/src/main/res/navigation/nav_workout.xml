@@ -10,4 +10,10 @@
         android:name="es.iesagora.fitjourney.ui.workout.session.WorkoutSessionFragment"
         android:label=""
         tools:layout="@layout/fragment_workout_session" />
+
+    <fragment
+        android:id="@+id/exerciseDetailFragment"
+        android:name="es.iesagora.fitjourney.ui.second.fitnesscenter.exercises.ExerciseDetailFragment"
+        android:label=""
+        tools:layout="@layout/fragment_exercise_detail" />
 </navigation>

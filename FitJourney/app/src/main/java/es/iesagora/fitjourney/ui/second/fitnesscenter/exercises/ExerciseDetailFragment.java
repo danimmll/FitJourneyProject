@@ -41,11 +41,11 @@ import es.iesagora.fitjourney.viewmodel.SecondViewModel;
  *
  * Responsabilidades principales:
  * <ul>
- *     <li>Obtener el ejercicio seleccionado desde el ViewModel.</li>
- *     <li>Renderizar la información detallada del ejercicio.</li>
- *     <li>Parsear la descripción en pasos/instrucciones.</li>
- *     <li>Gestionar carga de imágenes en Base64 o URL.</li>
- *     <li>Permitir edición y eliminación para administradores.</li>
+ * <li>Obtener el ejercicio seleccionado desde el ViewModel.</li>
+ * <li>Renderizar la información detallada del ejercicio.</li>
+ * <li>Parsear la descripción en pasos/instrucciones.</li>
+ * <li>Gestionar carga de imágenes en Base64 o URL.</li>
+ * <li>Permitir edición y eliminación para administradores.</li>
  * </ul>
  */
 public class ExerciseDetailFragment extends Fragment {
@@ -61,6 +61,8 @@ public class ExerciseDetailFragment extends Fragment {
 
     /** Adaptador de instrucciones paso a paso */
     private InstructionAdapter instructionAdapter;
+
+    private static final String EXERCISE_DATA_STRING = "exercise_data";
 
     /**
      * Infla la vista del fragmento.
@@ -96,22 +98,32 @@ public class ExerciseDetailFragment extends Fragment {
         binding.rvInstructions.setLayoutManager(new LinearLayoutManager(requireContext()));
         binding.rvInstructions.setAdapter(instructionAdapter);
 
-        viewModel.getSelectedExercise().observe(getViewLifecycleOwner(), exercise -> {
-            if (exercise != null) {
-                currentExercise = exercise;
-                fillData(exercise);
-            }
-        });
+        if (getArguments() != null && getArguments().containsKey(EXERCISE_DATA_STRING)) {
+            currentExercise = (Exercise) getArguments().getSerializable(EXERCISE_DATA_STRING);
+            fillData(currentExercise);
+        } else {
+            viewModel.getSelectedExercise().observe(getViewLifecycleOwner(), exercise -> {
+                if (exercise != null) {
+                    currentExercise = exercise;
+                    fillData(exercise);
+                }
+            });
+        }
+
+        boolean esSoloLectura = false;
+        if (getArguments() != null) {
+            esSoloLectura = getArguments().getBoolean("readOnly", false);
+        }
 
         PreferencesRepository prefs = new PreferencesRepository(requireContext());
 
-        if ("admin".equals(prefs.getRole())) {
+        if ("admin".equals(prefs.getRole()) && !esSoloLectura) {
             binding.adminPanel.setVisibility(View.VISIBLE);
 
             binding.btnEdit.setOnClickListener(v -> {
                 if (currentExercise != null) {
                     Bundle bundle = new Bundle();
-                    bundle.putSerializable("exercise_data", currentExercise);
+                    bundle.putSerializable(EXERCISE_DATA_STRING, currentExercise);
                     Navigation.findNavController(v).navigate(R.id.action_detail_to_form, bundle);
                 }
             });
