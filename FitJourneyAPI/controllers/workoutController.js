@@ -50,9 +50,7 @@ const createWorkout = async (req, res, next) => {
 
 const getWorkoutHistory = async (req, res, next) => {
     try {
-        let whereCondition = {
-            active: 1
-        };
+        let whereCondition = {};
 
         if (req.user.role !== 'admin') {
             whereCondition.id_user = req.user.id;
@@ -62,9 +60,7 @@ const getWorkoutHistory = async (req, res, next) => {
             where: whereCondition,
             include: {
                 routine: {
-                    select: {
-                        name: true
-                    }
+                    select: { name: true }
                 },
                 details: {
                     include: {
@@ -135,14 +131,10 @@ const getWorkoutById = async (req, res, next) => {
         const workoutId = parseInt(id, 10);
 
         const workout = await prisma.workout.findUnique({
-            where: {
-                id_workout: workoutId
-            },
+            where: { id_workout: workoutId },
             include: {
                 routine: {
-                    select: {
-                        name: true
-                    }
+                    select: { name: true }
                 },
                 details: {
                     include: {
@@ -163,14 +155,7 @@ const getWorkoutById = async (req, res, next) => {
             }
         });
 
-        if (
-            !workout ||
-            workout.active === 0 ||
-            (
-                req.user.role !== 'admin' &&
-                workout.id_user !== req.user.id
-            )
-        ) {
+        if (!workout || (req.user.role !== 'admin' && workout.id_user !== req.user.id)) {
             return res.status(404).json({
                 error: "Entrenamiento no encontrado o acceso denegado"
             });

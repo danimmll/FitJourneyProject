@@ -1,6 +1,7 @@
 package es.iesagora.fitjourney.data.model;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
 
 import lombok.AllArgsConstructor;
@@ -38,7 +39,7 @@ public class Workout implements Serializable {
     /**
      * Fecha en la que se realizó el entrenamiento.
      */
-    private String workoutDate;
+    private Date workoutDate;
 
     /**
      * Duración total del entrenamiento en minutos.
