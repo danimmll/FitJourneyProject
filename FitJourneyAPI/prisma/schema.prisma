@@ -13,10 +13,10 @@ model User {
   email        String   @unique
   name         String
   password     String
-  gender       String?
+  gender       String
   goal         String?
-  height       Float?
-  weight       Float?
+  height       Float
+  weight       Float
   birth_date   DateTime?
   photo_url    String?
   role         String   @default("user")
