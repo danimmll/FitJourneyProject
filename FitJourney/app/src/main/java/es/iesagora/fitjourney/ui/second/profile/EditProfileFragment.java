@@ -3,7 +3,6 @@ package es.iesagora.fitjourney.ui.second.profile;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,8 +10,6 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Toast;
 
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -36,12 +33,8 @@ import es.iesagora.fitjourney.viewmodel.SecondViewModel;
 /**
  * Fragment encargado de la edición del perfil del usuario.
  * Este fragment permite al usuario autenticado modificar sus datos personales
- * dentro de la aplicación, incluyendo nombre, contraseña, altura, peso, objetivo fitness y foto.
- * * Gestiona el modo Administrador:
- * Si un admin edita a otro usuario, se ocultan opciones de seguridad y
- * se utiliza un endpoint específico de actualización.
- * * Incorpora la gestión dinámica de objetivos basada en el catálogo global de la aplicación,
- * sincronizando las opciones de edición con las disponibles durante el registro inicial.
+ * dentro de la aplicación, incluyendo nombre, contraseña, altura, peso y objetivo fitness.
+ * (La edición de la foto de perfil ha sido deshabilitada).
  */
 public class EditProfileFragment extends Fragment {
 
@@ -52,48 +45,14 @@ public class EditProfileFragment extends Fragment {
     private static final String USERDATA_STRING = "user_data";
 
     private boolean isAdminEdit = false;
-
-    private Uri selectedLocalImageUri = null;
-    private String currentImageBase64 = null;
     private boolean passwordWasChanged = false;
 
-
-    /**
-     * Lanzador para abrir la galería y seleccionar una foto.
-     * Al recibir un resultado, prioriza la imagen local y limpia el campo de URL.
-     */
-    private final ActivityResultLauncher<String> getContent =
-            registerForActivityResult(new ActivityResultContracts.GetContent(), uri -> {
-                if (uri != null) {
-                    selectedLocalImageUri = uri;
-                    currentImageBase64 = null;
-                    binding.etPhotoUrl.setText("");
-
-                    ImageUtils.loadCircle(requireContext(), uri.toString(), binding.ivAvatar, R.drawable.ic_profile);
-                }
-            });
-
-    /**
-     * Infla la vista del fragmento de edición de perfil.
-     *
-     * @param inflater           Instancia de LayoutInflater para inflar la vista.
-     * @param container          Vista padre a la que se adjuntará el fragment.
-     * @param savedInstanceState Estado previamente guardado.
-     * @return La vista raíz del fragment.
-     */
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentEditProfileBinding.inflate(inflater, container, false);
         return binding.getRoot();
     }
 
-    /**
-     * Se llama después de crear la vista. Inicializa ViewModel, preferencias,
-     * evalúa el rol del usuario que accede y configura la interfaz y los observadores.
-     *
-     * @param view               La vista creada.
-     * @param savedInstanceState Estado previamente guardado.
-     */
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -120,10 +79,6 @@ public class EditProfileFragment extends Fragment {
         setupObservers(prefs);
     }
 
-    /**
-     * Configura el menú desplegable de objetivos utilizando la misma estructura
-     * del proceso de registro, garantizando la consistencia en toda la plataforma.
-     */
     private void setupDropdowns() {
         String[] goals = {
                 getString(R.string.lose_weight),
@@ -145,9 +100,6 @@ public class EditProfileFragment extends Fragment {
         binding.actvGoal.setAdapter(adapterGoals);
     }
 
-    /**
-     * Ajusta la visibilidad de ciertos campos dependiendo de si es un usuario normal o un administrador.
-     */
     @SuppressLint("SetTextI18n")
     private void setupUIForRole() {
         if (isAdminEdit) {
@@ -159,24 +111,7 @@ public class EditProfileFragment extends Fragment {
         }
     }
 
-    /**
-     * Configura los listeners de los botones, la imagen y la gestión del foco en la URL.
-     */
     private void setupListeners() {
-        binding.ivAvatar.setOnClickListener(v -> getContent.launch("image/*"));
-        binding.btnSelectImage.setOnClickListener(v -> getContent.launch("image/*"));
-
-        binding.etPhotoUrl.setOnFocusChangeListener((v, hasFocus) -> {
-            if (!hasFocus) {
-                String url = binding.etPhotoUrl.getText() != null ? binding.etPhotoUrl.getText().toString().trim() : "";
-                if (!url.isEmpty()) {
-                    selectedLocalImageUri = null;
-                    currentImageBase64 = null;
-                    ImageUtils.loadCircle(requireContext(), url, binding.ivAvatar, R.drawable.ic_profile);
-                }
-            }
-        });
-
         binding.btnSaveProfile.setOnClickListener(v -> submitChanges());
 
         if (!isAdminEdit) {
@@ -184,9 +119,6 @@ public class EditProfileFragment extends Fragment {
         }
     }
 
-    /**
-     * Carga los datos del usuario en los campos del formulario.
-     */
     private void loadUserData() {
         if (currentUser == null) return;
 
@@ -200,16 +132,6 @@ public class EditProfileFragment extends Fragment {
             binding.etWeight.setText(String.valueOf(currentUser.getWeight()));
         }
 
-        String existingImage = currentUser.getPhotoUrl() != null ?
-                currentUser.getPhotoUrl() : currentUser.getDisplayAvatar();
-        if (existingImage != null && !existingImage.isEmpty()) {
-            if (existingImage.startsWith("http")) {
-                binding.etPhotoUrl.setText(existingImage);
-            } else {
-                currentImageBase64 = existingImage;
-            }
-        }
-
         ImageUtils.loadCircle(requireContext(), currentUser.getDisplayAvatar(), binding.ivAvatar, R.drawable.ic_profile);
 
         if (currentUser.getGoal() != null) {
@@ -217,15 +139,10 @@ public class EditProfileFragment extends Fragment {
         }
     }
 
-    /**
-     * Recoge los datos, los valida, procesa la imagen final y decide qué endpoint llamar.
-     */
     private void submitChanges() {
         String name = Objects.requireNonNull(binding.etName.getText()).toString().trim();
         String heightStr = Objects.requireNonNull(binding.etHeight.getText()).toString().trim();
         String weightStr = Objects.requireNonNull(binding.etWeight.getText()).toString().trim();
-        String photoUrlStr = Objects.requireNonNull(binding.etPhotoUrl.getText()).toString().trim();
-
         String goalStr = binding.actvGoal.getText().toString().trim();
 
         String newPasswordStr = binding.etNewPassword.getText() != null ? binding.etNewPassword.getText().toString().trim() : "";
@@ -240,19 +157,6 @@ public class EditProfileFragment extends Fragment {
 
         binding.tLGoal.setError(null);
 
-        String finalPhotoData;
-        if (selectedLocalImageUri != null) {
-            finalPhotoData = ImageUtils.uriToBase64(requireContext().getContentResolver(), selectedLocalImageUri);
-            if (finalPhotoData == null) {
-                Toast.makeText(getContext(), "Error al procesar imagen de galería", Toast.LENGTH_SHORT).show();
-                return;
-            }
-        } else if (!photoUrlStr.isEmpty()) {
-            finalPhotoData = photoUrlStr;
-        } else {
-            finalPhotoData = currentImageBase64;
-        }
-
         User updatedUser = new User();
         updatedUser.setName(name);
 
@@ -260,7 +164,8 @@ public class EditProfileFragment extends Fragment {
             updatedUser.setGoal(goalStr);
         }
 
-        updatedUser.setPhotoUrl(finalPhotoData);
+        // Conservamos la URL de la foto que ya tuviera el usuario
+        updatedUser.setPhotoUrl(currentUser.getPhotoUrl());
 
         if (!isAdminEdit && !newPasswordStr.isEmpty()) {
             if (!newPasswordStr.equals(confirmPasswordStr)) {
@@ -287,11 +192,6 @@ public class EditProfileFragment extends Fragment {
         }
     }
 
-    /**
-     * Configura los observadores para las respuestas de red relacionadas
-     * con la actualización del perfil y la desactivación de cuenta.
-     * * @param prefs Gestor de preferencias para operaciones de sesión.
-     */
     private void setupObservers(PreferencesRepository prefs) {
         viewModel.getUpdateProfileStatus().observe(getViewLifecycleOwner(), resource -> {
             if (resource == null) return;
@@ -377,10 +277,6 @@ public class EditProfileFragment extends Fragment {
         });
     }
 
-    /**
-     * Muestra un cuadro de diálogo para confirmar la intención del
-     * usuario de desactivar su propia cuenta.
-     */
     private void showDeleteConfirmationDialog() {
         String currentPassword = binding.etCurrentPassword.getText() != null
                 ? binding.etCurrentPassword.getText().toString().trim()
@@ -415,10 +311,6 @@ public class EditProfileFragment extends Fragment {
         dialog.show();
     }
 
-    /**
-     * Libera las referencias a las vistas encoladas al destruir
-     * la interfaz del fragmento.
-     */
     @Override
     public void onDestroyView() {
         super.onDestroyView();
