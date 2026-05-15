@@ -15,13 +15,16 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import es.iesagora.fitjourney.R;
@@ -32,60 +35,18 @@ import es.iesagora.fitjourney.databinding.FragmentHomeBinding;
 import es.iesagora.fitjourney.utils.FitnessCalculator;
 import es.iesagora.fitjourney.viewmodel.SecondViewModel;
 
-/**
- * Fragment principal (Home) de la sección secundaria de la aplicación.
- * Este fragmento actúa como panel principal del usuario autenticado, mostrando
- * información general de su estado físico, progreso y actividad reciente.
- * Responsabilidades principales:
- * - Mostrar saludo personalizado y fecha actual.
- * - Cargar datos del usuario desde el ViewModel.
- * - Calcular métricas físicas (IMC, grasa corporal, masa magra, etc.).
- * - Mostrar estadísticas de entrenamientos (calorías, racha, actividad semanal).
- * - Permitir navegación rápida a secciones de entrenamiento.
- * Este fragmento depende del {@link SecondViewModel} para obtener datos del usuario
- * y del historial de entrenamientos, así como de {@link PreferencesRepository}
- * para recuperar la sesión actual.
- */
 public class HomeFragment extends Fragment {
 
-    /**
-     * ViewBinding del layout del HomeFragment.
-     * Permite acceder de forma segura a las vistas sin usar findViewById.
-     */
     private FragmentHomeBinding binding;
-
-    /**
-     * Usuario actualmente cargado en la pantalla Home.
-     * Se utiliza para calcular métricas físicas y personalizar la UI.
-     */
     private User currentUser;
+    private final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
 
-    /**
-     * Infla la vista del fragmento Home.
-     *
-     * @param inflater objeto para inflar layouts XML
-     * @param container contenedor padre
-     * @param savedInstanceState estado previo del fragmento
-     * @return vista raíz del fragmento
-     */
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentHomeBinding.inflate(inflater, container, false);
         return binding.getRoot();
     }
 
-    /**
-     * Inicializa la interfaz del HomeFragment.
-     * Aquí se:
-     * - Inicializa ViewModel y repositorio de preferencias.
-     * - Configura header con fecha actual.
-     * - Configura botones de navegación rápida.
-     * - Carga datos del usuario y entrenamientos.
-     * - Observa cambios en perfil e historial.
-     *
-     * @param view vista raíz del fragmento
-     * @param savedInstanceState estado previo
-     */
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -117,18 +78,11 @@ public class HomeFragment extends Fragment {
         });
     }
 
-    /**
-     * Configura el encabezado del Home con la fecha actual formateada.
-     */
     private void setupHeader() {
         SimpleDateFormat sdf = new SimpleDateFormat("d 'DE' MMMM, yyyy", new Locale("es", "ES"));
         binding.tvDate.setText(sdf.format(new Date()).toUpperCase());
     }
 
-    /**
-     * Configura botones de navegación rápida hacia el centro de entrenamiento.
-     * Todos los botones redirigen al mismo fragmento de fitness.
-     */
     private void setupNavigationButtons() {
         View.OnClickListener goToFitnessCenter =
                 v -> Navigation.findNavController(v).navigate(R.id.fitnessCenterFragment);
@@ -139,18 +93,9 @@ public class HomeFragment extends Fragment {
         binding.btnStretching.setOnClickListener(goToFitnessCenter);
     }
 
-    /**
-     * Muestra los datos físicos del usuario (IMC, grasa corporal, masa magra, etc.).
-     * Utiliza {@link FitnessCalculator} para realizar los cálculos.
-     *
-     * @param user usuario autenticado
-     */
     @SuppressLint("SetTextI18n")
     private void populatePhysicalData(User user) {
-        String firstName = user.getName().contains(" ")
-                ? user.getName().split(" ")[0]
-                : user.getName();
-
+        String firstName = user.getName().contains(" ") ? user.getName().split(" ")[0] : user.getName();
         binding.tvGreeting.setText("Hola, " + firstName + " 👋");
 
         try {
@@ -159,199 +104,198 @@ public class HomeFragment extends Fragment {
             int edad = FitnessCalculator.calculateAge(user.getBirthDate());
 
             float imc = FitnessCalculator.calculateBMI(peso, alturaCm);
-
-            float porcentajeGrasa =
-                    FitnessCalculator.calculateBodyFat(imc, edad, user.getGender(), user.getGoal());
-
+            float porcentajeGrasa = FitnessCalculator.calculateBodyFat(imc, edad, user.getGender(), user.getGoal());
             float masaMagra = FitnessCalculator.calculateLeanMass(peso, porcentajeGrasa);
             String categoriaImc = FitnessCalculator.getBMICategory(imc, user.getGoal());
 
             binding.tvBMI.setText(String.format(Locale.US, "%.1f", imc));
             binding.tvBMICategory.setText(categoriaImc);
-
             binding.tvFat.setText(String.format(Locale.US, "%.1f%%", porcentajeGrasa));
             binding.tvLeanMass.setText(String.format(Locale.US, "%.1f kg", masaMagra));
 
         } catch (Exception e) {
-            binding.tvBMI.setText("--");
-            binding.tvBMICategory.setText("--");
-            binding.tvFat.setText("--%");
-            binding.tvLeanMass.setText("-- kg");
+            resetPhysicalDataUI();
         }
     }
 
-    /**
-     * Calcula la racha de entrenamientos y estadísticas generales.
-     * Se analiza:
-     * - Calorías máximas registradas.
-     * - Calorías del día actual.
-     * - Días consecutivos de entrenamiento (streak).
-     *
-     * @param history lista de entrenamientos del usuario
-     */
+    @SuppressLint("SetTextI18n")
+    private void resetPhysicalDataUI() {
+        binding.tvBMI.setText("--");
+        binding.tvBMICategory.setText("--");
+        binding.tvFat.setText("--%");
+        binding.tvLeanMass.setText("-- kg");
+    }
+
+    // --- REFACTOR: Estadísticas y Racha ---
+
     @SuppressLint("SetTextI18n")
     private void calculateStreakAndStats(List<Workout> history) {
         if (history == null || history.isEmpty()) {
-            binding.tvStreakTitle.setText("🔥  0 Días de Racha");
-            binding.tvStreakMessage.setText("Aún no has registrado entrenamientos. ¡Empieza hoy!");
-            binding.tvPeakCal.setText("0 kcal");
-            binding.tvTodayCalories.setText("0 kcal");
+            showEmptyStreakUI();
             return;
         }
 
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-        String hoyStr = sdf.format(new Date());
+        updateCaloriesStats(history);
 
-        List<Date> workoutDates = new ArrayList<>();
+        List<Date> uniqueWorkoutDates = getSortedUniqueDates(history);
+        if (uniqueWorkoutDates.isEmpty()) return;
+
+        calculateAndDisplayStreak(uniqueWorkoutDates);
+    }
+
+    @SuppressLint("SetTextI18n")
+    private void showEmptyStreakUI() {
+        binding.tvStreakTitle.setText("🔥  0 Días de Racha");
+        binding.tvStreakMessage.setText("Aún no has registrado entrenamientos. ¡Empieza hoy!");
+        binding.tvPeakCal.setText("0 kcal");
+        binding.tvTodayCalories.setText("0 kcal");
+    }
+
+    private void updateCaloriesStats(List<Workout> history) {
+        String todayStr = dateFormat.format(new Date());
         double maxCalories = 0.0;
-        float caloriasHoy = 0.0f;
+        float todayCalories = 0.0f;
 
         for (Workout w : history) {
-
-            if (w.getCaloriesBurned() != null && w.getCaloriesBurned() > maxCalories) {
-                maxCalories = w.getCaloriesBurned();
+            Double cal = w.getCaloriesBurned();
+            if (cal != null && cal > maxCalories) {
+                maxCalories = cal;
             }
+            if (w.getWorkoutDate() != null && dateFormat.format(w.getWorkoutDate()).equals(todayStr) && cal != null) todayCalories += cal;
 
-            try {
-                if (w.getWorkoutDate() != null) {
-                    String dateStr = w.getWorkoutDate().length() >= 10
-                            ? w.getWorkoutDate().substring(0, 10)
-                            : w.getWorkoutDate();
-
-                    if (dateStr.equals(hoyStr) && w.getCaloriesBurned() != null) {
-                        caloriasHoy += w.getCaloriesBurned();
-                    }
-
-                    Date d = sdf.parse(dateStr);
-                    if (d != null && !workoutDates.contains(d)) workoutDates.add(d);
-                }
-            } catch (Exception ignored) {}
         }
 
         binding.tvPeakCal.setText(String.format(Locale.US, "%.0f kcal", maxCalories));
-        binding.tvTodayCalories.setText(String.format(Locale.US, "%.0f kcal", caloriasHoy));
+        binding.tvTodayCalories.setText(String.format(Locale.US, "%.0f kcal", todayCalories));
+    }
 
-        workoutDates.sort(Collections.reverseOrder());
-        if (workoutDates.isEmpty()) return;
+    private List<Date> getSortedUniqueDates(List<Workout> history) {
+        List<Date> dates = new ArrayList<>();
+        for (Workout w : history) {
+            if (w.getWorkoutDate() != null) {
+                try {
+                    Date dateWithoutTime = dateFormat.parse(dateFormat.format(w.getWorkoutDate()));
+                    if (dateWithoutTime != null && !dates.contains(dateWithoutTime)) {
+                        dates.add(dateWithoutTime);
+                    }
+                } catch (ParseException ignored) {}
+            }
+        }
+        dates.sort(Collections.reverseOrder());
+        return dates;
+    }
 
+    @SuppressLint("SetTextI18n")
+    private void calculateAndDisplayStreak(List<Date> workoutDates) {
+        long daysSinceLastWorkout = getDaysSince(workoutDates.get(0));
+        int streak = evaluateStreakStatus(daysSinceLastWorkout);
+
+        if (streak > 0) {
+            streak = countConsecutiveDays(workoutDates, streak);
+        }
+
+        binding.tvStreakTitle.setText("🔥  " + streak + " Días de Racha");
+    }
+
+    private long getDaysSince(Date targetDate) {
         Calendar todayCal = Calendar.getInstance();
         todayCal.set(Calendar.HOUR_OF_DAY, 0);
         todayCal.set(Calendar.MINUTE, 0);
         todayCal.set(Calendar.SECOND, 0);
         todayCal.set(Calendar.MILLISECOND, 0);
 
-        long diffInMillis = todayCal.getTime().getTime() - workoutDates.get(0).getTime();
-        long daysSinceLastWorkout =
-                TimeUnit.DAYS.convert(diffInMillis, TimeUnit.MILLISECONDS);
-
-        int streak = 0;
-
-        if (daysSinceLastWorkout == 0) {
-            binding.tvStreakMessage.setText("¡Entrenaste hoy! Sigue así 🔥");
-            streak = 1;
-
-        } else if (daysSinceLastWorkout == 1) {
-            binding.tvStreakMessage.setText("Ayer entrenaste. ¡No pierdas el ritmo!");
-            streak = 1;
-
-        } else if (daysSinceLastWorkout == 2) {
-            binding.tvStreakMessage.setText("⚠️ Llevas 2 días sin entrenar. ¡Hoy es crucial!");
-            streak = 1;
-
-        } else {
-            binding.tvStreakMessage.setText("Has perdido la racha. ¡Es hora de volver a empezar!");
-            streak = 0;
-        }
-
-        if (streak > 0) {
-            for (int i = 0; i < workoutDates.size() - 1; i++) {
-
-                long diff = workoutDates.get(i).getTime() - workoutDates.get(i + 1).getTime();
-
-                long daysBetween = TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS);
-
-                if (daysBetween <= 2) {
-                    streak++;
-                } else {
-                    break;
-                }
-            }
-        }
-
-        binding.tvStreakTitle.setText("🔥  " + streak + " Días de Racha");
+        long diffInMillis = todayCal.getTime().getTime() - targetDate.getTime();
+        return TimeUnit.DAYS.convert(diffInMillis, TimeUnit.MILLISECONDS);
     }
 
-    /**
-     * Calcula y dibuja la actividad semanal del usuario en forma de barras.
-     * Cada día muestra si hubo entrenamiento o no,
-     * ajustando altura y color de la barra correspondiente.
-     *
-     * @param history historial de entrenamientos
-     */
+    @SuppressLint("SetTextI18n")
+    private int evaluateStreakStatus(long daysSinceLastWorkout) {
+        if (daysSinceLastWorkout == 0) {
+            binding.tvStreakMessage.setText("¡Entrenaste hoy! Sigue así 🔥");
+            return 1;
+        } else if (daysSinceLastWorkout == 1) {
+            binding.tvStreakMessage.setText("Ayer entrenaste. ¡No pierdas el ritmo!");
+            return 1;
+        } else if (daysSinceLastWorkout == 2) {
+            binding.tvStreakMessage.setText("⚠️ Llevas 2 días sin entrenar. ¡Hoy es crucial!");
+            return 1;
+        } else {
+            binding.tvStreakMessage.setText("Has perdido la racha. ¡Es hora de volver a empezar!");
+            return 0;
+        }
+    }
+
+    private int countConsecutiveDays(List<Date> workoutDates, int initialStreak) {
+        int streak = initialStreak;
+        for (int i = 0; i < workoutDates.size() - 1; i++) {
+            long diff = workoutDates.get(i).getTime() - workoutDates.get(i + 1).getTime();
+            long daysBetween = TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS);
+            if (daysBetween <= 2) {
+                streak++;
+            } else {
+                break;
+            }
+        }
+        return streak;
+    }
+
+    // --- REFACTOR: Actividad Semanal ---
+
     private void calculateWeeklyActivity(List<Workout> history) {
-        View[] bars = {
-                binding.bar1, binding.bar2, binding.bar3,
-                binding.bar4, binding.bar5, binding.bar6, binding.bar7
-        };
+        View[] bars = {binding.bar1, binding.bar2, binding.bar3, binding.bar4, binding.bar5, binding.bar6, binding.bar7};
+        TextView[] texts = {binding.tvDay1, binding.tvDay2, binding.tvDay3, binding.tvDay4, binding.tvDay5, binding.tvDay6, binding.tvDay7};
+        String[] dayNames = {"D", "L", "M", "X", "J", "V", "S"};
 
-        TextView[] texts = {
-                binding.tvDay1, binding.tvDay2, binding.tvDay3,
-                binding.tvDay4, binding.tvDay5, binding.tvDay6, binding.tvDay7
-        };
-
-        String[] nombresDias = {"D", "L", "M", "X", "J", "V", "S"};
+        Set<String> activeDates = getActiveDatesSet(history);
         Calendar cal = Calendar.getInstance();
-        int diaSemanaHoy = cal.get(Calendar.DAY_OF_WEEK) - 1;
-
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-
-        int colorRosa = ContextCompat.getColor(requireContext(), R.color.mainrosa);
-        int colorStroke = ContextCompat.getColor(requireContext(), R.color.stroke);
-        int colorText = ContextCompat.getColor(requireContext(), R.color.text);
-
-        float density = getResources().getDisplayMetrics().density;
+        int todayDayOfWeek = cal.get(Calendar.DAY_OF_WEEK) - 1;
 
         for (int i = 6; i >= 0; i--) {
-
-            int currentDayIndex = (diaSemanaHoy - (6 - i)) % 7;
+            int currentDayIndex = (todayDayOfWeek - (6 - i)) % 7;
             if (currentDayIndex < 0) currentDayIndex += 7;
 
-            texts[i].setText(nombresDias[currentDayIndex]);
+            texts[i].setText(dayNames[currentDayIndex]);
 
-            String targetDate = sdf.format(cal.getTime());
-            boolean entrenoEseDia = false;
+            String targetDate = dateFormat.format(cal.getTime());
+            boolean hasWorkout = activeDates.contains(targetDate);
 
-            if (history != null) {
-                for (Workout w : history) {
-                    if (w.getWorkoutDate() != null &&
-                            w.getWorkoutDate().startsWith(targetDate)) {
-                        entrenoEseDia = true;
-                        break;
-                    }
-                }
-            }
-
-            LinearLayout.LayoutParams params =
-                    (LinearLayout.LayoutParams) bars[i].getLayoutParams();
-
-            if (entrenoEseDia) {
-                params.height = (int) (40 * density);
-                bars[i].setBackgroundColor(colorRosa);
-                if (i != 6) texts[i].setTextColor(colorRosa);
-            } else {
-                params.height = (int) (10 * density);
-                bars[i].setBackgroundColor(colorStroke);
-                if (i != 6) texts[i].setTextColor(colorText);
-            }
-
-            bars[i].setLayoutParams(params);
+            updateBarUI(bars[i], texts[i], hasWorkout, i == 6);
             cal.add(Calendar.DAY_OF_YEAR, -1);
         }
     }
 
-    /**
-     * Libera recursos del ViewBinding para evitar fugas de memoria.
-     */
+    private Set<String> getActiveDatesSet(List<Workout> history) {
+        Set<String> activeDates = new HashSet<>();
+        if (history != null) {
+            for (Workout w : history) {
+                if (w.getWorkoutDate() != null) {
+                    activeDates.add(dateFormat.format(w.getWorkoutDate()));
+                }
+            }
+        }
+        return activeDates;
+    }
+
+    private void updateBarUI(View bar, TextView text, boolean isActive, boolean isToday) {
+        float density = getResources().getDisplayMetrics().density;
+        int colorRosa = ContextCompat.getColor(requireContext(), R.color.mainrosa);
+        int colorStroke = ContextCompat.getColor(requireContext(), R.color.stroke);
+        int colorText = ContextCompat.getColor(requireContext(), R.color.text);
+
+        LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) bar.getLayoutParams();
+
+        if (isActive) {
+            params.height = (int) (40 * density);
+            bar.setBackgroundColor(colorRosa);
+            if (!isToday) text.setTextColor(colorRosa);
+        } else {
+            params.height = (int) (10 * density);
+            bar.setBackgroundColor(colorStroke);
+            if (!isToday) text.setTextColor(colorText);
+        }
+        bar.setLayoutParams(params);
+    }
+
     @Override
     public void onDestroyView() {
         super.onDestroyView();

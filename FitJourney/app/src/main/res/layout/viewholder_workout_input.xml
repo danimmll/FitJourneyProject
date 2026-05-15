@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginHorizontal="16dp"
-    android:layout_marginBottom="16dp"
+    android:layout_marginBottom="12dp"
     app:cardBackgroundColor="?attr/colorSurface"
     app:cardCornerRadius="16dp"
     app:cardElevation="2dp"
@@ -14,72 +14,78 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="16dp">
-
-        <TextView
-            android:id="@+id/tvWorkoutExerciseName"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textColor="@color/mainrosa"
-            android:textSize="18sp"
-            android:textStyle="bold" />
-
-        <TextView
-            android:id="@+id/tvTargetGoal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:textColor="@color/textSecondary"
-            android:textSize="14sp" />
+        android:orientation="vertical">
 
         <LinearLayout
+            android:id="@+id/llExerciseHeader"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:baselineAligned="false"
-            android:orientation="horizontal">
+            android:background="?attr/selectableItemBackground"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:padding="16dp">
 
-            <com.google.android.material.textfield.TextInputLayout
+            <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
                 android:layout_weight="1"
-                android:hint="Series">
+                android:orientation="vertical">
 
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/etActualSets"
-                    android:layout_width="match_parent"
+                <TextView
+                    android:id="@+id/tvWorkoutExerciseName"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:inputType="number" />
-            </com.google.android.material.textfield.TextInputLayout>
+                    android:textColor="@color/mainrosa"
+                    android:textSize="17sp"
+                    android:textStyle="bold" />
 
-            <com.google.android.material.textfield.TextInputLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                <TextView
+                    android:id="@+id/tvTargetGoal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:textColor="@color/textSecondary"
+                    android:textSize="13sp" />
+
+            </LinearLayout>
+
+            <ImageView
+                android:id="@+id/ivExerciseInfo"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
                 android:layout_marginEnd="8dp"
-                android:layout_weight="1"
-                android:hint="Reps">
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="Info"
+                android:padding="4dp"
+                android:src="@drawable/ic_info"
+                app:tint="@color/textSecondary" />
 
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/etActualReps"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:inputType="number" />
-            </com.google.android.material.textfield.TextInputLayout>
+            <ImageView
+                android:id="@+id/ivExpandArrow"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:contentDescription="Expandir"
+                android:src="@drawable/ic_arrow_back"
+                android:rotation="270"
+                app:tint="@color/textSecondary" />
 
-            <com.google.android.material.textfield.TextInputLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1.2"
-                android:hint="Peso (kg)">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/etActualWeight"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:inputType="numberDecimal" />
-            </com.google.android.material.textfield.TextInputLayout>
         </LinearLayout>
+
+        <View
+            android:id="@+id/dividerExercise"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/stroke"
+            android:visibility="gone" />
+
+        <LinearLayout
+            android:id="@+id/llSeriesContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingBottom="8dp"
+            android:visibility="gone" />
+
     </LinearLayout>
+
 </com.google.android.material.card.MaterialCardView>

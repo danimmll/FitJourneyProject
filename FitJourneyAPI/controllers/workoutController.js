@@ -17,11 +17,11 @@ const createWorkout = async (req, res, next) => {
                 duration_minutes,
                 calories_burned,
                 notes,
-                details: { 
+                details: {
                     create: arrayDetalles.length > 0
                         ? arrayDetalles.map((d, index) => ({
                             id_exercise: d.id_exercise,
-                            sets_performed: d.sets || d.sets_performed || 1, 
+                            sets_performed: d.sets || d.sets_performed || 1,
                             reps_performed: d.reps || d.reps_performed || 0,
                             max_weight_used: d.weight || d.max_weight_used || 0
                         }))
@@ -40,7 +40,7 @@ const createWorkout = async (req, res, next) => {
 
         res.status(201).json({
             message: "¡Entrenamiento registrado con éxito!",
-            data: workout 
+            data: workout
         });
     } catch (error) {
         console.error("Error al crear workout:", error);
@@ -104,7 +104,7 @@ const deleteWorkout = async (req, res, next) => {
             return res.status(404).json({ error: "Entrenamiento no encontrado" });
         }
 
-        if (workout.id_user !== req.user.id) {
+        if (req.user.role !== 'admin' && workout.id_user !== req.user.id) {
             return res.status(403).json({ error: "No tienes permiso. Solo puedes borrar tus propios entrenamientos." });
         }
 
