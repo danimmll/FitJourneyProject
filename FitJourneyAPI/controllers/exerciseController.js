@@ -6,6 +6,7 @@ const getExercises = async (req, res, next) => {
         const exercises = await prisma.exercise.findMany();
         res.json(exercises);
     } catch (error) {
+        console.log(error);
         next(error);
     }
 };
@@ -37,6 +38,7 @@ const createExercise = async (req, res, next) => {
         });
         res.status(201).json(exercise);
     } catch (error) {
+        console.log(error);
         next(error);
     }
 };
@@ -71,6 +73,7 @@ const updateExercise = async (req, res, next) => {
         });
         res.json(updated);
     } catch (error) {
+        console.log(error);
         next(error);
     }
 };
@@ -88,6 +91,7 @@ const deleteExercise = async (req, res, next) => {
         });
         res.json({ message: "Ejercicio eliminado físicamente de la base de datos" });
     } catch (error) {
+        console.log(error);
         next(error);
     }
 };
@@ -104,6 +108,7 @@ const getExerciseById = async (req, res, next) => {
         }
         res.json(exercise);
     } catch (error) {
+        console.log(error);
         next(error);
     }
 };

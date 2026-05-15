@@ -42,6 +42,7 @@ const register = async (req, res, next) => {
         res.status(201).json({ message: "Usuario registrado con éxito", token, user: userWithoutPassword });
 
     } catch (error) {
+        console.log(error);
         next(error);
     }
 };
@@ -67,6 +68,7 @@ const login = async (req, res, next) => {
         res.json({ message: "Login exitoso", token, user: userWithoutPassword });
 
     } catch (error) {
+        console.log(error);
         next(error);
     }
 };
@@ -105,6 +107,7 @@ const reactivateAccount = async (req, res, next) => {
         res.json({ message: "Cuenta reactivada con éxito", token, user: userWithoutPassword });
 
     } catch (error) {
+        console.log(error);
         next(error);
     }
 };
@@ -126,6 +129,7 @@ const deleteAccount = async (req, res, next) => {
         res.json({ message: "Cuenta y datos históricos eliminados para siempre. Ya puedes registrarte de nuevo." });
 
     } catch (error) {
+        console.log(error);
         next(error);
     }
 };

@@ -10,6 +10,7 @@ const getAllUsers = async (req, res, next) => {
         });
         res.json(users);
     } catch (error) {
+        console.log(error);
         next(error);
     }
 };
@@ -24,6 +25,7 @@ const getProfile = async (req, res, next) => {
         const { password, ...userData } = user;
         res.json(userData);
     } catch (error) {
+        console.log(error);
         next(error);
     }
 };
@@ -38,6 +40,7 @@ const deleteUser = async (req, res, next) => {
 
         res.json({ message: "Usuario desactivado correctamente" });
     } catch (error) {
+        console.log(error);
         next(error);
     }
 };
@@ -66,6 +69,7 @@ const updateProfile = async (req, res, next) => {
         const { password: pw, ...userData } = updatedUser;
         res.json(userData);
     } catch (error) {
+        console.log(error);
         next(error);
     }
 };
@@ -98,6 +102,7 @@ const updateUserByAdmin = async (req, res, next) => {
         const { password, ...userData } = updatedUser;
         res.json(userData);
     } catch (error) {
+        console.log(error);
         next(error);
     }
 };
@@ -122,6 +127,7 @@ const deactivateMyAccount = async (req, res, next) => {
 
         res.json({ message: "Cuenta desactivada correctamente" });
     } catch (error) {
+        console.log(error);
         next(error);
     }
 };

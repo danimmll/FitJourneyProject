@@ -27,6 +27,7 @@ const createRoutine = async (req, res, next) => {
 
         res.status(201).json({ message: "Rutina creada con éxito", routine });
     } catch (error) {
+        console.log(error);
         next(error);
     }
 };
@@ -44,6 +45,7 @@ const getUserRoutines = async (req, res, next) => {
         });
         res.json(routines);
     } catch (error) {
+        console.log(error);
         next(error);
     }
 };
@@ -65,6 +67,7 @@ const deleteRoutine = async (req, res, next) => {
 
         res.json({ message: "Rutina eliminada físicamente" });
     } catch (error) {
+        console.log(error);
         next(error);
     }
 };
@@ -87,6 +90,7 @@ const getRoutineById = async (req, res, next) => {
 
         res.json(routine);
     } catch (error) {
+        console.log(error);
         next(error);
     }
 };
@@ -147,6 +151,7 @@ const updateRoutine = async (req, res, next) => {
         res.json({ message: "Rutina actualizada correctamente", data: updatedRoutine });
 
     } catch (error) {
+        console.log(error);
         next(error);
     }
 };

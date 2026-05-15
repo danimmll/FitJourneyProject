@@ -42,6 +42,7 @@ const createWorkout = async (req, res, next) => {
             data: workout
         });
     } catch (error) {
+        console.log(error);
         next(error);
     }
 };
@@ -85,6 +86,7 @@ const getWorkoutHistory = async (req, res, next) => {
 
         res.json(workouts);
     } catch (error) {
+        console.log(error);
         next(error);
     }
 };
@@ -119,6 +121,7 @@ const deleteWorkout = async (req, res, next) => {
         res.json({ message: "Entrenamiento eliminado correctamente de tu historial" });
 
     } catch (error) {
+        console.log(error);
         next(error);
     }
 };
@@ -164,6 +167,7 @@ const getWorkoutById = async (req, res, next) => {
         res.json(workout);
 
     } catch (error) {
+        console.log(error);
         next(error);
     }
 };
