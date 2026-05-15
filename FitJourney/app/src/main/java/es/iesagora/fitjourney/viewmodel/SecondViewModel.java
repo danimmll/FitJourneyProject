@@ -42,7 +42,6 @@ public class SecondViewModel extends AndroidViewModel {
 
     private final MutableLiveData<Resource<List<Exercise>>> exercisesLiveData = new MutableLiveData<>();
     private final MutableLiveData<Exercise> exerciseSelected = new MutableLiveData<>();
-    private final MutableLiveData<Resource<Exercise>> singleExerciseLiveData = new MutableLiveData<>();
     private final MutableLiveData<Resource<AccessResponse>> profileLiveData = new MutableLiveData<>();
     private final MutableLiveData<Resource<List<Workout>>> workoutHistoryLiveData = new MutableLiveData<>();
     private final MutableLiveData<Resource<User>> updateProfileLiveData = new MutableLiveData<>();
@@ -95,15 +94,6 @@ public class SecondViewModel extends AndroidViewModel {
     }
 
     /**
-     * Devuelve el estado de la carga de un ejercicio individual por ID.
-     *
-     * @return LiveData con estado y ejercicio.
-     */
-    public LiveData<Resource<Exercise>> getSingleExercise() {
-        return singleExerciseLiveData;
-    }
-
-    /**
      * Almacena en memoria el ejercicio seleccionado.
      *
      * @param exercise Ejercicio a seleccionar.
@@ -147,16 +137,6 @@ public class SecondViewModel extends AndroidViewModel {
         }
 
         exercisesLiveData.setValue(Resource.success(filteredList));
-    }
-
-    /**
-     * Obtiene los detalles de un ejercicio mediante su ID.
-     *
-     * @param id Identificador del ejercicio.
-     */
-    public void fetchExerciseById(int id) {
-        singleExerciseLiveData.setValue(Resource.loading());
-        repository.getExerciseById(id, singleExerciseLiveData::setValue);
     }
 
     /**
@@ -435,18 +415,6 @@ public class SecondViewModel extends AndroidViewModel {
         deleteUserLiveData.setValue(Resource.loading());
         userRepository.deleteUserByAdmin(userId, deleteUserLiveData::setValue);
         return deleteUserLiveData;
-    }
-
-    /**
-     * Desactiva el acceso a la plataforma para un usuario específico (Solo administradores).
-     *
-     * @param userId Identificador del usuario a banear.
-     * @return LiveData para monitorizar el estado de la petición.
-     */
-    public LiveData<Resource<String>> banUser(int userId) {
-        banUserLiveData.setValue(Resource.loading());
-        userRepository.banUser(userId, banUserLiveData::setValue);
-        return banUserLiveData;
     }
 
     /**

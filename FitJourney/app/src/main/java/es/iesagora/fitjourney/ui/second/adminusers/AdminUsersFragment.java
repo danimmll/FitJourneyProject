@@ -7,7 +7,6 @@ import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -19,7 +18,6 @@ import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.google.android.material.bottomsheet.BottomSheetDialog;
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import java.util.ArrayList;
 
@@ -76,7 +74,7 @@ public class AdminUsersFragment extends Fragment {
     private void setupSearchBar() {
         binding.etSearchUser.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) { /* TODO document why this method is empty */ }
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) { /* TO-DO document why this method is empty */ }
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
@@ -86,7 +84,7 @@ public class AdminUsersFragment extends Fragment {
             }
 
             @Override
-            public void afterTextChanged(Editable s) { /* TODO document why this method is empty */ }
+            public void afterTextChanged(Editable s) { /* TO-DO document why this method is empty */ }
         });
     }
 

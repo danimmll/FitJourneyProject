@@ -72,13 +72,6 @@ public class PreferencesRepository {
     }
 
     /**
-     * Borra completamente todas las preferencias.
-     */
-    public void clear() {
-        sharedPreferences.edit().clear().apply();
-    }
-
-    /**
      * Guarda el token de autenticación.
      *
      * @param token Token JWT.

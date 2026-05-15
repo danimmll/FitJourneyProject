@@ -372,31 +372,6 @@ public class UserRepository {
         });
     }
 
-    /**
-     * Banea/Suspende la cuenta de un usuario (Acción de Administrador).
-     *
-     * @param userId    Id del usuario a banear.
-     * @param callback Callback con el resultado de la operación.
-     */
-    public void banUser(int userId, AdminActionCallback callback) {
-        callback.onResult(Resource.loading());
-        api.banUser(userId).enqueue(new Callback<>() {
-            @Override
-            public void onResponse(@NonNull Call<ResponseBody> call,
-                                   @NonNull Response<ResponseBody> response) {
-                if (response.isSuccessful()) {
-                    callback.onResult(Resource.success("Usuario baneado correctamente"));
-                } else {
-                    callback.onResult(Resource.error(getError(response)));
-                }
-            }
-            @Override
-            public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable t) {
-                callback.onResult(Resource.error(ERROR_CONEXION + t.getMessage()));
-            }
-        });
-    }
-
     public void deactivateUser(String email, String password, DeleteCallback callback) {
 
         callback.onResult(Resource.loading());

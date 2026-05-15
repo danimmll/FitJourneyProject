@@ -98,10 +98,10 @@ public interface AppApi {
     Call<User> updateUserByAdmin(@Path("id") int id, @Body User user);
 
     /**
-     * Elimina lógicamente a un usuario y desactiva sus rutinas y entrenamientos asociados.
+     * Desactiva lógicamente a un usuario poniendo su campo active a 0.
      * Requiere permisos de Administrador.
      *
-     * @param userId Identificador único del usuario a eliminar.
+     * @param userId Identificador único del usuario a desactivar.
      * @return Un ResponseBody confirmando la desactivación.
      */
     @DELETE("users/{id}")
@@ -115,16 +115,6 @@ public interface AppApi {
      */
     @POST("users/deactivate")
     Call<ResponseBody> deactivateUser(@Body LoginRequest request);
-
-    /**
-     * Desactiva (banea) la cuenta de un usuario impidiendo su acceso, modificando su estado activo.
-     * Requiere permisos de Administrador.
-     *
-     * @param userId Identificador único del usuario a banear.
-     * @return Un ResponseBody confirmando el baneo.
-     */
-    @PUT("users/{id}/ban")
-    Call<ResponseBody> banUser(@Path("id") int userId);
 
     // ── EJERCICIOS ────────────────────────────────────────────────────────────
 
