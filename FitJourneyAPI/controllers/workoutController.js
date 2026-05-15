@@ -3,7 +3,11 @@ const prisma = new PrismaClient();
 
 const createWorkout = async (req, res, next) => {
     try {
-        const { id_routine, duration_minutes, calories_burned, notes, details } = req.body;
+        // 1. Extraemos TODO lo que podría mandar Android
+        const { id_routine, duration_minutes, calories_burned, notes, workoutDetails, workout_details, details } = req.body;
+
+        // 2. Pillamos el array venga con el nombre que venga
+        const arrayDetalles = workoutDetails || workout_details || details || [];
 
         const workout = await prisma.workout.create({
             data: {
@@ -13,13 +17,13 @@ const createWorkout = async (req, res, next) => {
                 duration_minutes,
                 calories_burned,
                 notes,
-                details: {
-                    create: details && details.length > 0
-                        ? details.map(d => ({
+                details: { 
+                    create: arrayDetalles.length > 0
+                        ? arrayDetalles.map((d, index) => ({
                             id_exercise: d.id_exercise,
-                            sets_performed: d.sets_performed,
-                            reps_performed: d.reps_performed,
-                            max_weight_used: d.max_weight_used
+                            sets_performed: d.sets || d.sets_performed || 1, 
+                            reps_performed: d.reps || d.reps_performed || 0,
+                            max_weight_used: d.weight || d.max_weight_used || 0
                         }))
                         : []
                 }
@@ -36,9 +40,10 @@ const createWorkout = async (req, res, next) => {
 
         res.status(201).json({
             message: "¡Entrenamiento registrado con éxito!",
-            workout
+            data: workout 
         });
     } catch (error) {
+        console.error("Error al crear workout:", error);
         next(error);
     }
 };

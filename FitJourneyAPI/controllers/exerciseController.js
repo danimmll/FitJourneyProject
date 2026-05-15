@@ -19,7 +19,8 @@ const createExercise = async (req, res, next) => {
             description,
             image_url,
             video_url,
-            equipment
+            equipment,
+            exercise_type
         } = req.body;
 
         const exercise = await prisma.exercise.create({
@@ -30,7 +31,8 @@ const createExercise = async (req, res, next) => {
                 description,
                 image_url,
                 video_url,
-                equipment
+                equipment,
+                exercise_type
             }
         });
         res.status(201).json(exercise);
@@ -42,7 +44,6 @@ const createExercise = async (req, res, next) => {
 const updateExercise = async (req, res, next) => {
     const { id } = req.params;
     try {
-
         const {
             name,
             muscle_group,
@@ -50,7 +51,8 @@ const updateExercise = async (req, res, next) => {
             description,
             image_url,
             video_url,
-            equipment
+            equipment,
+            exercise_type
         } = req.body;
 
         const updateData = {};
@@ -61,7 +63,7 @@ const updateExercise = async (req, res, next) => {
         if (image_url !== undefined) updateData.image_url = image_url;
         if (video_url !== undefined) updateData.video_url = video_url;
         if (equipment !== undefined) updateData.equipment = equipment;
-
+        if (exercise_type !== undefined) updateData.exercise_type = exercise_type;
 
         const updated = await prisma.exercise.update({
             where: { id_exercise: parseInt(id) },
