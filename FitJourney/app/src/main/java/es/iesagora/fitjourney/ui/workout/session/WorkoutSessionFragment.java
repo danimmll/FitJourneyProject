@@ -596,6 +596,10 @@ public class WorkoutSessionFragment extends Fragment {
      */
     private void finishWorkout() {
 
+        if (!validarDatosEntrenamiento()) {
+            return;
+        }
+
         binding.btnFinishWorkout.setEnabled(false);
 
         isTimerRunning = false;
@@ -989,6 +993,52 @@ public class WorkoutSessionFragment extends Fragment {
                 )
                 .setCancelable(false)
                 .show();
+    }
+
+    /**
+     * Valida que los datos metidos a mano tengan sentido.
+     */
+    private boolean validarDatosEntrenamiento() {
+        for (ExerciseBlock bloque : exerciseBlocks) {
+            List<SerieRow> filasMarcadas = getCheckedRows(bloque);
+            if (filasMarcadas.isEmpty()) continue;
+
+            for (SerieRow fila : filasMarcadas) {
+                String texto1 = getText(fila.rowBinding.etPrimary);
+                String texto2 = getText(fila.rowBinding.etSecondary);
+
+                try {
+                    double peso = texto2.isEmpty() ? 0 : Double.parseDouble(texto2);
+                    if (fila.type.equals(TYPE_CARDIO)) {
+                        double minutos = texto1.isEmpty() ? 0 : Double.parseDouble(texto1);
+
+                        if (minutos > 300) {
+                            Toast.makeText(getContext(), "Máximo 300 min por serie", Toast.LENGTH_SHORT).show();
+                            return false;
+                        }
+                        if (peso > 50) {
+                            Toast.makeText(getContext(), "Pilla una bici. Máximo 50 km/h", Toast.LENGTH_SHORT).show();
+                            return false;
+                        }
+                    } else if (!fila.type.equals(TYPE_ESTIRAMIENTO)) {
+                        int repes = texto1.isEmpty() ? 0 : Integer.parseInt(texto1);
+
+                        if (repes > 200) {
+                            Toast.makeText(getContext(), "Demasiadas repes. Máximo 200", Toast.LENGTH_SHORT).show();
+                            return false;
+                        }
+                        if (peso > 1000) {
+                            Toast.makeText(getContext(), "Ni Ronnie Coleman. Máximo 1000 kg", Toast.LENGTH_SHORT).show();
+                            return false;
+                        }
+                    }
+                } catch (NumberFormatException e) {
+                    Toast.makeText(getContext(), "Por favor, mete números normales", Toast.LENGTH_SHORT).show();
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     @Override
