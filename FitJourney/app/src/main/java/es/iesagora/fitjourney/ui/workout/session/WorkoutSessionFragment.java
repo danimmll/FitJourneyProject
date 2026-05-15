@@ -58,7 +58,23 @@ public class WorkoutSessionFragment extends Fragment {
     private final Handler timerHandler = new Handler(Looper.getMainLooper());
     private Runnable timerRunnable;
 
+    private static final String KEY_SECONDS = "seconds_elapsed";
+
     private final List<ExerciseBlock> exerciseBlocks = new ArrayList<>();
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (savedInstanceState != null) {
+            secondsElapsed = savedInstanceState.getInt(KEY_SECONDS, 0);
+        }
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt(KEY_SECONDS, secondsElapsed);
+    }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -226,6 +242,10 @@ public class WorkoutSessionFragment extends Fragment {
             public void run() {
 
                 if (!isTimerRunning) {
+                    return;
+                }
+
+                if (binding == null) {
                     return;
                 }
 

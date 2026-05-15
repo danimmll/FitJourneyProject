@@ -50,6 +50,8 @@ public class FormRoutineFragment extends Fragment {
     private static final String TYPE_CARDIO = "Cardio";
     private static final String TYPE_ESTIRAMIENTO = "Estiramiento";
 
+    private static final String ROUTINE_DATA_STRING = "routine_data";
+
     private final ActivityResultLauncher<String> getContent =
             registerForActivityResult(new ActivityResultContracts.GetContent(), uri -> {
                 if (uri != null) {
@@ -77,8 +79,8 @@ public class FormRoutineFragment extends Fragment {
             viewModel.fetchExercises();
         }
 
-        if (getArguments() != null && getArguments().containsKey("routine_data")) {
-            Routine routineToEdit = (Routine) getArguments().getSerializable("routine_data");
+        if (getArguments() != null && getArguments().containsKey(ROUTINE_DATA_STRING)) {
+            Routine routineToEdit = (Routine) getArguments().getSerializable(ROUTINE_DATA_STRING);
             assert routineToEdit != null;
             fillFieldsForEdit(routineToEdit);
         }
@@ -252,7 +254,8 @@ public class FormRoutineFragment extends Fragment {
             binding.btnSaveRoutine.setEnabled(true);
 
             if (resource.status == Resource.Status.SUCCESS) {
-                toast("¡Rutina creada con éxito!");
+                boolean isEditing = getArguments() != null && getArguments().containsKey(ROUTINE_DATA_STRING);
+                toast(isEditing ? "¡Rutina actualizada con éxito!" : "¡Rutina creada con éxito!");
                 viewModel.getRoutineActionStatus().setValue(null);
                 viewModel.fetchRoutines();
                 Navigation.findNavController(requireView()).popBackStack();
@@ -285,14 +288,29 @@ public class FormRoutineFragment extends Fragment {
             finalPhotoData = imageUrl;
         }
 
+        Routine routine = getRoutine(name, desc, finalPhotoData);
+
+        viewModel.createRoutine(routine);
+    }
+
+    private Routine getRoutine(String name, String desc, String finalPhotoData) {
+        List<RoutineExercise> cleanExercises = new ArrayList<>();
+        for (RoutineExercise re : addedExercises) {
+            RoutineExercise clean = new RoutineExercise();
+            clean.setIdExercise(re.getIdExercise());
+            clean.setTargetSets(re.getTargetSets());
+            clean.setTargetReps(re.getTargetReps());
+            clean.setTargetWeight(re.getTargetWeight());
+            cleanExercises.add(clean);
+        }
+
         Routine routine = new Routine();
         routine.setName(name);
         routine.setDescription(desc.isEmpty() ? null : desc);
         routine.setPhotoUrl(finalPhotoData);
-        routine.setExercises(addedExercises);
+        routine.setExercises(cleanExercises);
         routine.setIsPublic(binding.switchPublic.isChecked() ? 1 : 0);
-
-        viewModel.createRoutine(routine);
+        return routine;
     }
 
     private void updateRoutine(int routineId) {
@@ -317,12 +335,22 @@ public class FormRoutineFragment extends Fragment {
             finalPhotoData = imageUrl;
         }
 
+        List<RoutineExercise> cleanExercises = new ArrayList<>();
+        for (RoutineExercise re : addedExercises) {
+            RoutineExercise clean = new RoutineExercise();
+            clean.setIdExercise(re.getIdExercise());
+            clean.setTargetSets(re.getTargetSets());
+            clean.setTargetReps(re.getTargetReps());
+            clean.setTargetWeight(re.getTargetWeight());
+            cleanExercises.add(clean);
+        }
+
         Routine routine = new Routine();
         routine.setIdRoutine(routineId);
         routine.setName(name);
         routine.setDescription(desc.isEmpty() ? null : desc);
         routine.setPhotoUrl(finalPhotoData);
-        routine.setExercises(addedExercises);
+        routine.setExercises(cleanExercises);
         routine.setIsPublic(binding.switchPublic.isChecked() ? 1 : 0);
 
         viewModel.updateRoutine(routineId, routine);

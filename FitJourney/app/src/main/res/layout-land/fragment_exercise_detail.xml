@@ -51,7 +51,7 @@
                 android:fontFamily="sans-serif-black"
                 android:lineSpacingExtra="2dp"
                 android:textAllCaps="true"
-                android:textColor="@color/text"
+                android:textColor="@color/white"
                 android:textSize="28sp"
                 tools:text="Barbell Bench Press" />
 
