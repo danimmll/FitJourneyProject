@@ -126,8 +126,6 @@ public class HomeFragment extends Fragment {
         binding.tvLeanMass.setText("-- kg");
     }
 
-    // --- REFACTOR: Estadísticas y Racha ---
-
     @SuppressLint("SetTextI18n")
     private void calculateStreakAndStats(List<Workout> history) {
         if (history == null || history.isEmpty()) {
@@ -238,8 +236,6 @@ public class HomeFragment extends Fragment {
         }
         return streak;
     }
-
-    // --- REFACTOR: Actividad Semanal ---
 
     private void calculateWeeklyActivity(List<Workout> history) {
         View[] bars = {binding.bar1, binding.bar2, binding.bar3, binding.bar4, binding.bar5, binding.bar6, binding.bar7};
