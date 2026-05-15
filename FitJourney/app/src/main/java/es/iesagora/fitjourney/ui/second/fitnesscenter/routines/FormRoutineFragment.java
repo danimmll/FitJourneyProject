@@ -42,6 +42,7 @@ public class FormRoutineFragment extends Fragment {
     private SecondViewModel viewModel;
 
     private Uri selectedLocalImageUri = null;
+    private int routineIdToEdit = -1;
 
     private final List<RoutineExercise> addedExercises = new ArrayList<>();
     private AddedExerciseAdapter adapter;
@@ -49,8 +50,6 @@ public class FormRoutineFragment extends Fragment {
     private static final String TYPE_HIPERTROFIA = "Hipertrofia";
     private static final String TYPE_CARDIO = "Cardio";
     private static final String TYPE_ESTIRAMIENTO = "Estiramiento";
-
-    private static final String ROUTINE_DATA_STRING = "routine_data";
 
     private final ActivityResultLauncher<String> getContent =
             registerForActivityResult(new ActivityResultContracts.GetContent(), uri -> {
@@ -79,17 +78,19 @@ public class FormRoutineFragment extends Fragment {
             viewModel.fetchExercises();
         }
 
-        if (getArguments() != null && getArguments().containsKey(ROUTINE_DATA_STRING)) {
-            Routine routineToEdit = (Routine) getArguments().getSerializable(ROUTINE_DATA_STRING);
+        setupRecyclerView();
+
+        if (getArguments() != null && getArguments().containsKey("routine_data")) {
+            Routine routineToEdit = (Routine) getArguments().getSerializable("routine_data");
             assert routineToEdit != null;
             fillFieldsForEdit(routineToEdit);
         }
 
-        setupRecyclerView();
         setupListeners();
         setupObservers();
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     private void setupRecyclerView() {
         adapter = new AddedExerciseAdapter(addedExercises, position -> {
             addedExercises.remove(position);
@@ -97,6 +98,7 @@ public class FormRoutineFragment extends Fragment {
             updateEmptyState();
         });
         binding.rvExercises.setAdapter(adapter);
+        adapter.notifyDataSetChanged();
         updateEmptyState();
     }
 
@@ -117,7 +119,13 @@ public class FormRoutineFragment extends Fragment {
         });
 
         binding.btnAddExercise.setOnClickListener(v -> showAddExerciseDialog());
-        binding.btnSaveRoutine.setOnClickListener(v -> saveRoutine());
+        binding.btnSaveRoutine.setOnClickListener(v -> {
+            if (routineIdToEdit != -1) {
+                updateRoutine(routineIdToEdit);
+            } else {
+                saveRoutine();
+            }
+        });
     }
 
     private void showAddExerciseDialog() {
@@ -254,8 +262,7 @@ public class FormRoutineFragment extends Fragment {
             binding.btnSaveRoutine.setEnabled(true);
 
             if (resource.status == Resource.Status.SUCCESS) {
-                boolean isEditing = getArguments() != null && getArguments().containsKey(ROUTINE_DATA_STRING);
-                toast(isEditing ? "¡Rutina actualizada con éxito!" : "¡Rutina creada con éxito!");
+                toast(routineIdToEdit != -1 ? "¡Rutina actualizada con éxito!" : "¡Rutina creada con éxito!");
                 viewModel.getRoutineActionStatus().setValue(null);
                 viewModel.fetchRoutines();
                 Navigation.findNavController(requireView()).popBackStack();
@@ -358,6 +365,8 @@ public class FormRoutineFragment extends Fragment {
 
     @SuppressLint("NotifyDataSetChanged")
     private void fillFieldsForEdit(Routine routine) {
+        routineIdToEdit = routine.getIdRoutine();
+
         binding.etRoutineName.setText(routine.getName());
         binding.etRoutineDesc.setText(routine.getDescription());
         binding.etRoutineImage.setText(routine.getPhotoUrl());
@@ -365,10 +374,6 @@ public class FormRoutineFragment extends Fragment {
 
         addedExercises.clear();
         addedExercises.addAll(routine.getExercises());
-        adapter.notifyDataSetChanged();
-        updateEmptyState();
-
-        binding.btnSaveRoutine.setOnClickListener(v -> updateRoutine(routine.getIdRoutine()));
     }
 
     private void toast(String msg) {
