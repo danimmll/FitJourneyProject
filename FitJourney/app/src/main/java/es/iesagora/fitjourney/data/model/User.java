@@ -10,6 +10,8 @@ import lombok.NoArgsConstructor;
 
 /**
  * Modelo que representa a un usuario de la aplicación.
+ * Contiene la información personal, física y de acceso
+ * necesaria para gestionar la cuenta del usuario.
  */
 @Data
 @NoArgsConstructor
@@ -35,7 +37,7 @@ public class User implements Serializable {
     private String name;
 
     /**
-     * Contraseña cifrada del usuario.
+     * Contraseña del usuario.
      */
     @SerializedName("password")
     private String password;
@@ -71,7 +73,7 @@ public class User implements Serializable {
     private String birthDate;
 
     /**
-     * URL de la foto de perfil del usuario.
+     * URL de la foto de perfil.
      */
     @SerializedName("photo_url")
     private String photoUrl;
@@ -84,8 +86,6 @@ public class User implements Serializable {
 
     /**
      * Estado del usuario.
-     * 1 = Activo
-     * 0 = Inactivo
      */
     @SerializedName("active")
     private Integer active;
@@ -97,8 +97,8 @@ public class User implements Serializable {
     private String registerDate;
 
     /**
-     * Constructor personalizado — CORREGIDO: antes el cuerpo estaba vacío
-     * y todos los campos llegaban a null al servidor.
+     * Constructor personalizado para crear usuarios
+     * con los datos principales de registro.
      */
     public User(Integer idUser, String name, String email, String pass,
                 String birthDate, String gender, String goal,
@@ -115,9 +115,10 @@ public class User implements Serializable {
     }
 
     /**
-     * Devuelve la imagen de perfil que se mostrará en pantalla.
-     * Si el usuario tiene una foto personalizada, se devuelve esa.
-     * En caso contrario, se genera automáticamente un avatar con DiceBear.
+     * Devuelve la imagen de perfil que se mostrará del usuario.
+     * Si no existe una foto personalizada, genera un avatar por defecto.
+     *
+     * @return URL de la imagen de perfil.
      */
     public String getDisplayAvatar() {
         if (this.photoUrl != null && !this.photoUrl.trim().isEmpty()) {

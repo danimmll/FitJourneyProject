@@ -25,25 +25,25 @@ import es.iesagora.fitjourney.utils.NotificationWorker;
 
 /**
  * Actividad principal de la aplicación.
- * Actúa como punto de entrada cuando el usuario no ha iniciado sesión.
- * Gestiona la navegación inicial (login/registro), aplica el tema guardado
- * y redirige al usuario a la pantalla principal si ya tiene sesión activa.
- * También inicializa tareas en segundo plano como notificaciones periódicas.
+ * Gestiona la navegación inicial, aplica el tema guardado
+ * y redirige al usuario si ya tiene sesión iniciada.
  */
 public class MainActivity extends AppCompatActivity {
 
     /**
-     * Controlador de navegación de Jetpack Navigation.
+     * Controlador de navegación.
      */
     private NavController navController;
 
     /**
      * Método principal de creación de la actividad.
-     * Configura tema, navegación, notificaciones y redirección
-     * si el usuario ya tiene sesión iniciada.
+     * Configura tema, navegación y tareas en segundo plano.
+     *
+     * @param savedInstanceState Estado previo de la actividad.
      */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
 
         PreferencesRepository prefs = new PreferencesRepository(this);
@@ -64,24 +64,34 @@ public class MainActivity extends AppCompatActivity {
         );
 
         if (prefs.getToken() != null && !prefs.getToken().isEmpty()) {
+
             Intent intent = new Intent(this, SecondActivity.class);
+
             startActivity(intent);
             finish();
+
             return;
         }
 
-        ActivityMainBinding binding = ActivityMainBinding.inflate(getLayoutInflater());
+        ActivityMainBinding binding =
+                ActivityMainBinding.inflate(getLayoutInflater());
+
         setContentView(binding.getRoot());
 
         binding.progressBar.setVisibility(View.GONE);
+
         setSupportActionBar(binding.toolbar);
 
         navController = ((NavHostFragment) Objects.requireNonNull(
-                getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment)
+                getSupportFragmentManager().findFragmentById(
+                        R.id.nav_host_fragment
+                )
         )).getNavController();
 
         AppBarConfiguration appBarConfiguration =
-                new AppBarConfiguration.Builder(navController.getGraph()).build();
+                new AppBarConfiguration.Builder(
+                        navController.getGraph()
+                ).build();
 
         NavigationUI.setupActionBarWithNavController(
                 this,
@@ -89,25 +99,37 @@ public class MainActivity extends AppCompatActivity {
                 appBarConfiguration
         );
 
-        navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
-            if (destination.getId() == R.id.accessFragment) {
-                binding.appBarLayout.setVisibility(View.GONE);
-            } else {
-                binding.appBarLayout.setVisibility(View.VISIBLE);
-            }
-        });
+        navController.addOnDestinationChangedListener(
+                (controller, destination, arguments) -> {
+
+                    if (destination.getId() == R.id.accessFragment) {
+
+                        binding.appBarLayout.setVisibility(View.GONE);
+
+                    } else {
+
+                        binding.appBarLayout.setVisibility(View.VISIBLE);
+                    }
+                }
+        );
 
         navController.navigate(R.id.accessFragment);
     }
 
     /**
-     * Maneja la navegación hacia atrás en la barra superior.
+     * Gestiona la navegación hacia atrás desde la barra superior.
+     *
+     * @return true si la navegación se realizó correctamente.
      */
     @Override
     public boolean onSupportNavigateUp() {
+
         return NavigationUI.navigateUp(
                 navController,
-                new AppBarConfiguration.Builder(navController.getGraph()).build()
+                new AppBarConfiguration.Builder(
+                        navController.getGraph()
+                ).build()
+
         ) || super.onSupportNavigateUp();
     }
 }

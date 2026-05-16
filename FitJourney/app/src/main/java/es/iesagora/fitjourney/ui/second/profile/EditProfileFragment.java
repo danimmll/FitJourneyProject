@@ -32,9 +32,8 @@ import es.iesagora.fitjourney.viewmodel.SecondViewModel;
 
 /**
  * Fragment encargado de la edición del perfil del usuario.
- * Este fragment permite al usuario autenticado modificar sus datos personales
- * dentro de la aplicación, incluyendo nombre, contraseña, altura, peso y objetivo fitness.
- * (La edición de la foto de perfil ha sido deshabilitada).
+ * Permite modificar datos personales como nombre, peso, altura, objetivo y contraseña.
+ * También permite la eliminación de la cuenta (excepto en modo administrador).
  */
 public class EditProfileFragment extends Fragment {
 
@@ -47,12 +46,18 @@ public class EditProfileFragment extends Fragment {
     private boolean isAdminEdit = false;
     private boolean passwordWasChanged = false;
 
+    /**
+     * Infla la vista del fragmento.
+     */
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentEditProfileBinding.inflate(inflater, container, false);
         return binding.getRoot();
     }
 
+    /**
+     * Inicializa ViewModel, datos del usuario, UI y observadores.
+     */
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -79,6 +84,9 @@ public class EditProfileFragment extends Fragment {
         setupObservers(prefs);
     }
 
+    /**
+     * Configura el dropdown de objetivos del usuario.
+     */
     private void setupDropdowns() {
         String[] goals = {
                 getString(R.string.lose_weight),
@@ -100,6 +108,9 @@ public class EditProfileFragment extends Fragment {
         binding.actvGoal.setAdapter(adapterGoals);
     }
 
+    /**
+     * Ajusta la UI según el rol (usuario o administrador).
+     */
     @SuppressLint("SetTextI18n")
     private void setupUIForRole() {
         if (isAdminEdit) {
@@ -111,6 +122,9 @@ public class EditProfileFragment extends Fragment {
         }
     }
 
+    /**
+     * Configura listeners de botones.
+     */
     private void setupListeners() {
         binding.btnSaveProfile.setOnClickListener(v -> submitChanges());
 
@@ -119,6 +133,9 @@ public class EditProfileFragment extends Fragment {
         }
     }
 
+    /**
+     * Carga los datos actuales del usuario en la UI.
+     */
     private void loadUserData() {
         if (currentUser == null) return;
 
@@ -132,21 +149,33 @@ public class EditProfileFragment extends Fragment {
             binding.etWeight.setText(String.valueOf(currentUser.getWeight()));
         }
 
-        ImageUtils.loadCircle(requireContext(), currentUser.getDisplayAvatar(), binding.ivAvatar, R.drawable.ic_profile);
+        ImageUtils.loadCircle(
+                requireContext(),
+                currentUser.getDisplayAvatar(),
+                binding.ivAvatar,
+                R.drawable.ic_profile
+        );
 
         if (currentUser.getGoal() != null) {
             binding.actvGoal.setText(currentUser.getGoal(), false);
         }
     }
 
+    /**
+     * Envía los cambios del perfil al servidor.
+     */
     private void submitChanges() {
         String name = Objects.requireNonNull(binding.etName.getText()).toString().trim();
         String heightStr = Objects.requireNonNull(binding.etHeight.getText()).toString().trim();
         String weightStr = Objects.requireNonNull(binding.etWeight.getText()).toString().trim();
         String goalStr = binding.actvGoal.getText().toString().trim();
 
-        String newPasswordStr = binding.etNewPassword.getText() != null ? binding.etNewPassword.getText().toString().trim() : "";
-        String confirmPasswordStr = binding.etConfirmPassword.getText() != null ? binding.etConfirmPassword.getText().toString().trim() : "";
+        String newPasswordStr = binding.etNewPassword.getText() != null
+                ? binding.etNewPassword.getText().toString().trim()
+                : "";
+        String confirmPasswordStr = binding.etConfirmPassword.getText() != null
+                ? binding.etConfirmPassword.getText().toString().trim()
+                : "";
 
         if (name.isEmpty()) {
             binding.tilName.setError("El nombre no puede estar vacío");
@@ -164,7 +193,6 @@ public class EditProfileFragment extends Fragment {
             updatedUser.setGoal(goalStr);
         }
 
-        // Conservamos la URL de la foto que ya tuviera el usuario
         updatedUser.setPhotoUrl(currentUser.getPhotoUrl());
 
         if (!isAdminEdit && !newPasswordStr.isEmpty()) {
@@ -192,7 +220,11 @@ public class EditProfileFragment extends Fragment {
         }
     }
 
+    /**
+     * Observa el estado de actualización y eliminación del perfil.
+     */
     private void setupObservers(PreferencesRepository prefs) {
+
         viewModel.getUpdateProfileStatus().observe(getViewLifecycleOwner(), resource -> {
             if (resource == null) return;
 
@@ -215,7 +247,11 @@ public class EditProfileFragment extends Fragment {
                     if (!isAdminEdit && passwordWasChanged) {
                         viewModel.logout();
                         passwordWasChanged = false;
-                        Toast.makeText(getContext(), "Contraseña actualizada. Inicia sesión de nuevo.", Toast.LENGTH_LONG).show();
+
+                        Toast.makeText(getContext(),
+                                "Contraseña actualizada. Inicia sesión de nuevo.",
+                                Toast.LENGTH_LONG).show();
+
                         Intent intent = new Intent(requireContext(), MainActivity.class);
                         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                         startActivity(intent);
@@ -235,7 +271,9 @@ public class EditProfileFragment extends Fragment {
                     binding.progressBar.setVisibility(View.GONE);
                     binding.btnSaveProfile.setEnabled(true);
 
-                    Toast.makeText(getContext(), "Error: " + resource.message, Toast.LENGTH_LONG).show();
+                    Toast.makeText(getContext(),
+                            "Error: " + resource.message,
+                            Toast.LENGTH_LONG).show();
 
                     LiveData<Resource<User>> errorStatus = viewModel.getUpdateProfileStatus();
                     if (errorStatus instanceof MutableLiveData) {
@@ -253,6 +291,7 @@ public class EditProfileFragment extends Fragment {
                     binding.progressBar.setVisibility(View.VISIBLE);
                     binding.btnDeleteAccount.setEnabled(false);
                     break;
+
                 case SUCCESS:
                     binding.progressBar.setVisibility(View.GONE);
                     viewModel.logout();
@@ -262,11 +301,14 @@ public class EditProfileFragment extends Fragment {
                     startActivity(intent);
                     requireActivity().finish();
                     break;
+
                 case ERROR:
                     binding.progressBar.setVisibility(View.GONE);
                     binding.btnDeleteAccount.setEnabled(true);
 
-                    binding.tilCurrentPassword.setError("Error al desactivar cuenta: " + resource.message);
+                    binding.tilCurrentPassword.setError(
+                            "Error al desactivar cuenta: " + resource.message
+                    );
 
                     LiveData<Resource<String>> deleteStatus = viewModel.getDeleteAccountStatus();
                     if (deleteStatus instanceof MutableLiveData) {
@@ -277,19 +319,26 @@ public class EditProfileFragment extends Fragment {
         });
     }
 
+    /**
+     * Muestra diálogo de confirmación para eliminar cuenta.
+     */
     private void showDeleteConfirmationDialog() {
         String currentPassword = binding.etCurrentPassword.getText() != null
                 ? binding.etCurrentPassword.getText().toString().trim()
                 : "";
 
         if (currentPassword.isEmpty()) {
-            binding.tilCurrentPassword.setError("Introduce tu contraseña actual para desactivar la cuenta");
+            binding.tilCurrentPassword.setError(
+                    "Introduce tu contraseña actual para desactivar la cuenta"
+            );
             binding.etCurrentPassword.requestFocus();
             return;
         }
+
         binding.tilCurrentPassword.setError(null);
 
-        DialogConfirmDeleteBinding dialogBinding = DialogConfirmDeleteBinding.inflate(getLayoutInflater());
+        DialogConfirmDeleteBinding dialogBinding =
+                DialogConfirmDeleteBinding.inflate(getLayoutInflater());
 
         AlertDialog dialog = new AlertDialog.Builder(requireContext())
                 .setView(dialogBinding.getRoot())
@@ -301,16 +350,22 @@ public class EditProfileFragment extends Fragment {
         dialogBinding.btnConfirmDelete.setOnClickListener(v -> {
             dialog.dismiss();
             String email = currentUser != null ? currentUser.getEmail() : null;
+
             if (email != null && !email.trim().isEmpty()) {
                 viewModel.deactivateMyAccount(email, currentPassword);
             } else {
-                Toast.makeText(getContext(), "Error: No se encontró el email", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(),
+                        "Error: No se encontró el email",
+                        Toast.LENGTH_SHORT).show();
             }
         });
 
         dialog.show();
     }
 
+    /**
+     * Limpia el binding al destruir la vista.
+     */
     @Override
     public void onDestroyView() {
         super.onDestroyView();

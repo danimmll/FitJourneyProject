@@ -12,11 +12,8 @@ import lombok.NoArgsConstructor;
 
 /**
  * Modelo que representa un entrenamiento realizado por un usuario.
- * Un entrenamiento puede estar asociado a una rutina concreta
- * y contiene información como la fecha, duración, calorías
- * quemadas y observaciones del usuario.
- * También almacena el detalle de los ejercicios realizados
- * durante la sesión de entrenamiento.
+ * Guarda la información general de la sesión y los ejercicios
+ * realizados durante el entrenamiento.
  */
 @Data
 @NoArgsConstructor
@@ -30,37 +27,37 @@ public class Workout implements Serializable {
     private int idWorkout;
 
     /**
-     * Identificador del usuario que realizó el entrenamiento.
+     * Identificador del usuario.
      */
     @SerializedName("id_user")
     private int idUser;
 
     /**
-     * Identificador de la rutina utilizada en el entrenamiento.
+     * Identificador de la rutina utilizada.
      */
     @SerializedName("id_routine")
     private int idRoutine;
 
     /**
-     * Fecha en la que se realizó el entrenamiento.
+     * Fecha del entrenamiento.
      */
     @SerializedName("workout_date")
     private Date workoutDate;
 
     /**
-     * Duración total del entrenamiento en minutos.
+     * Duración total en minutos.
      */
     @SerializedName("duration_minutes")
     private Integer durationMinutes;
 
     /**
-     * Cantidad estimada de calorías quemadas.
+     * Calorías estimadas quemadas.
      */
     @SerializedName("calories_burned")
     private Double caloriesBurned;
 
     /**
-     * Notas u observaciones añadidas por el usuario.
+     * Notas u observaciones del usuario.
      */
     @SerializedName("notes")
     private String notes;
@@ -76,7 +73,7 @@ public class Workout implements Serializable {
     private User user;
 
     /**
-     * Lista de ejercicios realizados durante el entrenamiento.
+     * Lista de ejercicios realizados en el entrenamiento.
      */
     private List<WorkoutDetail> details;
 }

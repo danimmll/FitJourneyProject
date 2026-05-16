@@ -25,48 +25,19 @@ import es.iesagora.fitjourney.utils.ImageUtils;
 import es.iesagora.fitjourney.viewmodel.SecondViewModel;
 
 /**
- * Fragment de perfil del usuario.
- * Este fragmento muestra la información personal del usuario autenticado y permite:
- * - Visualizar datos del perfil (nombre, email, peso, altura y objetivo)
- * - Cargar y mostrar la imagen de perfil (desde URL o Base64)
- * - Acceder a la edición del perfil
- * - Cerrar sesión del usuario
- * - Mostrar opciones administrativas si el usuario tiene rol de admin
- * Los datos del usuario se obtienen a través de {@link SecondViewModel}.
+ * Fragment que muestra el perfil del usuario.
+ * Permite visualizar datos personales, acceder a edición de perfil,
+ * cerrar sesión y, en caso de administrador, acceder al panel de gestión de usuarios.
  */
 public class ProfileFragment extends Fragment {
 
-    /**
-     * ViewBinding del layout del perfil.
-     * Permite acceso seguro a las vistas del XML.
-     */
     private FragmentProfileBinding binding;
-
-    /**
-     * ViewModel compartido de la actividad secundaria.
-     * Encargado de obtener y exponer los datos del perfil del usuario.
-     */
     private SecondViewModel viewModel;
-
-    /**
-     * Repositorio de preferencias locales.
-     * Se utiliza para obtener token, rol del usuario y gestionar sesión.
-     */
     private PreferencesRepository prefs;
-
-    /**
-     * Usuario actualmente cargado en pantalla.
-     * Se utiliza para edición y navegación a otros fragmentos.
-     */
     private User currentUser;
 
     /**
      * Infla la vista del fragmento de perfil.
-     *
-     * @param inflater inflador de layouts XML
-     * @param container contenedor padre del fragmento
-     * @param savedInstanceState estado previo del fragmento
-     * @return vista raíz del fragmento
      */
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -77,16 +48,7 @@ public class ProfileFragment extends Fragment {
     }
 
     /**
-     * Inicializa el fragmento de perfil.
-     * Configura:
-     * - ViewModel
-     * - Preferencias del usuario
-     * - Botones de acción
-     * - FAB de administrador
-     * - Observador del perfil del usuario
-     *
-     * @param view vista raíz del fragmento
-     * @param savedInstanceState estado previo del fragmento
+     * Inicializa ViewModel, repositorios, botones y observadores del perfil.
      */
     @Override
     public void onViewCreated(@NonNull View view,
@@ -137,21 +99,13 @@ public class ProfileFragment extends Fragment {
     }
 
     /**
-     * Rellena la interfaz con los datos del usuario.
-     * Muestra información como:
-     * - Nombre y email
-     * - Peso y altura
-     * - Objetivo de entrenamiento
-     * - Imagen de perfil (Base64 o URL)
-     *
-     * @param user usuario cuyos datos se mostrarán
+     * Rellena la UI con los datos del usuario.
      */
     @SuppressLint("SetTextI18n")
     private void fillUserData(User user) {
         binding.tvProfileName.setText(user.getName());
         binding.tvProfileEmail.setText(user.getEmail());
 
-        // CORREGIDO: evitar "75.0 kg" usando intValue() o formato con 1 decimal
         String weight = user.getWeight() != null
                 ? formatMetric(user.getWeight()) + " kg"
                 : "-- kg";
@@ -161,7 +115,6 @@ public class ProfileFragment extends Fragment {
 
         binding.tvProfileWeight.setText(weight);
         binding.tvProfileHeight.setText(height);
-
 
         if (user.getGoal() != null && !user.getGoal().isEmpty()) {
             String goal = user.getGoal().substring(0, 1).toUpperCase()
@@ -177,12 +130,16 @@ public class ProfileFragment extends Fragment {
                 binding.ivProfilePhoto,
                 R.drawable.ic_profile
         );
+
+        if ("ADMIN".equalsIgnoreCase(user.getRole())) {
+            binding.btnEditProfile.setVisibility(View.GONE);
+        } else {
+            binding.btnEditProfile.setVisibility(View.VISIBLE);
+        }
     }
 
     /**
-     * Configura los botones del perfil:
-     * - Edición de perfil
-     * - Cierre de sesión
+     * Configura botones de edición y cierre de sesión.
      */
     private void setupButtons() {
 
@@ -208,9 +165,7 @@ public class ProfileFragment extends Fragment {
     }
 
     /**
-     * Configura el botón flotante de administrador.
-     * Solo se muestra si el usuario tiene rol "admin".
-     * En caso contrario, se oculta.
+     * Configura el botón flotante de administración si el usuario es admin.
      */
     private void setupAdminFab() {
         if ("admin".equalsIgnoreCase(prefs.getRole())) {
@@ -224,6 +179,9 @@ public class ProfileFragment extends Fragment {
         }
     }
 
+    /**
+     * Formatea un valor numérico eliminando decimales innecesarios.
+     */
     private String formatMetric(Double value) {
         if (value == null) return "--";
         if (value == Math.floor(value)) {
@@ -232,9 +190,8 @@ public class ProfileFragment extends Fragment {
         return String.format(Locale.getDefault(), "%.1f", value);
     }
 
-
     /**
-     * Limpia el binding al destruir la vista para evitar fugas de memoria.
+     * Limpia el binding cuando se destruye la vista.
      */
     @Override
     public void onDestroyView() {

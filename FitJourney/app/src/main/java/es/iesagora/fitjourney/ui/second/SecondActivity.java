@@ -11,6 +11,7 @@ import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
+
 import android.util.Base64;
 import org.json.JSONObject;
 import java.util.Objects;
@@ -23,17 +24,23 @@ import es.iesagora.fitjourney.utils.SessionEvent;
 
 /**
  * Actividad principal de la zona autenticada.
+ * Gestiona la navegación principal con BottomNavigation y NavController,
+ * además de validar la sesión del usuario mediante token JWT.
  */
 public class SecondActivity extends AppCompatActivity {
 
     private NavController navController;
     private AppBarConfiguration appBarConfiguration;
 
+    /**
+     * Inicializa la actividad, valida sesión y configura navegación.
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         PreferencesRepository prefs = new PreferencesRepository(this);
+
         if (!isTokenValid(prefs.getToken())) {
             prefs.clearSession();
             redirectToLogin();
@@ -45,9 +52,9 @@ public class SecondActivity extends AppCompatActivity {
 
         setSupportActionBar(binding.toolbar);
 
-        navController = ((NavHostFragment) Objects.requireNonNull(getSupportFragmentManager()
-                .findFragmentById(R.id.nav_host_fragment)))
-                .getNavController();
+        navController = ((NavHostFragment) Objects.requireNonNull(
+                getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment)
+        )).getNavController();
 
         appBarConfiguration = new AppBarConfiguration.Builder(
                 R.id.homeFragment,
@@ -67,25 +74,35 @@ public class SecondActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Valida si un token JWT es correcto y no ha expirado.
+     */
     private boolean isTokenValid(String token) {
         if (token == null || token.trim().isEmpty()) return false;
+
         try {
             String[] parts = token.split("\\.");
             if (parts.length != 3) return false;
-            String payload = new String(Base64.decode(parts[1], Base64.URL_SAFE | Base64.NO_WRAP | Base64.NO_PADDING));
+
+            String payload = new String(
+                    Base64.decode(parts[1], Base64.URL_SAFE | Base64.NO_WRAP | Base64.NO_PADDING)
+            );
+
             JSONObject json = new JSONObject(payload);
             long exp = json.optLong("exp", 0L);
+
             if (exp <= 0) return false;
+
             long now = System.currentTimeMillis() / 1000L;
             return exp > now;
+
         } catch (Exception e) {
             return false;
         }
     }
 
     /**
-     * Redirige al usuario a MainActivity (login) limpiando el back stack
-     * para que no pueda volver atrás a la zona autenticada.
+     * Redirige al usuario a la pantalla de login eliminando el back stack.
      */
     private void redirectToLogin() {
         Intent intent = new Intent(this, MainActivity.class);
@@ -94,18 +111,27 @@ public class SecondActivity extends AppCompatActivity {
         finish();
     }
 
+    /**
+     * Infla el menú superior de opciones.
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.settings_menu, menu);
         return true;
     }
 
+    /**
+     * Gestiona la navegación desde el menú superior.
+     */
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         return NavigationUI.onNavDestinationSelected(item, navController)
                 || super.onOptionsItemSelected(item);
     }
 
+    /**
+     * Maneja la navegación "Up" de la toolbar.
+     */
     @Override
     public boolean onSupportNavigateUp() {
         return NavigationUI.navigateUp(navController, appBarConfiguration)

@@ -11,12 +11,8 @@ import lombok.NoArgsConstructor;
 
 /**
  * Modelo que representa una rutina de entrenamiento.
- * Una rutina contiene información general como el nombre,
- * descripción, imagen y usuario creador, además de la lista
- * de ejercicios que forman parte de ella.
- * Esta clase se utiliza para intercambiar datos entre
- * la API, los repositorios y las distintas pantallas
- * de la aplicación.
+ * Contiene la información general de la rutina y
+ * la lista de ejercicios asociados a ella.
  */
 @Data
 @NoArgsConstructor
@@ -31,19 +27,18 @@ public class Routine implements Serializable {
 
     /**
      * Nombre de la rutina.
-     * Ejemplo: "Rutina Full Body", "Pierna Avanzada", etc.
      */
     @SerializedName("name")
     private String name;
 
     /**
-     * Descripción o explicación de la rutina.
+     * Descripción de la rutina.
      */
     @SerializedName("description")
     private String description;
 
     /**
-     * URL de la imagen asociada a la rutina.
+     * URL de la imagen de la rutina.
      */
     @SerializedName("photo_url")
     private String photoUrl;
@@ -55,30 +50,27 @@ public class Routine implements Serializable {
     private String creationDate;
 
     /**
-     * Identificador del usuario que creó la rutina.
+     * Identificador del usuario creador.
      */
     @SerializedName("id_user")
     private int idUser;
 
     /**
-     * Indica si la rutina es pública.
-     * 1 = Pública
-     * 0 = Privada
+     * Indica si la rutina es pública o privada.
      */
     @SerializedName("is_public")
     private int isPublic;
 
     /**
-     * Lista de ejercicios que forman parte de la rutina.
+     * Lista de ejercicios de la rutina.
      */
     private List<RoutineExercise> exercises;
 
     /**
-     * Devuelve la imagen que se mostrará en pantalla.
-     * Si la rutina tiene una imagen asignada, devuelve esa URL.
-     * En caso contrario, devuelve una imagen por defecto.
+     * Devuelve la imagen que se mostrará de la rutina.
+     * Si no existe una imagen asignada, devuelve una por defecto.
      *
-     * @return URL de la imagen de la rutina.
+     * @return URL de la imagen a mostrar.
      */
     public String getDisplayImage() {
         if (photoUrl != null && !photoUrl.trim().isEmpty()) {

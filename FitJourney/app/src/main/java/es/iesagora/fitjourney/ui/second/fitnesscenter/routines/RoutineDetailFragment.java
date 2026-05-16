@@ -29,6 +29,12 @@ import es.iesagora.fitjourney.ui.workout.WorkoutActivity;
 import es.iesagora.fitjourney.utils.ImageUtils;
 import es.iesagora.fitjourney.viewmodel.SecondViewModel;
 
+/**
+ * Fragmento encargado de mostrar los detalles de una rutina específica.
+ * Presenta la información general (imagen, nombre) y la lista de ejercicios que la componen.
+ * Gestiona los permisos de usuario para habilitar la edición y eliminación (solo creador o administrador)
+ * y permite iniciar un entrenamiento basado en esta rutina.
+ */
 public class RoutineDetailFragment extends Fragment {
 
     private FragmentRoutineDetailBinding binding;
@@ -60,6 +66,10 @@ public class RoutineDetailFragment extends Fragment {
         }
     }
 
+    /**
+     * Solicita al ViewModel los datos de la rutina mediante su ID y observa la respuesta.
+     * En caso de éxito, actualiza la interfaz y configura los botones correspondientes.
+     */
     private void loadRoutineData() {
         viewModel.fetchRoutineById(routineId);
 
@@ -76,6 +86,12 @@ public class RoutineDetailFragment extends Fragment {
         });
     }
 
+    /**
+     * Rellena la interfaz de usuario con la información de la rutina.
+     * Carga la imagen de portada y configura el RecyclerView con los ejercicios asignados.
+     *
+     * @param routine La rutina cuyos datos se van a mostrar.
+     */
     private void fillRoutineData(Routine routine) {
         binding.tvRoutineDetailName.setText(routine.getName());
         ImageUtils.loadInto(requireContext(), routine.getDisplayImage(),
@@ -104,6 +120,13 @@ public class RoutineDetailFragment extends Fragment {
         }
     }
 
+    /**
+     * Configura la visibilidad y las acciones de los botones según los permisos del usuario.
+     * Muestra el panel de propietario (editar/eliminar) si el usuario es el creador de la rutina o un administrador.
+     * Habilita el botón principal para iniciar la actividad de entrenamiento.
+     *
+     * @param routine La rutina actual, utilizada para comprobar la autoría y pasar su ID.
+     */
     private void setupButtons(Routine routine) {
         PreferencesRepository prefs = new PreferencesRepository(requireContext());
         boolean isAdmin = "admin".equalsIgnoreCase(prefs.getRole());
@@ -140,6 +163,12 @@ public class RoutineDetailFragment extends Fragment {
         });
     }
 
+    /**
+     * Muestra un cuadro de diálogo de confirmación para eliminar la rutina actual.
+     * Si se confirma, solicita la eliminación al ViewModel, actualiza la lista global y cierra el fragmento.
+     *
+     * @param routine La rutina que se desea eliminar.
+     */
     @SuppressLint("SetTextI18n")
     private void showDeleteDialog(Routine routine) {
         DialogConfirmDeleteBinding dialogBinding = DialogConfirmDeleteBinding.inflate(getLayoutInflater());

@@ -36,6 +36,11 @@ import es.iesagora.fitjourney.ui.second.adapters.SelectExerciseAdapter;
 import es.iesagora.fitjourney.utils.ImageUtils;
 import es.iesagora.fitjourney.viewmodel.SecondViewModel;
 
+/**
+ * Fragmento encargado de la creación y edición de Rutinas.
+ * Permite al usuario definir el nombre, descripción, visibilidad e imagen de la rutina,
+ * así como añadir, configurar (series/repeticiones) y eliminar ejercicios de la misma.
+ */
 public class FormRoutineFragment extends Fragment {
 
     private FragmentFormRoutineBinding binding;
@@ -52,6 +57,10 @@ public class FormRoutineFragment extends Fragment {
     private static final String TYPE_CARDIO = "Cardio";
     private static final String TYPE_ESTIRAMIENTO = "Estiramiento";
 
+    /**
+     * Lanzador para registrar el resultado de seleccionar una imagen de la galería.
+     * Actualiza la previsualización y borra cualquier URL introducida manualmente.
+     */
     private final ActivityResultLauncher<String> getContent =
             registerForActivityResult(new ActivityResultContracts.GetContent(), uri -> {
                 if (uri != null) {
@@ -94,6 +103,10 @@ public class FormRoutineFragment extends Fragment {
         setupObservers();
     }
 
+    /**
+     * Configura el RecyclerView que muestra la lista de ejercicios añadidos a la rutina actual.
+     * Incluye la lógica para poder eliminar un ejercicio de la lista.
+     */
     @SuppressLint("NotifyDataSetChanged")
     private void setupRecyclerView() {
         adapter = new AddedExerciseAdapter(addedExercises, position -> {
@@ -106,6 +119,9 @@ public class FormRoutineFragment extends Fragment {
         updateEmptyState();
     }
 
+    /**
+     * Configura los listeners de los botones, carga de imágenes y el guardado de la rutina.
+     */
     private void setupListeners() {
         binding.toolbar.setNavigationOnClickListener(v -> Navigation.findNavController(v).navigateUp());
 
@@ -132,6 +148,11 @@ public class FormRoutineFragment extends Fragment {
         });
     }
 
+    /**
+     * Muestra un cuadro de diálogo con buscador para seleccionar un ejercicio del catálogo
+     * y definir su número de series y repeticiones. Adapta los campos visibles dependiendo
+     * de si es un ejercicio de Hipertrofia, Cardio o Estiramiento.
+     */
     private void showAddExerciseDialog() {
         List<Exercise> allExercises = getExerciseCatalog();
         if (allExercises == null) return;
@@ -191,6 +212,10 @@ public class FormRoutineFragment extends Fragment {
         });
     }
 
+    /**
+     * Obtiene la lista completa de ejercicios cargados en el ViewModel.
+     * * @return Lista de ejercicios o null si aún no se han cargado.
+     */
     private List<Exercise> getExerciseCatalog() {
         Resource<List<Exercise>> resource = viewModel.getExercises().getValue();
         if (resource == null || resource.data == null) {
@@ -200,6 +225,14 @@ public class FormRoutineFragment extends Fragment {
         return resource.data;
     }
 
+    /**
+     * Valida los datos introducidos en el diálogo (series y repeticiones) según el tipo
+     * de ejercicio y procede a añadirlo a la lista de la rutina si es correcto.
+     *
+     * @param selectedExercise Ejercicio seleccionado.
+     * @param dialogBinding Binding del diálogo para obtener los valores introducidos.
+     * @param dialog Instancia del diálogo para poder cerrarlo tras el éxito.
+     */
     private void onConfirmAddExercise(Exercise selectedExercise, DialogAddRoutineExerciseBinding dialogBinding, AlertDialog dialog) {
         String type = selectedExercise.getExerciseType() != null ? selectedExercise.getExerciseType() : TYPE_HIPERTROFIA;
         boolean isHipertrofia = type.equals(TYPE_HIPERTROFIA);
@@ -239,6 +272,9 @@ public class FormRoutineFragment extends Fragment {
         dialog.dismiss();
     }
 
+    /**
+     * Crea un nuevo objeto RoutineExercise y lo añade a la colección en memoria de la rutina.
+     */
     private void addRoutineExercise(Exercise exercise, int sets, int reps) {
         RoutineExercise newRoutineEx = new RoutineExercise();
         newRoutineEx.setIdExercise(exercise.getIdExercise());
@@ -251,12 +287,20 @@ public class FormRoutineFragment extends Fragment {
         updateEmptyState();
     }
 
+    /**
+     * Alterna la visibilidad del texto de estado vacío dependiendo de si hay ejercicios
+     * en la lista o no.
+     */
     private void updateEmptyState() {
         boolean isEmpty = addedExercises.isEmpty();
         binding.tvEmptyState.setVisibility(isEmpty ? View.VISIBLE : View.GONE);
         binding.rvExercises.setVisibility(isEmpty ? View.GONE : View.VISIBLE);
     }
 
+    /**
+     * Observa el estado de la acción de guardar/actualizar la rutina en el ViewModel.
+     * Muestra feedback al usuario y cierra el fragmento en caso de éxito.
+     */
     private void setupObservers() {
         viewModel.getRoutineActionStatus().observe(getViewLifecycleOwner(), resource -> {
             if (resource == null) return;
@@ -282,6 +326,10 @@ public class FormRoutineFragment extends Fragment {
         });
     }
 
+    /**
+     * Recoge los datos del formulario, procesa la imagen (Base64 o URL) y solicita
+     * al ViewModel la creación de una nueva rutina.
+     */
     private void saveRoutine() {
         String name = binding.etRoutineName.getText() != null ? binding.etRoutineName.getText().toString().trim() : "";
         String desc = binding.etRoutineDesc.getText() != null ? binding.etRoutineDesc.getText().toString().trim() : "";
@@ -309,6 +357,12 @@ public class FormRoutineFragment extends Fragment {
         viewModel.createRoutine(routine);
     }
 
+    /**
+     * Construye una lista limpia de RoutineExercise extrayendo únicamente los identificadores
+     * y objetivos para enviarlos al backend de forma óptima.
+     *
+     * @return Lista depurada de ejercicios de la rutina.
+     */
     private List<RoutineExercise> buildCleanExercises() {
         List<RoutineExercise> cleanExercises = new ArrayList<>();
         for (RoutineExercise re : addedExercises) {
@@ -330,6 +384,10 @@ public class FormRoutineFragment extends Fragment {
         return cleanExercises;
     }
 
+    /**
+     * Genera la entidad Routine a partir de los datos pasados por parámetro y
+     * los datos recopilados en el formulario.
+     */
     private Routine getRoutine(String name, String desc, String finalPhotoData) {
         List<RoutineExercise> cleanExercises = buildCleanExercises();
 
@@ -342,6 +400,12 @@ public class FormRoutineFragment extends Fragment {
         return routine;
     }
 
+    /**
+     * Recoge los datos del formulario, procesa la imagen y solicita al ViewModel
+     * la actualización de una rutina ya existente.
+     *
+     * @param routineId ID de la rutina a editar.
+     */
     private void updateRoutine(int routineId) {
         String name = binding.etRoutineName.getText() != null ? binding.etRoutineName.getText().toString().trim() : "";
         String desc = binding.etRoutineDesc.getText() != null ? binding.etRoutineDesc.getText().toString().trim() : "";
@@ -379,6 +443,12 @@ public class FormRoutineFragment extends Fragment {
         viewModel.updateRoutine(routineId, routine);
     }
 
+    /**
+     * Rellena todos los campos de la interfaz con los datos de una rutina
+     * cuando se entra en modo edición.
+     *
+     * @param routine Objeto Routine recibido por argumentos.
+     */
     @SuppressLint("NotifyDataSetChanged")
     private void fillFieldsForEdit(Routine routine) {
         routineIdToEdit = routine.getIdRoutine();

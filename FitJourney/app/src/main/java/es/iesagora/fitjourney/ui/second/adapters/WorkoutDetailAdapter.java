@@ -14,6 +14,20 @@ import java.util.List;
 import es.iesagora.fitjourney.R;
 import es.iesagora.fitjourney.data.model.WorkoutDetail;
 
+/**
+ * Adapter encargado de mostrar los detalles de un entrenamiento (Workout)
+ * en un RecyclerView.
+ *
+ * <p>Cada item representa un ejercicio realizado dentro del entrenamiento,
+ * mostrando su nombre y las estadísticas asociadas según el tipo de ejercicio.</p>
+ *
+ * <p>Soporta tres tipos de ejercicios:</p>
+ * <ul>
+ *     <li>Hipertrofia (fuerza)</li>
+ *     <li>Cardio</li>
+ *     <li>Estiramiento</li>
+ * </ul>
+ */
 public class WorkoutDetailAdapter extends RecyclerView.Adapter<WorkoutDetailAdapter.ViewHolder> {
 
     private static final String TYPE_HIPERTROFIA = "Hipertrofia";
@@ -22,10 +36,22 @@ public class WorkoutDetailAdapter extends RecyclerView.Adapter<WorkoutDetailAdap
 
     private final List<WorkoutDetail> details;
 
+    /**
+     * Constructor del adapter.
+     *
+     * @param details lista de detalles del entrenamiento a mostrar
+     */
     public WorkoutDetailAdapter(List<WorkoutDetail> details) {
         this.details = details;
     }
 
+    /**
+     * Crea la vista de cada item del RecyclerView.
+     *
+     * @param parent ViewGroup padre
+     * @param viewType tipo de vista
+     * @return ViewHolder con la vista inflada
+     */
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -35,29 +61,41 @@ public class WorkoutDetailAdapter extends RecyclerView.Adapter<WorkoutDetailAdap
         return new ViewHolder(view);
     }
 
+    /**
+     * Asocia los datos del WorkoutDetail con la vista.
+     *
+     * @param holder ViewHolder
+     * @param position posición del elemento en la lista
+     */
     @SuppressLint("SetTextI18n")
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+
         WorkoutDetail detail = details.get(position);
 
         holder.tvName.setText(getExerciseName(detail));
         holder.tvStats.setText(buildStatisticsText(detail));
     }
 
+    /**
+     * Devuelve el número total de elementos.
+     *
+     * @return tamaño de la lista de detalles
+     */
     @Override
     public int getItemCount() {
         return details != null ? details.size() : 0;
     }
 
     /**
-     * Devuelve el nombre del ejercicio.
-     * Si no existe información del ejercicio,
-     * se muestra un texto por defecto.
+     * Obtiene el nombre del ejercicio asociado al detalle.
+     *
+     * @param detail detalle del workout
+     * @return nombre del ejercicio o valor por defecto si no existe
      */
     private String getExerciseName(WorkoutDetail detail) {
         if (detail.getExercise() != null
                 && detail.getExercise().getName() != null) {
-
             return detail.getExercise().getName();
         }
 
@@ -65,8 +103,10 @@ public class WorkoutDetailAdapter extends RecyclerView.Adapter<WorkoutDetailAdap
     }
 
     /**
-     * Construye el texto de estadísticas dependiendo
-     * del tipo de ejercicio realizado.
+     * Construye el texto de estadísticas según el tipo de ejercicio.
+     *
+     * @param detail detalle del workout
+     * @return texto formateado con estadísticas
      */
     private String buildStatisticsText(WorkoutDetail detail) {
 
@@ -84,14 +124,15 @@ public class WorkoutDetailAdapter extends RecyclerView.Adapter<WorkoutDetailAdap
     }
 
     /**
-     * Devuelve el tipo de ejercicio.
-     * Por defecto será Hipertrofia.
+     * Obtiene el tipo de ejercicio.
+     *
+     * @param detail detalle del workout
+     * @return tipo de ejercicio o hipertrofia por defecto
      */
     private String getExerciseType(WorkoutDetail detail) {
 
         if (detail.getExercise() != null
                 && detail.getExercise().getExerciseType() != null) {
-
             return detail.getExercise().getExerciseType();
         }
 
@@ -99,7 +140,10 @@ public class WorkoutDetailAdapter extends RecyclerView.Adapter<WorkoutDetailAdap
     }
 
     /**
-     * Genera las estadísticas para ejercicios de cardio.
+     * Genera estadísticas para ejercicios de cardio.
+     *
+     * @param detail detalle del workout
+     * @return texto formateado
      */
     private String buildCardioStats(WorkoutDetail detail) {
 
@@ -119,14 +163,20 @@ public class WorkoutDetailAdapter extends RecyclerView.Adapter<WorkoutDetailAdap
     }
 
     /**
-     * Genera las estadísticas para ejercicios de estiramiento.
+     * Genera estadísticas para ejercicios de estiramiento.
+     *
+     * @param detail detalle del workout
+     * @return texto formateado
      */
     private String buildStretchingStats(WorkoutDetail detail) {
         return getSets(detail) + " rondas completadas";
     }
 
     /**
-     * Genera las estadísticas para ejercicios de hipertrofia.
+     * Genera estadísticas para ejercicios de fuerza/hipertrofia.
+     *
+     * @param detail detalle del workout
+     * @return texto formateado
      */
     private String buildStrengthStats(WorkoutDetail detail) {
 
@@ -141,17 +191,18 @@ public class WorkoutDetailAdapter extends RecyclerView.Adapter<WorkoutDetailAdap
                 : 0.0;
 
         if (weight > 0) {
-            return sets + " series x ("
-                    + reps + ") reps • "
+            return sets + " series x (" + reps + ") reps • "
                     + weight + " kg máx";
         }
 
-        return sets + " series x ("
-                + reps + ") reps";
+        return sets + " series x (" + reps + ") reps";
     }
 
     /**
-     * Devuelve el número de series realizadas.
+     * Obtiene el número de series realizadas.
+     *
+     * @param detail detalle del workout
+     * @return número de sets o 0 si es null
      */
     private int getSets(WorkoutDetail detail) {
         return detail.getSetsPerformed() != null
@@ -159,11 +210,19 @@ public class WorkoutDetailAdapter extends RecyclerView.Adapter<WorkoutDetailAdap
                 : 0;
     }
 
+    /**
+     * ViewHolder que representa cada item del RecyclerView.
+     */
     static class ViewHolder extends RecyclerView.ViewHolder {
 
         TextView tvName;
         TextView tvStats;
 
+        /**
+         * Constructor del ViewHolder.
+         *
+         * @param itemView vista del item
+         */
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
 

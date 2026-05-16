@@ -23,6 +23,12 @@ import es.iesagora.fitjourney.databinding.FragmentFormExerciseBinding;
 import es.iesagora.fitjourney.utils.ImageUtils;
 import es.iesagora.fitjourney.viewmodel.SecondViewModel;
 
+/**
+ * Fragmento que proporciona la interfaz para crear o editar un {@link Exercise}.
+ * Permite al usuario introducir detalles del ejercicio como nombre, descripción, 
+ * grupo muscular, dificultad y tipo de ejercicio (Hipertrofia, Cardio, Estiramiento).
+ * Soporta la adición de imágenes mediante una URL o seleccionando un archivo de la galería.
+ */
 public class FormExerciseFragment extends Fragment {
 
     private FragmentFormExerciseBinding binding;
@@ -39,6 +45,11 @@ public class FormExerciseFragment extends Fragment {
     private static final String TYPE_CARDIO        = "Cardio";
     private static final String TYPE_ESTIRAMIENTO  = "Estiramiento";
 
+    /**
+     * Lanzador para registrar el resultado de seleccionar contenido de la galería.
+     * Si se selecciona una imagen, actualiza la URI local, limpia el texto de URL 
+     * y muestra una previsualización.
+     */
     private final ActivityResultLauncher<String> getContent =
             registerForActivityResult(new ActivityResultContracts.GetContent(), uri -> {
                 if (uri != null) {
@@ -79,8 +90,11 @@ public class FormExerciseFragment extends Fragment {
         setupListeners();
     }
 
+    /**
+     * Inicializa los menús desplegables para seleccionar la dificultad y el tipo 
+     * de ejercicio, utilizando un {@link ArrayAdapter}.
+     */
     private void setupDropdowns() {
-        // Dropdown de dificultad
         String[] difficulties = {PRINCIPIANTE_STRING, INTERMEDIO_STRING, EXPERTO_STRING};
         ArrayAdapter<String> adapterDifficulty = new ArrayAdapter<>(
                 requireContext(), android.R.layout.simple_dropdown_item_1line, difficulties);
@@ -92,6 +106,11 @@ public class FormExerciseFragment extends Fragment {
         binding.actvExerciseType.setAdapter(adapterType);
     }
 
+    /**
+     * Configura los listeners de clics y cambios de foco en los elementos de la UI, 
+     * incluyendo el botón de guardar y la previsualización de imágenes a partir 
+     * de un enlace proporcionado.
+     */
     private void setupListeners() {
         binding.btnSelectImage.setOnClickListener(v -> getContent.launch("image/*"));
         binding.ivPreview.setOnClickListener(v -> getContent.launch("image/*"));
@@ -111,6 +130,11 @@ public class FormExerciseFragment extends Fragment {
         binding.btnSave.setOnClickListener(v -> saveExercise());
     }
 
+    /**
+     * Carga en la UI los datos del ejercicio a editar proporcionados a través de los argumentos.
+     * Convierte los IDs de dificultad en strings legibles para el usuario y maneja
+     * la visualización previa tanto si la imagen es Base64 como si es un enlace HTTP.
+     */
     private void setupEditMode() {
         binding.tvFormTitle.setText(R.string.edit_exercise);
         binding.btnSave.setText(R.string.update);
@@ -121,9 +145,19 @@ public class FormExerciseFragment extends Fragment {
 
         String diff = exerciseToEdit.getDifficulty();
         if (diff != null) {
-            if (diff.equals("1"))      diff = PRINCIPIANTE_STRING;
-            else if (diff.equals("2")) diff = INTERMEDIO_STRING;
-            else if (diff.equals("3")) diff = EXPERTO_STRING;
+            switch (diff) {
+                case "1":
+                    diff = PRINCIPIANTE_STRING;
+                    break;
+                case "2":
+                    diff = INTERMEDIO_STRING;
+                    break;
+                case "3":
+                    diff = EXPERTO_STRING;
+                    break;
+                default:
+                    throw new IllegalStateException("Unexpected value: " + diff);
+            }
             binding.actvDifficulty.setText(diff, false);
         }
 
@@ -146,6 +180,11 @@ public class FormExerciseFragment extends Fragment {
         }
     }
 
+    /**
+     * Recoge los datos del formulario, los valida y llama al ViewModel para 
+     * procesar la creación o actualización del ejercicio en la base de datos.
+     * Codifica la imagen a formato Base64 si procede desde una URI local.
+     */
     private void saveExercise() {
         String name        = Objects.requireNonNull(binding.etName.getText()).toString().trim();
         String description = Objects.requireNonNull(binding.etDescription.getText()).toString().trim();

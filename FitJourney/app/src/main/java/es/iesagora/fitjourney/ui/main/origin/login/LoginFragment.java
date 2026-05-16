@@ -23,37 +23,66 @@ import es.iesagora.fitjourney.ui.second.SecondActivity;
 import es.iesagora.fitjourney.viewmodel.MainViewModel;
 
 /**
- * Fragment encargado del inicio de sesión del usuario.
- * Gestiona la autenticación, valida los datos introducidos,
- * observa el estado del login y redirige a la pantalla principal
- * cuando la autenticación es correcta.
+ * Fragment encargado del inicio de sesión.
+ * Permite al usuario autenticarse en la aplicación
+ * y acceder a la pantalla principal.
  */
 public class LoginFragment extends Fragment {
 
+    /**
+     * ViewBinding asociado al fragmento.
+     */
     private FragmentLoginBinding binding;
+
+    /**
+     * Clave utilizada para guardar el email.
+     */
     private static final String KEY_EMAIL = "email";
+
+    /**
+     * Clave utilizada para guardar la contraseña.
+     */
     private static final String KEY_PASSWORD = "password";
 
     /**
-     * Infla la vista del fragmento y restaura datos si existen.
+     * Infla la vista del fragmento y restaura los datos guardados.
+     *
+     * @param inflater Objeto para inflar layouts.
+     * @param container Contenedor padre de la vista.
+     * @param savedInstanceState Estado previo del fragmento.
+     * @return Vista raíz del fragmento.
      */
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container,
                              Bundle savedInstanceState) {
 
-        binding = FragmentLoginBinding.inflate(inflater, container, false);
+        binding = FragmentLoginBinding.inflate(
+                inflater,
+                container,
+                false
+        );
 
         if (savedInstanceState != null) {
-            binding.etEmail.setText(savedInstanceState.getString(KEY_EMAIL, ""));
-            binding.etPassword.setText(savedInstanceState.getString(KEY_PASSWORD, ""));
+
+            binding.etEmail.setText(
+                    savedInstanceState.getString(KEY_EMAIL, "")
+            );
+
+            binding.etPassword.setText(
+                    savedInstanceState.getString(KEY_PASSWORD, "")
+            );
         }
 
         return binding.getRoot();
     }
 
     /**
-     * Inicializa ViewModel, navegación y observadores del login.
+     * Configura el ViewModel, la navegación y los eventos
+     * relacionados con el inicio de sesión.
+     *
+     * @param view Vista del fragmento.
+     * @param savedInstanceState Estado previo del fragmento.
      */
     @Override
     public void onViewCreated(@NonNull View view,
@@ -61,46 +90,88 @@ public class LoginFragment extends Fragment {
 
         super.onViewCreated(view, savedInstanceState);
 
-        MainViewModel viewModel = new ViewModelProvider(this).get(MainViewModel.class);
-        NavController navController = Navigation.findNavController(view);
+        MainViewModel viewModel =
+                new ViewModelProvider(this).get(MainViewModel.class);
 
-        viewModel.getLoginState().observe(getViewLifecycleOwner(), resource -> {
-            if (resource == null) return;
+        NavController navController =
+                Navigation.findNavController(view);
 
-            switch (resource.status) {
+        viewModel.getLoginState().observe(
+                getViewLifecycleOwner(),
+                resource -> {
 
-                case LOADING:
-                    binding.btnLoginSubmit.setEnabled(false);
-                    binding.progressBar.setVisibility(View.VISIBLE);
-                    break;
+                    if (resource == null) return;
 
-                case SUCCESS:
-                    binding.btnLoginSubmit.setEnabled(true);
-                    binding.progressBar.setVisibility(View.GONE);
+                    switch (resource.status) {
 
-                    Toast.makeText(requireContext(),
-                            "¡BIENVENIDO!",
-                            Toast.LENGTH_SHORT).show();
+                        case LOADING:
 
-                    Intent intent = new Intent(requireContext(), SecondActivity.class);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                    startActivity(intent);
-                    requireActivity().finish();
-                    break;
+                            binding.btnLoginSubmit.setEnabled(false);
 
-                case ERROR:
-                    binding.btnLoginSubmit.setEnabled(true);
-                    binding.progressBar.setVisibility(View.GONE);
-                    Toast.makeText(requireContext(),
-                            "Error: " + resource.message,
-                            Toast.LENGTH_SHORT).show();
-                    break;
-            }
-        });
+                            binding.progressBar.setVisibility(
+                                    View.VISIBLE
+                            );
+
+                            break;
+
+                        case SUCCESS:
+
+                            binding.btnLoginSubmit.setEnabled(true);
+
+                            binding.progressBar.setVisibility(
+                                    View.GONE
+                            );
+
+                            Toast.makeText(
+                                    requireContext(),
+                                    "¡BIENVENIDO!",
+                                    Toast.LENGTH_SHORT
+                            ).show();
+
+                            Intent intent = new Intent(
+                                    requireContext(),
+                                    SecondActivity.class
+                            );
+
+                            intent.setFlags(
+                                    Intent.FLAG_ACTIVITY_NEW_TASK
+                                            | Intent.FLAG_ACTIVITY_CLEAR_TASK
+                            );
+
+                            startActivity(intent);
+
+                            requireActivity().finish();
+
+                            break;
+
+                        case ERROR:
+
+                            binding.btnLoginSubmit.setEnabled(true);
+
+                            binding.progressBar.setVisibility(
+                                    View.GONE
+                            );
+
+                            Toast.makeText(
+                                    requireContext(),
+                                    "Error: " + resource.message,
+                                    Toast.LENGTH_SHORT
+                            ).show();
+
+                            break;
+                    }
+                }
+        );
 
         binding.btnLoginSubmit.setOnClickListener(v -> {
-            String email = Objects.requireNonNull(binding.etEmail.getText()).toString().trim();
-            String password = Objects.requireNonNull(binding.etPassword.getText()).toString().trim();
+
+            String email = Objects.requireNonNull(
+                    binding.etEmail.getText()
+            ).toString().trim();
+
+            String password = Objects.requireNonNull(
+                    binding.etPassword.getText()
+            ).toString().trim();
 
             if (checkData(email, password)) {
                 viewModel.login(email, password);
@@ -108,43 +179,81 @@ public class LoginFragment extends Fragment {
         });
 
         binding.tvGoToRegister.setOnClickListener(v ->
+
                 navController.navigate(R.id.registerFragment)
         );
     }
 
     /**
-     * Valida los campos de email y contraseña.
+     * Valida los datos introducidos por el usuario.
+     *
+     * @param email Email introducido.
+     * @param password Contraseña introducida.
+     * @return true si los datos son válidos.
      */
     private boolean checkData(String email, String password) {
 
         if (email.isEmpty()) {
+
             binding.tlEmail.setError("El email es requerido");
+
             return false;
+
         } else {
+
             binding.tlEmail.setError(null);
         }
 
         if (password.isEmpty()) {
-            binding.tlPassword.setError("La contraseña es requerida");
+
+            binding.tlPassword.setError(
+                    "La contraseña es requerida"
+            );
+
             return false;
+
         } else {
+
             binding.tlPassword.setError(null);
         }
 
         return true;
     }
 
+    /**
+     * Libera el binding para evitar fugas de memoria.
+     */
     @Override
     public void onDestroyView() {
+
         super.onDestroyView();
+
         binding = null;
     }
 
+    /**
+     * Guarda temporalmente los datos introducidos
+     * para restaurarlos en cambios de configuración.
+     *
+     * @param outState Bundle donde se guardan los datos.
+     */
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
+
         super.onSaveInstanceState(outState);
 
-        outState.putString(KEY_EMAIL, Objects.requireNonNull(binding.etEmail.getText()).toString());
-        outState.putString(KEY_PASSWORD, Objects.requireNonNull(binding.etPassword.getText()).toString());
+        outState.putString(
+                KEY_EMAIL,
+                Objects.requireNonNull(
+                        binding.etEmail.getText()
+                ).toString()
+        );
+
+        outState.putString(
+                KEY_PASSWORD,
+                Objects.requireNonNull(
+                        binding.etPassword.getText()
+                ).toString()
+        );
     }
 }

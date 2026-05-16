@@ -16,45 +16,47 @@ import retrofit2.http.PUT;
 import retrofit2.http.Path;
 
 /**
- * Interfaz principal de Retrofit.
- * Define los endpoints de la API de FitJourney para la comunicación cliente-servidor.
+ * Interfaz principal de Retrofit para la comunicación
+ * entre la aplicación y la API de FitJourney.
+ * Define todos los endpoints relacionados con autenticación,
+ * usuarios, ejercicios, rutinas y entrenamientos.
  */
 public interface AppApi {
 
     // ── AUTH ────────────────────────────────────────────────────────────────
 
     /**
-     * Registra un nuevo usuario en el sistema.
+     * Registra un nuevo usuario.
      *
-     * @param user Objeto con los datos del usuario a registrar.
-     * @return Una respuesta que contiene el token de acceso y los datos básicos del usuario.
+     * @param user Datos del usuario a registrar.
+     * @return Respuesta con el token y la información del usuario.
      */
     @POST("auth/register")
     Call<AccessResponse> registerUser(@Body User user);
 
     /**
-     * Inicia sesión con las credenciales del usuario.
+     * Inicia sesión en la aplicación.
      *
-     * @param loginRequest Objeto que contiene el email y la contraseña.
-     * @return Una respuesta que contiene el token de acceso y el perfil del usuario.
+     * @param loginRequest Credenciales del usuario.
+     * @return Respuesta con el token y los datos del usuario.
      */
     @POST("auth/login")
     Call<AccessResponse> loginUser(@Body LoginRequest loginRequest);
 
     /**
-     * Reactiva una cuenta de usuario previamente desactivada.
+     * Reactiva una cuenta desactivada.
      *
-     * @param loginRequest Objeto con las credenciales (email y contraseña) para validar la reactivación.
-     * @return Una respuesta con el token de acceso para la cuenta restaurada.
+     * @param loginRequest Credenciales del usuario.
+     * @return Respuesta con el token de acceso.
      */
     @POST("auth/reactivate")
     Call<AccessResponse> reactivateAccount(@Body LoginRequest loginRequest);
 
     /**
-     * Elimina físicamente y de forma irreversible la cuenta del usuario de la base de datos.
+     * Elimina permanentemente la cuenta del usuario.
      *
-     * @param loginRequest Objeto con las credenciales para autorizar la eliminación de la propia cuenta.
-     * @return Un ResponseBody confirmando el éxito de la operación.
+     * @param loginRequest Credenciales para confirmar la operación.
+     * @return Confirmación de eliminación.
      */
     @POST("auth/delete")
     Call<ResponseBody> deleteAccountPhysical(@Body LoginRequest loginRequest);
@@ -62,47 +64,45 @@ public interface AppApi {
     // ── USUARIOS ─────────────────────────────────────────────────────────────
 
     /**
-     * Obtiene los datos del perfil del usuario actualmente autenticado.
+     * Obtiene el perfil del usuario autenticado.
      *
-     * @return El objeto User con todos los datos personales del usuario.
+     * @return Datos completos del usuario.
      */
     @GET("users/profile")
     Call<User> getUserProfile();
 
     /**
-     * Actualiza los datos del perfil del usuario actualmente autenticado.
+     * Actualiza el perfil del usuario.
      *
-     * @param user Objeto User con los campos modificados.
-     * @return El objeto User actualizado desde el servidor.
+     * @param user Datos actualizados.
+     * @return Usuario actualizado.
      */
     @PUT("users/profile")
     Call<User> updateUserProfile(@Body User user);
 
     /**
-     * Obtiene una lista de todos los usuarios registrados en la plataforma.
-     * Requiere permisos de Administrador.
+     * Obtiene todos los usuarios registrados.
      *
-     * @return Una lista de objetos User.
+     * @return Lista de usuarios.
      */
     @GET("users")
     Call<List<User>> getAllUsers();
 
     /**
-     * Permite a un administrador actualizar los datos del perfil de cualquier usuario específico.
+     * Actualiza un usuario desde administración.
      *
-     * @param id   Identificador único del usuario a modificar.
-     * @param user Objeto User con los nuevos datos.
-     * @return El objeto User actualizado.
+     * @param id Identificador del usuario.
+     * @param user Nuevos datos del usuario.
+     * @return Usuario actualizado.
      */
     @PUT("users/{id}")
     Call<User> updateUserByAdmin(@Path("id") int id, @Body User user);
 
     /**
-     * Desactiva lógicamente a un usuario poniendo su campo active a 0.
-     * Requiere permisos de Administrador.
+     * Desactiva un usuario desde administración.
      *
-     * @param userId Identificador único del usuario a desactivar.
-     * @return Un ResponseBody confirmando la desactivación.
+     * @param userId Identificador del usuario.
+     * @return Confirmación de desactivación.
      */
     @DELETE("users/{id}")
     Call<ResponseBody> deleteUserByAdmin(@Path("id") int userId);
@@ -110,8 +110,8 @@ public interface AppApi {
     /**
      * Desactiva la cuenta del usuario actual.
      *
-     * @param request Objeto con las credenciales para confirmar la desactivación.
-     * @return Un ResponseBody confirmando la desactivación.
+     * @param request Credenciales de confirmación.
+     * @return Confirmación de desactivación.
      */
     @POST("users/deactivate")
     Call<ResponseBody> deactivateUser(@Body LoginRequest request);
@@ -119,49 +119,46 @@ public interface AppApi {
     // ── EJERCICIOS ────────────────────────────────────────────────────────────
 
     /**
-     * Obtiene el catálogo completo de ejercicios disponibles en la aplicación.
+     * Obtiene todos los ejercicios disponibles.
      *
-     * @return Una lista de todos los objetos Exercise.
+     * @return Lista de ejercicios.
      */
     @GET("exercises")
     Call<List<Exercise>> getExercises();
 
     /**
-     * Obtiene los detalles de un ejercicio específico mediante su ID.
+     * Obtiene un ejercicio por su ID.
      *
-     * @param id Identificador único del ejercicio.
-     * @return El objeto Exercise correspondiente.
+     * @param id Identificador del ejercicio.
+     * @return Ejercicio encontrado.
      */
     @GET("exercises/{id}")
     Call<Exercise> getExerciseById(@Path("id") int id);
 
     /**
-     * Crea un nuevo ejercicio y lo añade al catálogo global de la aplicación.
-     * Requiere permisos de Administrador.
+     * Crea un nuevo ejercicio.
      *
-     * @param exercise Objeto Exercise con la información del nuevo ejercicio.
-     * @return El objeto Exercise recién creado en la base de datos.
+     * @param exercise Datos del ejercicio.
+     * @return Ejercicio creado.
      */
     @POST("exercises")
     Call<Exercise> createExercise(@Body Exercise exercise);
 
     /**
-     * Actualiza la información (nombre, descripción, imagen, etc.) de un ejercicio existente.
-     * Requiere permisos de Administrador.
+     * Actualiza un ejercicio existente.
      *
-     * @param id       Identificador único del ejercicio a editar.
-     * @param exercise Objeto Exercise con los datos actualizados.
-     * @return Llamada sin contenido de respuesta (Void) que confirma el éxito HTTP.
+     * @param id Identificador del ejercicio.
+     * @param exercise Datos actualizados.
+     * @return Confirmación de actualización.
      */
     @PUT("exercises/{id}")
     Call<Void> updateExercise(@Path("id") int id, @Body Exercise exercise);
 
     /**
-     * Elimina un ejercicio del catálogo global.
-     * Requiere permisos de Administrador.
+     * Elimina un ejercicio.
      *
-     * @param id Identificador único del ejercicio a borrar.
-     * @return Llamada sin contenido de respuesta (Void) que confirma el borrado.
+     * @param id Identificador del ejercicio.
+     * @return Confirmación de eliminación.
      */
     @DELETE("exercises/{id}")
     Call<Void> deleteExercise(@Path("id") int id);
@@ -169,37 +166,36 @@ public interface AppApi {
     // ── RUTINAS ───────────────────────────────────────────────────────────────
 
     /**
-     * Obtiene una lista de rutinas accesibles para el usuario (sus rutinas privadas y las públicas del sistema).
+     * Obtiene las rutinas disponibles para el usuario.
      *
-     * @return Lista de objetos Routine.
+     * @return Lista de rutinas.
      */
     @GET("routines")
     Call<List<Routine>> getUserRoutines();
 
     /**
-     * Crea una nueva rutina de entrenamiento asociada al usuario que realiza la petición.
+     * Crea una nueva rutina.
      *
-     * @param routine Objeto Routine que contiene el nombre, descripción, privacidad y la lista de ejercicios.
-     * @return Un ResponseBody confirmando la creación exitosa de la rutina.
+     * @param routine Datos de la rutina.
+     * @return Confirmación de creación.
      */
     @POST("routines")
     Call<ResponseBody> createRoutine(@Body Routine routine);
 
     /**
-     * Elimina de forma física una rutina creada previamente.
-     * Requiere que el usuario sea el propietario de la rutina o tenga rol de administrador.
+     * Elimina una rutina.
      *
-     * @param id Identificador único de la rutina a borrar.
-     * @return Un ResponseBody confirmando la eliminación física.
+     * @param id Identificador de la rutina.
+     * @return Confirmación de eliminación.
      */
     @DELETE("routines/{id}")
     Call<ResponseBody> deleteRoutine(@Path("id") int id);
 
     /**
-     * Obtiene los detalles completos de una rutina específica, incluyendo todos sus ejercicios y configuraciones.
+     * Obtiene una rutina por su ID.
      *
      * @param id Identificador de la rutina.
-     * @return El objeto Routine con todos sus datos anidados.
+     * @return Rutina completa.
      */
     @GET("routines/{id}")
     Call<Routine> getRoutineById(@Path("id") int id);
@@ -207,9 +203,9 @@ public interface AppApi {
     /**
      * Actualiza una rutina existente.
      *
-     * @param id ID de la rutina a modificar.
-     * @param routine Objeto Routine con los datos actualizados.
-     * @return Call con un ResponseBody (o el tipo que espere tu backend).
+     * @param id Identificador de la rutina.
+     * @param routine Datos actualizados.
+     * @return Confirmación de actualización.
      */
     @PUT("routines/{id}")
     Call<ResponseBody> updateRoutine(@Path("id") int id, @Body Routine routine);
@@ -217,36 +213,36 @@ public interface AppApi {
     // ── WORKOUTS ──────────────────────────────────────────────────────────────
 
     /**
-     * Obtiene el historial completo de entrenamientos realizados (Workouts) por el usuario autenticado.
+     * Obtiene el historial de entrenamientos del usuario.
      *
-     * @return Una lista de objetos Workout.
+     * @return Lista de entrenamientos.
      */
     @GET("workouts/history")
     Call<List<Workout>> getWorkoutHistory();
 
     /**
-     * Obtiene los detalles de una sesión de entrenamiento específica finalizada previamente.
+     * Obtiene un entrenamiento por su ID.
      *
-     * @param id Identificador único de la sesión de entrenamiento.
-     * @return El objeto Workout con los detalles y ejercicios realizados.
+     * @param id Identificador del entrenamiento.
+     * @return Entrenamiento completo.
      */
     @GET("workouts/{id}")
     Call<Workout> getWorkoutById(@Path("id") int id);
 
     /**
-     * Registra una nueva sesión de entrenamiento finalizada en el historial del usuario.
+     * Guarda un nuevo entrenamiento.
      *
-     * @param workout Objeto Workout con la duración, calorías, notas y los detalles de los ejercicios realizados.
-     * @return Un ResponseBody confirmando el guardado del entrenamiento.
+     * @param workout Datos del entrenamiento.
+     * @return Confirmación de guardado.
      */
     @POST("workouts")
     Call<ResponseBody> createWorkout(@Body Workout workout);
 
     /**
-     * Elimina un registro de entrenamiento específico del historial del usuario.
+     * Elimina un entrenamiento del historial.
      *
-     * @param id Identificador de la sesión de entrenamiento a borrar.
-     * @return Un ResponseBody confirmando la eliminación exitosa.
+     * @param id Identificador del entrenamiento.
+     * @return Confirmación de eliminación.
      */
     @DELETE("workouts/{id}")
     Call<ResponseBody> deleteWorkout(@Path("id") int id);

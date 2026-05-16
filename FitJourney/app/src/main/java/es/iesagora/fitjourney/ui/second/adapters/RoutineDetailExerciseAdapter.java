@@ -1,5 +1,6 @@
 package es.iesagora.fitjourney.ui.second.adapters;
 
+import android.annotation.SuppressLint;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,7 +26,8 @@ public class RoutineDetailExerciseAdapter extends RecyclerView.Adapter<RoutineDe
         void onExerciseClick(Exercise exercise);
     }
 
-    public RoutineDetailExerciseAdapter(List<RoutineExercise> exercises, OnExerciseClickListener listener) {
+    public RoutineDetailExerciseAdapter(List<RoutineExercise> exercises,
+                                        OnExerciseClickListener listener) {
         this.exercises = exercises;
         this.listener = listener;
     }
@@ -33,32 +35,44 @@ public class RoutineDetailExerciseAdapter extends RecyclerView.Adapter<RoutineDe
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.viewholder_routine_detail_exercise, parent, false);
+        View view = LayoutInflater.from(parent.getContext())
+                .inflate(R.layout.viewholder_routine_detail_exercise, parent, false);
         return new ViewHolder(view);
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+
         RoutineExercise routineExercise = exercises.get(position);
         Exercise exercise = routineExercise.getExercise();
 
-        if (exercise != null) {
-            holder.tvName.setText(exercise.getName());
+        if (exercise == null) return;
 
-            String targetText = "Objetivo: " +
-                    (routineExercise.getTargetSets() != null ? routineExercise.getTargetSets() : "0") + "x" +
-                    (routineExercise.getTargetReps() != null ? routineExercise.getTargetReps() : "0");
-            holder.tvTarget.setText(targetText);
+        holder.tvName.setText(exercise.getName());
 
-            ImageUtils.loadInto(
-                    holder.itemView.getContext(),
-                    exercise.getDisplayImage(),
-                    holder.ivImage,
-                    R.drawable.ic_launcher_background
-            );
+        String sets = routineExercise.getTargetSets() != null
+                ? String.valueOf(routineExercise.getTargetSets())
+                : "0";
 
-            holder.itemView.setOnClickListener(v -> listener.onExerciseClick(exercise));
-        }
+        String reps = routineExercise.getTargetReps() != null
+                ? String.valueOf(routineExercise.getTargetReps())
+                : "0";
+
+        holder.tvTarget.setText("Objetivo: " + sets + "x" + reps);
+
+        ImageUtils.loadInto(
+                holder.itemView.getContext(),
+                exercise.getDisplayImage(),
+                holder.ivImage,
+                R.drawable.ic_launcher_background
+        );
+
+        holder.itemView.setOnClickListener(v -> {
+            if (listener != null) {
+                listener.onExerciseClick(exercise);
+            }
+        });
     }
 
     @Override
@@ -67,13 +81,13 @@ public class RoutineDetailExerciseAdapter extends RecyclerView.Adapter<RoutineDe
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
+
         TextView tvName;
         TextView tvTarget;
         ImageView ivImage;
 
-        public ViewHolder(@NonNull View itemView) {
+        ViewHolder(@NonNull View itemView) {
             super(itemView);
-            // IDs del nuevo XML
             tvName = itemView.findViewById(R.id.tvExerciseNameDetail);
             tvTarget = itemView.findViewById(R.id.tvTargetDetail);
             ivImage = itemView.findViewById(R.id.ivExerciseDetail);

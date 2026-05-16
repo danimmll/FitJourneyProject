@@ -18,16 +18,14 @@ import retrofit2.Response;
 /**
  * Repositorio encargado de gestionar las operaciones
  * relacionadas con los ejercicios.
- * Actúa como intermediario entre la API y la capa de
- * presentación, manejando llamadas de red y devolviendo
- * resultados encapsulados en Resource.
+ * Actúa como intermediario entre la API y la capa de presentación.
  */
 public class ExerciseRepository {
 
     private static final String ERROR_CONEXION_STRING = "Error de conexión: ";
 
     /**
-     * Instancia de la API utilizada para realizar peticiones.
+     * Instancia de la API para realizar peticiones.
      */
     private final AppApi api;
 
@@ -35,6 +33,12 @@ public class ExerciseRepository {
      * Callback para obtener listas de ejercicios.
      */
     public interface ExerciseCallBack {
+
+        /**
+         * Devuelve el resultado de la operación.
+         *
+         * @param result Resultado con la lista de ejercicios.
+         */
         void onResult(Resource<List<Exercise>> result);
     }
 
@@ -42,14 +46,25 @@ public class ExerciseRepository {
      * Callback para obtener un único ejercicio.
      */
     public interface SingleExerciseCallback {
+
+        /**
+         * Devuelve el resultado de la operación.
+         *
+         * @param result Resultado con el ejercicio solicitado.
+         */
         void onResult(Resource<Exercise> result);
     }
 
     /**
-     * Callback para operaciones sin retorno de datos.
-     * (eliminar o actualizar ejercicios)
+     * Callback para operaciones sin datos de retorno.
      */
     public interface ActionCallback {
+
+        /**
+         * Devuelve el resultado de la operación.
+         *
+         * @param result Resultado de la acción realizada.
+         */
         void onResult(Resource<Void> result);
     }
 
@@ -57,6 +72,12 @@ public class ExerciseRepository {
      * Callback para la creación de ejercicios.
      */
     public interface CreateCallback {
+
+        /**
+         * Devuelve el resultado de la operación.
+         *
+         * @param result Resultado con el ejercicio creado.
+         */
         void onResult(Resource<Exercise> result);
     }
 
@@ -100,7 +121,7 @@ public class ExerciseRepository {
     }
 
     /**
-     * Obtiene un ejercicio por su ID.
+     * Obtiene un ejercicio mediante su ID.
      *
      * @param id ID del ejercicio.
      * @param callback Callback con el resultado.
@@ -164,7 +185,7 @@ public class ExerciseRepository {
     /**
      * Crea un nuevo ejercicio.
      *
-     * @param exercise Ejercicio a crear.
+     * @param exercise Datos del ejercicio.
      * @param callback Callback con el resultado.
      */
     public void createExercise(Exercise exercise, CreateCallback callback) {
@@ -223,5 +244,4 @@ public class ExerciseRepository {
             }
         });
     }
-
 }

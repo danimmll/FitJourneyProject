@@ -8,9 +8,8 @@ import androidx.appcompat.app.AppCompatDelegate;
 /**
  * Repositorio encargado de gestionar las preferencias
  * locales de la aplicación mediante SharedPreferences.
- * Se utiliza para almacenar datos persistentes como:
- * token de usuario, rol, id, tema de la app y
- * configuración de notificaciones.
+ * Permite guardar datos persistentes del usuario y
+ * configuraciones generales de la app.
  */
 public class PreferencesRepository {
 
@@ -20,27 +19,27 @@ public class PreferencesRepository {
     private static final String PREF_NAME = "prefs";
 
     /**
-     * Clave para el token de autenticación.
+     * Clave del token de autenticación.
      */
     private static final String KEY_TOKEN = "token";
 
     /**
-     * Clave para el rol del usuario.
+     * Clave del rol del usuario.
      */
     private static final String KEY_ROLE = "role";
 
     /**
-     * Clave para el ID del usuario.
+     * Clave del ID del usuario.
      */
     private static final String KEY_USER_ID = "user_id";
 
     /**
-     * Clave para el tema de la aplicación.
+     * Clave del tema de la aplicación.
      */
     private static final String KEY_THEME = "app_theme";
 
     /**
-     * Clave para las notificaciones.
+     * Clave de las notificaciones.
      */
     private static final String KEY_NOTIFICATIONS = "notifications";
 
@@ -50,7 +49,7 @@ public class PreferencesRepository {
     private final SharedPreferences sharedPreferences;
 
     /**
-     * Constructor del repositorio de preferencias.
+     * Constructor del repositorio.
      *
      * @param context Contexto de la aplicación.
      */
@@ -60,8 +59,7 @@ public class PreferencesRepository {
     }
 
     /**
-     * Elimina solo la sesión del usuario
-     * (token, rol e id).
+     * Elimina los datos de sesión almacenados.
      */
     public void clearSession() {
         sharedPreferences.edit()
@@ -83,7 +81,7 @@ public class PreferencesRepository {
     /**
      * Obtiene el token almacenado.
      *
-     * @return Token o null si no existe.
+     * @return Token o null.
      */
     public String getToken() {
         return sharedPreferences.getString(KEY_TOKEN, null);
@@ -92,16 +90,16 @@ public class PreferencesRepository {
     /**
      * Guarda el rol del usuario.
      *
-     * @param role Rol (user, admin, etc.).
+     * @param role Rol del usuario.
      */
     public void setRole(String role) {
         sharedPreferences.edit().putString(KEY_ROLE, role).apply();
     }
 
     /**
-     * Obtiene el rol del usuario.
+     * Obtiene el rol almacenado.
      *
-     * @return Rol o "user" por defecto.
+     * @return Rol del usuario.
      */
     public String getRole() {
         return sharedPreferences.getString(KEY_ROLE, "user");
@@ -117,7 +115,7 @@ public class PreferencesRepository {
     }
 
     /**
-     * Obtiene el ID del usuario.
+     * Obtiene el ID almacenado.
      *
      * @return ID del usuario o null.
      */
@@ -126,7 +124,7 @@ public class PreferencesRepository {
     }
 
     /**
-     * Guarda el modo de tema de la app.
+     * Guarda el modo de tema de la aplicación.
      *
      * @param mode Modo de tema.
      */
@@ -135,9 +133,9 @@ public class PreferencesRepository {
     }
 
     /**
-     * Obtiene el modo de tema.
+     * Obtiene el modo de tema configurado.
      *
-     * @return Modo guardado o el del sistema por defecto.
+     * @return Modo de tema guardado.
      */
     public int getTheme() {
         return sharedPreferences.getInt(
@@ -149,7 +147,7 @@ public class PreferencesRepository {
     /**
      * Activa o desactiva las notificaciones.
      *
-     * @param enabled true si están activadas.
+     * @param enabled Estado de las notificaciones.
      */
     public void setNotifications(boolean enabled) {
         sharedPreferences.edit().putBoolean(KEY_NOTIFICATIONS, enabled).apply();
