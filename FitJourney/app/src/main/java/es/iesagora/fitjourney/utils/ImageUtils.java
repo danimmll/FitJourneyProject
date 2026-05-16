@@ -34,10 +34,15 @@ public class ImageUtils {
 
         if (source.length() > 500 && !source.startsWith("http") && !source.startsWith("content://")) {
             try {
-                byte[] decodedString = Base64.decode(source, Base64.DEFAULT);
-                Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
-                imageView.setImageBitmap(decodedByte);
+                byte[] imageBytes = Base64.decode(source.trim(), Base64.DEFAULT);
+                Glide.with(context)
+                        .asBitmap()
+                        .load(imageBytes)
+                        .placeholder(placeholder)
+                        .error(placeholder)
+                        .into(imageView);
             } catch (Exception e) {
+                Log.e(TAG, "Error al decodificar Base64", e);
                 imageView.setImageResource(placeholder);
             }
         } else {

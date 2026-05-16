@@ -1,25 +1,32 @@
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
+const DEFAULT_ROUTINE_IMAGE = "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=1200&auto=format&fit=crop";
+
+const normalizeRoutineImage = (photoUrl) => {
+    if (typeof photoUrl !== 'string') return DEFAULT_ROUTINE_IMAGE;
+    const trimmed = photoUrl.trim();
+    return trimmed.length > 0 ? trimmed : DEFAULT_ROUTINE_IMAGE;
+};
+
 const createRoutine = async (req, res, next) => {
     try {
-        // Añadido is_public a la desestructuración del body
         const { name, description, photo_url, is_public, exercises } = req.body;
 
         const routine = await prisma.routine.create({
             data: {
                 name,
                 description,
-                photo_url: photo_url || null,
-                id_user: req.user.id, // O req.user.id_user dependiendo de cómo lo mande tu middleware
-                is_public: is_public !== undefined ? is_public : 1, // Se guarda el valor recibido, por defecto 1 (pública)
+                photo_url: normalizeRoutineImage(photo_url),
+                id_user: req.user.id, 
+                is_public: is_public !== undefined ? is_public : 1,
                 exercises: {
                     create: exercises && exercises.length > 0 ? exercises.map(ex => ({
                         id_exercise: ex.id_exercise,
                         target_sets: ex.target_sets,
                         target_reps: ex.target_reps,
                         target_weight: ex.target_weight
-                    })) : [] // Previene error si el array viene vacío
+                    })) : [] 
                 }
             },
             include: { exercises: { include: { exercise: true } } }
@@ -55,12 +62,10 @@ const deleteRoutine = async (req, res, next) => {
     try {
         const routine = await prisma.routine.findUnique({ where: { id_routine: parseInt(id) } });
 
-        // Verifica si existe y si es el dueño o admin
         if (!routine || (routine.id_user !== req.user.id && req.user.role !== 'admin')) {
             return res.status(403).json({ error: "No tienes permiso para eliminar esta rutina" });
         }
 
-        // Borrado físico real
         await prisma.routine.delete({
             where: { id_routine: parseInt(id) }
         });
@@ -119,7 +124,7 @@ const updateRoutine = async (req, res, next) => {
                 data: {
                     name,
                     description,
-                    photo_url: photo_url || null,
+                    photo_url: normalizeRoutineImage(photo_url),
                     is_public: is_public !== undefined ? is_public : existingRoutine.is_public
                 }
             });

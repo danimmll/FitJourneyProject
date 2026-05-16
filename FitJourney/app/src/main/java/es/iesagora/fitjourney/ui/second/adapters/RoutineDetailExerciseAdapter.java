@@ -52,7 +52,7 @@ public class RoutineDetailExerciseAdapter extends RecyclerView.Adapter<RoutineDe
 
             ImageUtils.loadInto(
                     holder.itemView.getContext(),
-                    exercise.getImageUrl(),
+                    exercise.getDisplayImage(),
                     holder.ivImage,
                     R.drawable.ic_launcher_background
             );

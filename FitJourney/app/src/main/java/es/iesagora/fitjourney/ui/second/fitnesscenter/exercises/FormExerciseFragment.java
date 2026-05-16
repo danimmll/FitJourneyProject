@@ -155,8 +155,8 @@ public class FormExerciseFragment extends Fragment {
 
         String exerciseType = binding.actvExerciseType.getText().toString().trim();
 
-        String videoUrl = "";
-        if (binding.etVideoUrl.getText() != null) {
+        String videoUrl = null;
+        if (binding.etVideoUrl.getText() != null && !binding.etVideoUrl.getText().toString().trim().isEmpty()) {
             videoUrl = binding.etVideoUrl.getText().toString().trim();
         }
 

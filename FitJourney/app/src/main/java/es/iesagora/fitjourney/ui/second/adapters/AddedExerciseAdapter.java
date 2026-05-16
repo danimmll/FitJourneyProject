@@ -116,7 +116,7 @@ public class AddedExerciseAdapter
 
             ImageUtils.loadInto(
                     context,
-                    routineExercise.getExercise().getImageUrl(),
+                    routineExercise.getExercise().getDisplayImage(),
                     holder.ivExercise,
                     R.drawable.ic_ejercicios
             );

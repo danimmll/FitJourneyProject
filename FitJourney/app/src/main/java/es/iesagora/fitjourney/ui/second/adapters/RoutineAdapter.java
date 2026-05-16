@@ -52,12 +52,11 @@ public class RoutineAdapter extends RecyclerView.Adapter<RoutineAdapter.ViewHold
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Routine routine = routines.get(position);
 
-        // Asignamos el nombre
         holder.tvName.setText(routine.getName());
 
         ImageUtils.loadInto(
                 holder.itemView.getContext(),
-                routine.getPhotoUrl(),
+                routine.getDisplayImage(),
                 holder.ivImage,
                 R.drawable.img_construccion
         );

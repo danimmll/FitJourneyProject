@@ -88,4 +88,19 @@ public class Exercise implements Serializable {
      */
     @SerializedName("exercise_type")
     private String exerciseType;
+
+    /**
+     * Devuelve la imagen que se mostrará en pantalla.
+     * Si el ejercicio tiene una imagen asignada, devuelve esa URL.
+     * En caso contrario, devuelve una imagen por defecto.
+     *
+     * @return URL de la imagen del ejercicio.
+     */
+    public String getDisplayImage() {
+        if (imageUrl != null && !imageUrl.trim().isEmpty()) {
+            return imageUrl;
+        }
+
+        return "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=1200&auto=format&fit=crop";
+    }
 }

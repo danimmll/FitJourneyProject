@@ -42,7 +42,8 @@ public class SelectExerciseAdapter extends RecyclerView.Adapter<AddedExerciseAda
         Exercise exercise = exercises.get(position);
 
         holder.tvName.setText(exercise.getName());
-        ImageUtils.loadInto(holder.itemView.getContext(), exercise.getImageUrl(), holder.ivExercise, R.drawable.ic_ejercicios);
+        ImageUtils.loadInto(holder.itemView.getContext(), exercise.getDisplayImage(),
+                holder.ivExercise, R.drawable.ic_ejercicios);
 
         holder.tvDetails.setText(exercise.getMuscleGroup() + " · " + exercise.getDifficulty());
         holder.btnRemove.setImageResource(android.R.drawable.ic_input_add);

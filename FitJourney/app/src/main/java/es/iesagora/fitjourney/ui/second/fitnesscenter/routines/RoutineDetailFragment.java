@@ -78,7 +78,8 @@ public class RoutineDetailFragment extends Fragment {
 
     private void fillRoutineData(Routine routine) {
         binding.tvRoutineDetailName.setText(routine.getName());
-        ImageUtils.loadInto(requireContext(), routine.getPhotoUrl(), binding.ivRoutineDetail, R.drawable.ic_launcher_background);
+        ImageUtils.loadInto(requireContext(), routine.getDisplayImage(),
+                binding.ivRoutineDetail, R.drawable.img_construccion);
 
         if (routine.getExercises() != null && !routine.getExercises().isEmpty()) {
             RoutineDetailExerciseAdapter adapter = new RoutineDetailExerciseAdapter(routine.getExercises(), exercise -> {

@@ -1,6 +1,14 @@
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
+const DEFAULT_EXERCISE_IMAGE = "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=1200&auto=format&fit=crop";
+
+const normalizeImageUrl = (imageUrl) => {
+    if (typeof imageUrl !== 'string') return DEFAULT_EXERCISE_IMAGE;
+    const trimmed = imageUrl.trim();
+    return trimmed.length > 0 ? trimmed : DEFAULT_EXERCISE_IMAGE;
+};
+
 const getExercises = async (req, res, next) => {
     try {
         const exercises = await prisma.exercise.findMany();
@@ -30,7 +38,7 @@ const createExercise = async (req, res, next) => {
                 muscle_group,
                 difficulty,
                 description,
-                image_url,
+                image_url: normalizeImageUrl(image_url),
                 video_url,
                 equipment,
                 exercise_type
@@ -62,7 +70,7 @@ const updateExercise = async (req, res, next) => {
         if (muscle_group !== undefined) updateData.muscle_group = muscle_group;
         if (difficulty !== undefined) updateData.difficulty = difficulty;
         if (description !== undefined) updateData.description = description;
-        if (image_url !== undefined) updateData.image_url = image_url;
+        if (image_url !== undefined) updateData.image_url = normalizeImageUrl(image_url);
         if (video_url !== undefined) updateData.video_url = video_url;
         if (equipment !== undefined) updateData.equipment = equipment;
         if (exercise_type !== undefined) updateData.exercise_type = exercise_type;

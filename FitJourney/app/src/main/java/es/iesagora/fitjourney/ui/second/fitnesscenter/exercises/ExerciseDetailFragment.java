@@ -204,7 +204,7 @@ public class ExerciseDetailFragment extends Fragment {
 
         ImageUtils.loadInto(
                 requireContext(),
-                exercise.getImageUrl(),
+                exercise.getDisplayImage(),
                 binding.ivDetailImage,
                 R.drawable.ic_ejercicios
         );

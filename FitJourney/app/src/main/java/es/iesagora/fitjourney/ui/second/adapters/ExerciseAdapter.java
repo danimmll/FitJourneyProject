@@ -97,7 +97,7 @@ public class ExerciseAdapter extends RecyclerView.Adapter<ExerciseAdapter.Exerci
 
         ImageUtils.loadInto(
                 context,
-                exercise.getImageUrl(),
+                exercise.getDisplayImage(),
                 holder.ivImage,
                 R.drawable.ic_ejercicios
         );
