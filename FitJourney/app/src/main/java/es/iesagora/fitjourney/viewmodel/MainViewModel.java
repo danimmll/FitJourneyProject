@@ -138,7 +138,7 @@ public class MainViewModel extends AndroidViewModel {
 
             if (result.status == Resource.Status.SUCCESS) {
                 registerState.postValue(
-                        Resource.error("Cuenta eliminada definitivamente. Ya puedes registrarte de nuevo.")
+                        Resource.error("ACCOUNT_DELETED_SUCCESS")
                 );
             } else {
                 registerState.postValue(
@@ -146,6 +146,13 @@ public class MainViewModel extends AndroidViewModel {
                 );
             }
         });
+    }
+
+    /**
+     * Limpia el estado temporal de registro/reactivación para evitar re-disparos de UI.
+     */
+    public void clearRegisterState() {
+        registerState.postValue(null);
     }
 
     /**

@@ -227,6 +227,7 @@ public class RegisterFragment extends Fragment {
 
                 case SUCCESS:
                     setLoadingState(false);
+                    binding.tlEmail.setError(null);
 
                     Toast.makeText(requireContext(),
                             R.string.registration_completed,
@@ -238,6 +239,7 @@ public class RegisterFragment extends Fragment {
 
                     startActivity(intent);
                     requireActivity().finish();
+                    viewModel.clearRegisterState();
                     break;
 
                 case ERROR:
@@ -245,6 +247,13 @@ public class RegisterFragment extends Fragment {
 
                     if ("PROMPT_REACTIVATION".equals(resource.message)) {
                         showReactivationDialog();
+                    } else if ("ACCOUNT_DELETED_SUCCESS".equals(resource.message)) {
+                        binding.tlEmail.setError(null);
+                        Toast.makeText(requireContext(),
+                                "Cuenta eliminada definitivamente. Ya puedes registrarte de nuevo.",
+                                Toast.LENGTH_LONG).show();
+
+                        Navigation.findNavController(requireView()).navigate(R.id.accessFragment);
                     } else {
                         binding.tlEmail.setError(getString(R.string.email_already_in_use));
 
@@ -252,6 +261,7 @@ public class RegisterFragment extends Fragment {
                                 resource.message,
                                 Toast.LENGTH_LONG).show();
                     }
+                    viewModel.clearRegisterState();
                     break;
             }
         });
