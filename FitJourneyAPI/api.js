@@ -16,8 +16,6 @@ const exerciseRoutes = require('./routes/exerciseRoutes');
 const routineRoutes = require('./routes/routineRoutes');
 const workoutRoutes = require('./routes/workoutRoutes');
 
-const errorHandler = require('./middlewares/errorHandler');
-
 const app = express();
 
 app.use(cors());
