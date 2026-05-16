@@ -55,25 +55,19 @@ public class WorkoutSessionFragment extends Fragment {
 
     private int routineId = -1;
     private long startTime = 0L;
-    private boolean isTimerRunning = true;
+    private boolean isTimerRunning = false;
 
     private final Handler timerHandler = new Handler(Looper.getMainLooper());
     private Runnable timerRunnable;
 
     private final List<ExerciseBlock> exerciseBlocks = new ArrayList<>();
 
-    /**
-     * Infla la vista del fragmento.
-     */
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentWorkoutSessionBinding.inflate(inflater, container, false);
         return binding.getRoot();
     }
 
-    /**
-     * Inicializa la lógica del fragmento.
-     */
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -85,33 +79,21 @@ public class WorkoutSessionFragment extends Fragment {
         loadRoutine();
     }
 
-    /**
-     * Inicializa el ViewModel.
-     */
     private void initializeViewModel() {
         viewModel = new ViewModelProvider(requireActivity()).get(SecondViewModel.class);
     }
 
-    /**
-     * Obtiene el ID de rutina desde el Intent.
-     */
     private void getRoutineIdFromIntent() {
         if (getActivity() != null && getActivity().getIntent() != null) {
             routineId = getActivity().getIntent().getIntExtra("ROUTINE_ID", -1);
         }
     }
 
-    /**
-     * Configura listeners de UI.
-     */
     private void setupListeners() {
         binding.toolbarWorkout.setNavigationOnClickListener(v -> showExitConfirmationDialog());
         binding.btnFinishWorkout.setOnClickListener(v -> finishWorkout());
     }
 
-    /**
-     * Configura comportamiento del botón atrás.
-     */
     private void setupBackPressed() {
         requireActivity().getOnBackPressedDispatcher().addCallback(
                 getViewLifecycleOwner(),
@@ -124,9 +106,6 @@ public class WorkoutSessionFragment extends Fragment {
         );
     }
 
-    /**
-     * Carga la rutina y arranca el cronómetro.
-     */
     private void loadRoutine() {
         if (routineId == -1) {
             Toast.makeText(getContext(), "Error al cargar rutina", Toast.LENGTH_SHORT).show();
@@ -137,17 +116,11 @@ public class WorkoutSessionFragment extends Fragment {
         startTimer();
     }
 
-    /**
-     * Configura observers del ViewModel.
-     */
     private void setupObservers() {
         observeRoutine();
         observeWorkoutCreation();
     }
 
-    /**
-     * Observa la rutina cargada.
-     */
     private void observeRoutine() {
         viewModel.getSingleRoutine().observe(getViewLifecycleOwner(), resource -> {
             if (resource == null) return;
@@ -158,9 +131,6 @@ public class WorkoutSessionFragment extends Fragment {
         });
     }
 
-    /**
-     * Observa el estado de creación del workout.
-     */
     private void observeWorkoutCreation() {
         viewModel.getWorkoutActionStatus().observe(getViewLifecycleOwner(), resource -> {
             if (resource == null) return;
@@ -176,25 +146,26 @@ public class WorkoutSessionFragment extends Fragment {
 
     /**
      * Inicia el cronómetro.
+     * Solo fija startTime la primera vez; las siguientes llamadas reutilizan
+     * el startTime original para que el tiempo sea continuo al volver de otro fragmento.
      */
     private void startTimer() {
+        if (startTime == 0L) {
+            startTime = System.currentTimeMillis();
+        }
         isTimerRunning = true;
-        startTime = System.currentTimeMillis();
 
         timerRunnable = new Runnable() {
             @Override
             public void run() {
-                if (!isTimerRunning) return;
-                if (binding == null) return;
+                if (!isTimerRunning || binding == null) return;
 
                 long millis = System.currentTimeMillis() - startTime;
                 int secondsElapsed = (int) (millis / 1000);
 
-                int mins = secondsElapsed / 60;
-                int secs = secondsElapsed % 60;
-
                 binding.tvWorkoutTimer.setText(
-                        String.format(Locale.getDefault(), "%02d:%02d", mins, secs)
+                        String.format(Locale.getDefault(), "%02d:%02d",
+                                secondsElapsed / 60, secondsElapsed % 60)
                 );
 
                 timerHandler.postDelayed(this, 1000);
@@ -204,28 +175,21 @@ public class WorkoutSessionFragment extends Fragment {
         timerHandler.postDelayed(timerRunnable, 0);
     }
 
-    @Override
-    public void onPause() {
-        super.onPause();
-        timerHandler.removeCallbacks(timerRunnable);
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        if (startTime > 0 && isTimerRunning) {
-            timerHandler.postDelayed(timerRunnable, 0);
-        }
-    }
-
     /**
-     * Infla ejercicios de la rutina.
+     * Infla los ejercicios de la rutina.
+     *
+     * Si ya hay bloques guardados (venimos de una navegación al detail y hemos vuelto),
+     * re-infla las vistas pero restaura el estado que el usuario había introducido:
+     * checkboxes marcados, reps, peso, etc.
      */
     @SuppressLint("SetTextI18n")
     private void inflateExercises(Routine routine) {
+        List<ExerciseBlock> previousBlocks = new ArrayList<>(exerciseBlocks);
+
         binding.llExercisesContainer.removeAllViews();
         exerciseBlocks.clear();
 
+        int blockIndex = 0;
         for (RoutineExercise re : routine.getExercises()) {
             ViewholderWorkoutInputBinding cardBinding =
                     ViewholderWorkoutInputBinding.inflate(
@@ -238,17 +202,40 @@ public class WorkoutSessionFragment extends Fragment {
             List<SerieRow> rows = createExerciseRows(cardBinding, re);
             configureExerciseInfo(cardBinding, re);
 
+            if (blockIndex < previousBlocks.size()) {
+                restoreBlockState(rows, previousBlocks.get(blockIndex).rows);
+            }
+
             ExerciseBlock block = new ExerciseBlock(re, cardBinding, rows);
             setupExpandListener(block);
             exerciseBlocks.add(block);
 
             binding.llExercisesContainer.addView(cardBinding.getRoot());
+            blockIndex++;
         }
     }
 
     /**
-     * Configura tarjeta de ejercicio.
+     * Restaura el estado guardado de las series (checkboxes y valores de input)
+     * después de que la vista fue destruida al navegar al detail y reconstruida al volver.
      */
+    private void restoreBlockState(List<SerieRow> newRows, List<SerieRow> savedRows) {
+        for (int i = 0; i < Math.min(newRows.size(), savedRows.size()); i++) {
+            SerieRow newRow = newRows.get(i);
+            SerieRow saved = savedRows.get(i);
+
+            newRow.rowBinding.cbSerieCompleted.setChecked(saved.completed);
+            newRow.rowBinding.getRoot().setAlpha(saved.completed ? 1f : 0.6f);
+
+            if (!saved.primaryValue.isEmpty()) {
+                newRow.rowBinding.etPrimary.setText(saved.primaryValue);
+            }
+            if (!saved.secondaryValue.isEmpty()) {
+                newRow.rowBinding.etSecondary.setText(saved.secondaryValue);
+            }
+        }
+    }
+
     @SuppressLint("SetTextI18n")
     private void configureExerciseCard(ViewholderWorkoutInputBinding cardBinding, RoutineExercise re) {
         String type = TYPE_HIPERTROFIA;
@@ -263,9 +250,6 @@ public class WorkoutSessionFragment extends Fragment {
         setTargetText(cardBinding, re, type);
     }
 
-    /**
-     * Define texto objetivo.
-     */
     @SuppressLint("SetTextI18n")
     private void setTargetText(ViewholderWorkoutInputBinding cardBinding, RoutineExercise re, String type) {
         int targetSets = re.getTargetSets() != null ? re.getTargetSets() : 3;
@@ -278,27 +262,20 @@ public class WorkoutSessionFragment extends Fragment {
                 cardBinding.tvTargetGoal.setText(OBJETIVO_STRING + targetSets + " series • Estiramiento");
                 break;
             default:
-                cardBinding.tvTargetGoal.setText(getString(re, targetSets));
+                cardBinding.tvTargetGoal.setText(buildStrengthTargetText(re, targetSets));
                 break;
         }
     }
 
-    /**
-     * Genera string de objetivo fuerza.
-     */
-    private static String getString(RoutineExercise re, int targetSets) {
+    private static String buildStrengthTargetText(RoutineExercise re, int targetSets) {
         int targetReps = re.getTargetReps() != null ? re.getTargetReps() : 10;
-        String targetText = OBJETIVO_STRING + targetSets + "×" + targetReps + " reps";
-
+        String text = OBJETIVO_STRING + targetSets + "×" + targetReps + " reps";
         if (re.getTargetWeight() != null && re.getTargetWeight() > 0) {
-            targetText += " @ " + re.getTargetWeight() + " kg";
+            text += " @ " + re.getTargetWeight() + " kg";
         }
-        return targetText;
+        return text;
     }
 
-    /**
-     * Crea filas de series.
-     */
     private List<SerieRow> createExerciseRows(ViewholderWorkoutInputBinding cardBinding, RoutineExercise re) {
         List<SerieRow> rows = new ArrayList<>();
         String type = getExerciseType(re);
@@ -320,9 +297,6 @@ public class WorkoutSessionFragment extends Fragment {
         return rows;
     }
 
-    /**
-     * Configura fila de serie.
-     */
     @SuppressLint("SetTextI18n")
     private SerieRow setupSerieRow(ViewholderSetRowBinding rowBinding, int serieNumber, String type, RoutineExercise re) {
         rowBinding.tvSerieLabel.setText("S" + serieNumber);
@@ -339,17 +313,17 @@ public class WorkoutSessionFragment extends Fragment {
                 break;
         }
 
-        rowBinding.cbSerieCompleted.setOnCheckedChangeListener(
-                (buttonView, isChecked) -> rowBinding.getRoot().setAlpha(isChecked ? 1f : 0.6f)
-        );
+        SerieRow row = new SerieRow(rowBinding, type);
+
+        rowBinding.cbSerieCompleted.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            row.completed = isChecked;
+            rowBinding.getRoot().setAlpha(isChecked ? 1f : 0.6f);
+        });
 
         rowBinding.getRoot().setAlpha(0.6f);
-        return new SerieRow(rowBinding, type);
+        return row;
     }
 
-    /**
-     * Configura fila cardio.
-     */
     private void configureCardioRow(ViewholderSetRowBinding rowBinding) {
         rowBinding.tilPrimary.setHint("Min");
         rowBinding.tilSecondary.setHint("km/h");
@@ -357,17 +331,11 @@ public class WorkoutSessionFragment extends Fragment {
         rowBinding.etSecondary.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
     }
 
-    /**
-     * Configura fila estiramiento.
-     */
     private void configureStretchingRow(ViewholderSetRowBinding rowBinding) {
         rowBinding.tilPrimary.setVisibility(View.GONE);
         rowBinding.tilSecondary.setVisibility(View.GONE);
     }
 
-    /**
-     * Configura fila fuerza.
-     */
     private void configureStrengthRow(ViewholderSetRowBinding rowBinding, RoutineExercise re) {
         rowBinding.tilPrimary.setHint("Reps");
         rowBinding.tilSecondary.setHint("Peso (kg)");
@@ -375,15 +343,11 @@ public class WorkoutSessionFragment extends Fragment {
         if (re.getTargetReps() != null && re.getTargetReps() > 0) {
             rowBinding.etPrimary.setText(String.valueOf(re.getTargetReps()));
         }
-
         if (re.getTargetWeight() != null && re.getTargetWeight() > 0) {
             rowBinding.etSecondary.setText(String.valueOf(re.getTargetWeight()));
         }
     }
 
-    /**
-     * Configura info del ejercicio.
-     */
     private void configureExerciseInfo(ViewholderWorkoutInputBinding cardBinding, RoutineExercise re) {
         if (re.getExercise() == null) {
             cardBinding.ivExerciseInfo.setVisibility(View.GONE);
@@ -393,16 +357,15 @@ public class WorkoutSessionFragment extends Fragment {
         Exercise exercise = re.getExercise();
 
         cardBinding.ivExerciseInfo.setOnClickListener(v -> {
+            saveCurrentInputState();
+
             viewModel.selectExercise(exercise);
 
             try {
                 Bundle args = new Bundle();
                 args.putBoolean("readOnly", true);
                 args.putSerializable("exercise_data", exercise);
-
-                Navigation.findNavController(requireView())
-                        .navigate(R.id.exerciseDetailFragment, args);
-
+                Navigation.findNavController(requireView()).navigate(R.id.exerciseDetailFragment, args);
             } catch (Exception e) {
                 Toast.makeText(getContext(),
                         "Falta añadir exerciseDetailFragment en nav_workout.xml",
@@ -412,31 +375,32 @@ public class WorkoutSessionFragment extends Fragment {
     }
 
     /**
-     * Expande/cierra bloque ejercicio.
+     * Guarda en cada SerieRow el valor actual de sus inputs antes de navegar.
+     * Así cuando la vista se destruya y reconstruya, restoreBlockState puede recuperarlos.
      */
+    private void saveCurrentInputState() {
+        for (ExerciseBlock block : exerciseBlocks) {
+            for (SerieRow row : block.rows) {
+                row.primaryValue = getText(row.rowBinding.etPrimary);
+                row.secondaryValue = getText(row.rowBinding.etSecondary);
+            }
+        }
+    }
+
     private void setupExpandListener(ExerciseBlock block) {
         block.cardBinding.llExerciseHeader.setOnClickListener(v -> toggleExpand(block));
     }
 
-    /**
-     * Alterna expansión.
-     */
     private void toggleExpand(ExerciseBlock block) {
         block.expanded = !block.expanded;
 
         block.cardBinding.dividerExercise.setVisibility(block.expanded ? View.VISIBLE : View.GONE);
         block.cardBinding.llSeriesContainer.setVisibility(block.expanded ? View.VISIBLE : View.GONE);
 
-        float targetRotation = block.expanded ? 90f : 270f;
-
-        ObjectAnimator.ofFloat(block.cardBinding.ivExpandArrow, "rotation", targetRotation)
-                .setDuration(200)
-                .start();
+        ObjectAnimator.ofFloat(block.cardBinding.ivExpandArrow, "rotation",
+                block.expanded ? 90f : 270f).setDuration(200).start();
     }
 
-    /**
-     * Finaliza entrenamiento.
-     */
     private void finishWorkout() {
         if (!validarDatosEntrenamiento()) return;
 
@@ -445,7 +409,6 @@ public class WorkoutSessionFragment extends Fragment {
 
         long millis = System.currentTimeMillis() - startTime;
         int secondsElapsed = (int) (millis / 1000);
-
         int durationMinutes = Math.max(1, secondsElapsed / 60);
         float durationHours = durationMinutes / 60f;
         float userWeightKg = getUserWeight();
@@ -461,13 +424,10 @@ public class WorkoutSessionFragment extends Fragment {
 
         for (ExerciseBlock block : exerciseBlocks) {
             WorkoutDetail detail = buildWorkoutDetail(block);
-
             if (detail != null) {
                 details.add(detail);
                 float met = getMETForBlock(block, userWeightKg);
-                totalCalories += FitnessCalculator.calculateCaloriesBurned(
-                        met, userWeightKg, timePerExerciseHours
-                );
+                totalCalories += FitnessCalculator.calculateCaloriesBurned(met, userWeightKg, timePerExerciseHours);
             }
         }
 
@@ -476,9 +436,6 @@ public class WorkoutSessionFragment extends Fragment {
         viewModel.createWorkout(workout);
     }
 
-    /**
-     * Construye detalle workout.
-     */
     @Nullable
     private WorkoutDetail buildWorkoutDetail(ExerciseBlock block) {
         if (block.re.getIdExercise() == 0) return null;
@@ -505,29 +462,20 @@ public class WorkoutSessionFragment extends Fragment {
         return detail;
     }
 
-    /**
-     * Detalle cardio.
-     */
     private void buildCardioDetail(WorkoutDetail detail, List<SerieRow> checkedRows) {
         SerieRow last = checkedRows.get(checkedRows.size() - 1);
-
         String mins = getText(last.rowBinding.etPrimary);
         String speed = getText(last.rowBinding.etSecondary);
-
         detail.setDurationMinutes(mins.isEmpty() ? 0.0 : Double.parseDouble(mins.replace(",", ".")));
         detail.setSpeedKmh(speed.isEmpty() ? 0.0 : Double.parseDouble(speed.replace(",", ".")));
     }
 
-    /**
-     * Detalle fuerza.
-     */
     private void buildStrengthDetail(WorkoutDetail detail, List<SerieRow> checkedRows) {
         StringBuilder repsBuilder = new StringBuilder();
         double maxWeight = 0.0;
 
         for (int i = 0; i < checkedRows.size(); i++) {
             SerieRow row = checkedRows.get(i);
-
             String reps = getText(row.rowBinding.etPrimary);
             String weight = getText(row.rowBinding.etSecondary);
 
@@ -544,20 +492,14 @@ public class WorkoutSessionFragment extends Fragment {
         detail.setMaxWeight(maxWeight);
     }
 
-    /**
-     * Obtiene filas completadas.
-     */
     private List<SerieRow> getCheckedRows(ExerciseBlock block) {
         List<SerieRow> checked = new ArrayList<>();
         for (SerieRow row : block.rows) {
-            if (row.rowBinding.cbSerieCompleted.isChecked()) checked.add(row);
+            if (row.completed) checked.add(row);
         }
         return checked;
     }
 
-    /**
-     * Calcula MET del bloque.
-     */
     private float getMETForBlock(ExerciseBlock block, float userWeightKg) {
         Exercise ex = block.re.getExercise();
         if (ex == null || ex.getExerciseType() == null) return 6.0f;
@@ -575,13 +517,9 @@ public class WorkoutSessionFragment extends Fragment {
         }
     }
 
-    /**
-     * MET cardio.
-     */
     private float calculateCardioMET(List<SerieRow> checked) {
         float totalSpeed = 0f;
         int count = 0;
-
         for (SerieRow row : checked) {
             String speed = getText(row.rowBinding.etSecondary);
             if (!speed.isEmpty()) {
@@ -589,23 +527,17 @@ public class WorkoutSessionFragment extends Fragment {
                 count++;
             }
         }
-
         float avgSpeed = count > 0 ? totalSpeed / count : 8f;
         return FitnessCalculator.calculateCardioMET(8.0f, avgSpeed, 0f);
     }
 
-    /**
-     * MET fuerza.
-     */
     private float calculateStrengthMET(List<SerieRow> checked, float userWeightKg, int sets) {
-        float totalReps = 0f;
-        float totalWeight = 0f;
+        float totalReps = 0f, totalWeight = 0f;
         int count = 0;
 
         for (SerieRow row : checked) {
             String reps = getText(row.rowBinding.etPrimary);
             String weight = getText(row.rowBinding.etSecondary);
-
             if (!reps.isEmpty()) totalReps += Float.parseFloat(reps.replace(",", "."));
             if (!weight.isEmpty()) {
                 totalWeight += Float.parseFloat(weight.replace(",", "."));
@@ -617,18 +549,12 @@ public class WorkoutSessionFragment extends Fragment {
         float liftedWeight = count > 0 ? totalWeight / count : bodyWeight * 0.5f;
         int reps = sets > 0 && totalReps > 0 ? (int) (totalReps / sets) : 10;
 
-        return FitnessCalculator.calculateStrengthMET(
-                liftedWeight, bodyWeight, sets, reps, 90
-        );
+        return FitnessCalculator.calculateStrengthMET(liftedWeight, bodyWeight, sets, reps, 90);
     }
 
-    /**
-     * Obtiene peso usuario.
-     */
     private float getUserWeight() {
         if (viewModel.getProfile().getValue() != null
                 && viewModel.getProfile().getValue().data != null) {
-
             User user = viewModel.getProfile().getValue().data.getUser();
             if (user != null && user.getWeight() != null) {
                 return user.getWeight().floatValue();
@@ -637,18 +563,10 @@ public class WorkoutSessionFragment extends Fragment {
         return 70f;
     }
 
-    /**
-     * Obtiene texto input.
-     */
     private String getText(TextInputEditText et) {
-        return et != null && et.getText() != null
-                ? et.getText().toString().trim()
-                : "";
+        return et != null && et.getText() != null ? et.getText().toString().trim() : "";
     }
 
-    /**
-     * Tipo ejercicio.
-     */
     private String getExerciseType(RoutineExercise re) {
         if (re.getExercise() != null && re.getExercise().getExerciseType() != null) {
             return re.getExercise().getExerciseType();
@@ -656,9 +574,6 @@ public class WorkoutSessionFragment extends Fragment {
         return TYPE_HIPERTROFIA;
     }
 
-    /**
-     * Diálogo salir entrenamiento.
-     */
     private void showExitConfirmationDialog() {
         new MaterialAlertDialogBuilder(requireContext())
                 .setTitle("¿Abandonar Entrenamiento?")
@@ -672,9 +587,6 @@ public class WorkoutSessionFragment extends Fragment {
                 .show();
     }
 
-    /**
-     * Valida datos del entrenamiento.
-     */
     private boolean validarDatosEntrenamiento() {
         for (ExerciseBlock bloque : exerciseBlocks) {
             List<SerieRow> filasMarcadas = getCheckedRows(bloque);
@@ -689,7 +601,6 @@ public class WorkoutSessionFragment extends Fragment {
 
                     if (fila.type.equals(TYPE_CARDIO)) {
                         double minutos = texto1.isEmpty() ? 0 : Double.parseDouble(texto1.replace(",", "."));
-
                         if (minutos > 300) {
                             Toast.makeText(getContext(), "Máximo 300 min por serie", Toast.LENGTH_SHORT).show();
                             return false;
@@ -700,7 +611,6 @@ public class WorkoutSessionFragment extends Fragment {
                         }
                     } else if (!fila.type.equals(TYPE_ESTIRAMIENTO)) {
                         int repes = texto1.isEmpty() ? 0 : Integer.parseInt(texto1);
-
                         if (repes > 200) {
                             Toast.makeText(getContext(), "Demasiadas repes. Máximo 200", Toast.LENGTH_SHORT).show();
                             return false;
@@ -710,7 +620,6 @@ public class WorkoutSessionFragment extends Fragment {
                             return false;
                         }
                     }
-
                 } catch (NumberFormatException e) {
                     Toast.makeText(getContext(), "Por favor, mete números normales", Toast.LENGTH_SHORT).show();
                     return false;
@@ -720,20 +629,17 @@ public class WorkoutSessionFragment extends Fragment {
         return true;
     }
 
-    /**
-     * Limpieza de recursos.
-     */
     @Override
     public void onDestroyView() {
+
+        saveCurrentInputState();
+
         super.onDestroyView();
         isTimerRunning = false;
         timerHandler.removeCallbacks(timerRunnable);
         binding = null;
     }
 
-    /**
-     * Representa un bloque de ejercicio dentro de la rutina.
-     */
     private static class ExerciseBlock {
         RoutineExercise re;
         ViewholderWorkoutInputBinding cardBinding;
@@ -747,12 +653,12 @@ public class WorkoutSessionFragment extends Fragment {
         }
     }
 
-    /**
-     * Representa una fila de serie dentro de un ejercicio.
-     */
     private static class SerieRow {
         ViewholderSetRowBinding rowBinding;
         String type;
+        boolean completed = false;
+        String primaryValue = "";
+        String secondaryValue = "";
 
         SerieRow(ViewholderSetRowBinding rowBinding, String type) {
             this.rowBinding = rowBinding;
