@@ -55,7 +55,7 @@ const register = async (req, res, next) => {
                 photo_url
             }
         });
-        
+
         // Genera JWT token válido por 24 horas
         const token = jwt.sign(
             { id: newUser.id_user, role: newUser.role },
@@ -187,22 +187,29 @@ const deleteAccount = async (req, res, next) => {
     try {
         const { email, password } = req.body;
 
-        // Busca usuario para validar que existe y está inactivo
-        const user = await prisma.user.findUnique({ where: { email } });
-
-        if (!user || user.active === 1) {
+        if (!email || !password) {
             return res.status(400).json({
-                error: "Solo se pueden borrar físicamente cuentas inactivas"
+                error: "Email y contraseña son obligatorios"
             });
         }
+
+        // Busca usuario y aplica validación de credenciales.
+        // Responde error genérico para no exponer si el email existe o si la cuenta está activa.
+        const user = await prisma.user.findUnique({ where: { email } });
+
+        const invalidCredentialsResponse = () => res.status(401).json({
+            error: "Credenciales inválidas o cuenta no elegible para borrado definitivo"
+        });
+
+        if (!user || user.active === 1) {
+            return invalidCredentialsResponse();
+        };
 
         // Valida contraseña como confirmación final antes de eliminar datos
         const validPassword = await bcrypt.compare(password, user.password);
 
         if (!validPassword) {
-            return res.status(401).json({
-                error: "Contraseña incorrecta. No puedes eliminar esta cuenta."
-            });
+            return invalidCredentialsResponse();
         }
 
         // Borra permanentemente el usuario y todos sus datos asociados

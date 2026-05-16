@@ -142,7 +142,7 @@ public class MainViewModel extends AndroidViewModel {
                 );
             } else {
                 registerState.postValue(
-                        Resource.error("Error al borrar: " + result.message)
+                        Resource.error("No se pudo eliminar la cuenta. Revisa email/contraseña o estado de la cuenta.")
                 );
             }
         });

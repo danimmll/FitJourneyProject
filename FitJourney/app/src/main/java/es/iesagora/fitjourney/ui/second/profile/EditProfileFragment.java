@@ -3,6 +3,7 @@ package es.iesagora.fitjourney.ui.second.profile;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,6 +11,8 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -33,7 +36,7 @@ import es.iesagora.fitjourney.viewmodel.SecondViewModel;
 /**
  * Fragment encargado de la edición del perfil del usuario.
  * Permite modificar datos personales como nombre, peso, altura, objetivo y contraseña.
- * También permite la eliminación de la cuenta (excepto en modo administrador).
+ * También permite cambiar la foto de perfil (galería o URL) y eliminar la cuenta.
  */
 public class EditProfileFragment extends Fragment {
 
@@ -46,8 +49,28 @@ public class EditProfileFragment extends Fragment {
     private boolean isAdminEdit = false;
     private boolean passwordWasChanged = false;
 
+    private Uri selectedLocalImageUri = null;
+    private String currentImageBase64 = null;
+
+    /** Lanzador para seleccionar imagen de la galería */
+    private final ActivityResultLauncher<String> getContent =
+            registerForActivityResult(new ActivityResultContracts.GetContent(), uri -> {
+                if (uri != null && binding != null) {
+                    selectedLocalImageUri = uri;
+                    currentImageBase64 = null;
+                    binding.etAvatarUrl.setText("");
+                    ImageUtils.loadCircle(requireContext(), uri.toString(),
+                            binding.ivAvatar, R.drawable.ic_profile);
+                }
+            });
+
     /**
-     * Infla la vista del fragmento.
+     * Infla la vista asociada al fragmento utilizando View Binding.
+     *
+     * @param inflater El objeto LayoutInflater que se usa para inflar las vistas.
+     * @param container Si no es nulo, es la vista madre a la que se debe adjuntar la UI.
+     * @param savedInstanceState Si no es nulo, el fragmento se está reconstruyendo a partir de este estado.
+     * @return La vista raíz (Root View) del fragmento.
      */
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -56,7 +79,11 @@ public class EditProfileFragment extends Fragment {
     }
 
     /**
-     * Inicializa ViewModel, datos del usuario, UI y observadores.
+     * Inicializa los componentes de la interfaz de usuario, procesa los argumentos de navegación,
+     * carga los datos del usuario y configura los listeners y observadores necesarios.
+     *
+     * @param view La vista devuelta por {@link #onCreateView}.
+     * @param savedInstanceState Si no es nulo, el fragmento se está reconstruyendo a partir de este estado.
      */
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
@@ -80,12 +107,63 @@ public class EditProfileFragment extends Fragment {
 
         setupUIForRole();
         loadUserData();
+        setupImageListeners();
         setupListeners();
         setupObservers(prefs);
     }
 
     /**
-     * Configura el dropdown de objetivos del usuario.
+     * Configura los escuchadores de eventos relacionados con la gestión de la imagen de perfil,
+     * controlando tanto la selección desde la galería como la carga por URL cuando se pierde el foco del campo.
+     */
+    private void setupImageListeners() {
+        binding.frameAvatar.setOnClickListener(v -> getContent.launch("image/*"));
+
+        binding.btnSelectPhoto.setOnClickListener(v -> getContent.launch("image/*"));
+
+        binding.etAvatarUrl.setOnFocusChangeListener((v, hasFocus) -> {
+            if (!hasFocus && binding != null) {
+                String url = binding.etAvatarUrl.getText() != null
+                        ? binding.etAvatarUrl.getText().toString().trim() : "";
+                if (!url.isEmpty()) {
+                    selectedLocalImageUri = null;
+                    currentImageBase64 = null;
+                    ImageUtils.loadCircle(requireContext(), url,
+                            binding.ivAvatar, R.drawable.ic_profile);
+                }
+            }
+        });
+    }
+
+    /**
+     * Resuelve qué datos de imagen utilizar priorizando en el siguiente orden:
+     * 1. Imagen local seleccionada de la galería (convertida a Base64).
+     * 2. URL de imagen remota introducida en el campo de texto.
+     * 3. Imagen en formato Base64 previamente existente del usuario.
+     *
+     * @return Una cadena de texto con los datos de la imagen (Base64 o URL), o null si ocurre un fallo.
+     */
+    @Nullable
+    private String resolvePhotoData() {
+        if (selectedLocalImageUri != null) {
+            String base64 = ImageUtils.uriToBase64(
+                    requireContext().getContentResolver(), selectedLocalImageUri);
+            if (base64 == null) {
+                Toast.makeText(getContext(), "Error al procesar la imagen", Toast.LENGTH_SHORT).show();
+            }
+            return base64;
+        }
+
+        String urlInput = binding.etAvatarUrl.getText() != null
+                ? binding.etAvatarUrl.getText().toString().trim() : "";
+        if (!urlInput.isEmpty()) return urlInput;
+
+        return currentImageBase64;
+    }
+
+    /**
+     * Configura el menú desplegable (Spinner/AutoCompleteTextView) con las opciones disponibles
+     * para el objetivo principal de acondicionamiento físico del usuario.
      */
     private void setupDropdowns() {
         String[] goals = {
@@ -109,7 +187,9 @@ public class EditProfileFragment extends Fragment {
     }
 
     /**
-     * Ajusta la UI según el rol (usuario o administrador).
+     * Adapta los elementos de la interfaz de usuario en función del rol de la edición actual.
+     * Si la edición es realizada por un administrador, se ocultan los campos de contraseña
+     * y el botón de eliminación de cuenta.
      */
     @SuppressLint("SetTextI18n")
     private void setupUIForRole() {
@@ -123,7 +203,8 @@ public class EditProfileFragment extends Fragment {
     }
 
     /**
-     * Configura listeners de botones.
+     * Configura los escuchadores de clics para los botones de acción global del fragmento
+     * (guardar cambios y eliminar cuenta).
      */
     private void setupListeners() {
         binding.btnSaveProfile.setOnClickListener(v -> submitChanges());
@@ -134,7 +215,8 @@ public class EditProfileFragment extends Fragment {
     }
 
     /**
-     * Carga los datos actuales del usuario en la UI.
+     * Carga y rellena los campos del formulario con la información actual del usuario
+     * almacenada en el objeto {@code currentUser}.
      */
     private void loadUserData() {
         if (currentUser == null) return;
@@ -149,9 +231,14 @@ public class EditProfileFragment extends Fragment {
             binding.etWeight.setText(String.valueOf(currentUser.getWeight()));
         }
 
+        String existing = currentUser.getDisplayAvatar();
+        if (existing != null && !existing.startsWith("http") && !existing.isEmpty()) {
+            currentImageBase64 = existing;
+        }
+
         ImageUtils.loadCircle(
                 requireContext(),
-                currentUser.getDisplayAvatar(),
+                existing,
                 binding.ivAvatar,
                 R.drawable.ic_profile
         );
@@ -162,7 +249,9 @@ public class EditProfileFragment extends Fragment {
     }
 
     /**
-     * Envía los cambios del perfil al servidor.
+     * Recoge los datos introducidos en el formulario, realiza las validaciones pertinentes
+     * (campos vacíos, coincidencia de contraseñas, formato numérico) y solicita la actualización
+     * del perfil a través del ViewModel.
      */
     private void submitChanges() {
         String name = Objects.requireNonNull(binding.etName.getText()).toString().trim();
@@ -193,7 +282,12 @@ public class EditProfileFragment extends Fragment {
             updatedUser.setGoal(goalStr);
         }
 
-        updatedUser.setPhotoUrl(currentUser.getPhotoUrl());
+        String photoData = resolvePhotoData();
+        if (photoData == null && selectedLocalImageUri != null) {
+            return;
+        }
+        updatedUser.setPhotoUrl(photoData != null ? photoData : currentUser.getPhotoUrl());
+
 
         if (!isAdminEdit && !newPasswordStr.isEmpty()) {
             if (!newPasswordStr.equals(confirmPasswordStr)) {
@@ -221,7 +315,10 @@ public class EditProfileFragment extends Fragment {
     }
 
     /**
-     * Observa el estado de actualización y eliminación del perfil.
+     * Establece los observadores sobre los LiveData del ViewModel para reaccionar ante los cambios de estado
+     * (Cargando, Éxito, Error) tanto de la edición de perfil como de la eliminación de cuenta.
+     *
+     * @param prefs Repositorio de preferencias compartidas para gestionar tokens de sesión.
      */
     private void setupObservers(PreferencesRepository prefs) {
 
@@ -320,7 +417,8 @@ public class EditProfileFragment extends Fragment {
     }
 
     /**
-     * Muestra diálogo de confirmación para eliminar cuenta.
+     * Valida que el campo de contraseña actual no esté vacío y muestra un cuadro de diálogo personalizado
+     * solicitando la confirmación definitiva para dar de baja y desactivar la cuenta del usuario.
      */
     private void showDeleteConfirmationDialog() {
         String currentPassword = binding.etCurrentPassword.getText() != null
@@ -364,7 +462,8 @@ public class EditProfileFragment extends Fragment {
     }
 
     /**
-     * Limpia el binding al destruir la vista.
+     * Se ejecuta cuando la vista jerárquica del fragmento está siendo eliminada.
+     * Limpia la referencia al objeto binding para evitar fugas de memoria (Memory Leaks).
      */
     @Override
     public void onDestroyView() {

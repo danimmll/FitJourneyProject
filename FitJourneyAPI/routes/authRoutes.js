@@ -1,6 +1,5 @@
 const express = require('express');
 const { register, login, reactivateAccount, deleteAccount } = require('../controllers/authController');
-const { authenticateToken, isAdmin } = require('../middlewares/auth');
 const router = express.Router();
 
 /**
@@ -244,11 +243,9 @@ router.post('/reactivate', reactivateAccount);
  * @swagger
  * /api/auth/delete:
  *   post:
- *     summary: Elimina permanentemente una cuenta de usuario (solo admin)
- *     description: Permite eliminar de forma física (hard delete) una cuenta inactiva de la base de datos. Solo accesible para administradores. Requiere autenticación con token JWT válido.
+ *     summary: Elimina permanentemente una cuenta inactiva de usuario
+ *     description: Permite eliminar de forma física una cuenta inactiva validando email y contraseña.
  *     tags: [Autenticacion]
- *     security:
- *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -280,7 +277,7 @@ router.post('/reactivate', reactivateAccount);
  *                   type: string
  *                   example: "Cuenta y datos históricos eliminados para siempre. Ya puedes registrarte de nuevo."
  *       400:
- *         description: Solo se pueden eliminar cuentas inactivas
+ *         description: Faltan datos obligatorios (email o contraseña)
  *         content:
  *           application/json:
  *             schema:
@@ -288,9 +285,9 @@ router.post('/reactivate', reactivateAccount);
  *               properties:
  *                 error:
  *                   type: string
- *                   example: "Solo se pueden borrar físicamente cuentas inactivas"
+ *                   example: "Email y contraseña son obligatorios"
  *       401:
- *         description: Token JWT ausente, inválido o expirado
+ *         description: Credenciales inválidas o cuenta no elegible para borrado
  *         content:
  *           application/json:
  *             schema:
@@ -298,18 +295,8 @@ router.post('/reactivate', reactivateAccount);
  *               properties:
  *                 error:
  *                   type: string
- *                   example: "Token no proporcionado"
- *       403:
- *         description: Permisos insuficientes - Usuario no es administrador
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 error:
- *                   type: string
- *                   example: "Acceso denegado: se requieren permisos de administrador"
+ *                   example: "Credenciales inválidas o cuenta no elegible para borrado definitivo"
  */
-router.post('/delete', authenticateToken, isAdmin, deleteAccount);
+router.post('/delete', deleteAccount);
 
 module.exports = router;
