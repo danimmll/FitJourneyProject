@@ -252,8 +252,16 @@ public class RegisterFragment extends Fragment {
                         Toast.makeText(requireContext(),
                                 "Cuenta eliminada definitivamente. Ya puedes registrarte de nuevo.",
                                 Toast.LENGTH_LONG).show();
-
                         Navigation.findNavController(requireView()).navigate(R.id.accessFragment);
+                    } else if ("ACCOUNT_DELETED_FAILED"
+                            .equals(resource.message)) {
+                        binding.tlEmail.setError(null);
+                        binding.etPassword.setError(resource.message);
+
+                        Toast.makeText(getContext(),
+                                "No se pudo eliminar la cuenta. Revisa email/contraseña o estado de la cuenta.",
+                                Toast.LENGTH_LONG).show();
+
                     } else {
                         binding.tlEmail.setError(getString(R.string.email_already_in_use));
 

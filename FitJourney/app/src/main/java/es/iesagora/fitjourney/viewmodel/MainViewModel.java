@@ -136,13 +136,15 @@ public class MainViewModel extends AndroidViewModel {
 
         repository.deleteAccountPhysical(email, password, result -> {
 
-            if (result.status == Resource.Status.SUCCESS) {
+            if (result.status == Resource.Status.LOADING) {
+                registerState.postValue(Resource.loading());
+            } else if (result.status == Resource.Status.SUCCESS) {
                 registerState.postValue(
                         Resource.error("ACCOUNT_DELETED_SUCCESS")
                 );
             } else {
                 registerState.postValue(
-                        Resource.error("No se pudo eliminar la cuenta. Revisa email/contraseña o estado de la cuenta.")
+                        Resource.error("ACCOUNT_DELETED_FAILED")
                 );
             }
         });
