@@ -3,7 +3,6 @@ const router = express.Router();
 
 const workoutCtrl = require('../controllers/workoutController');
 const { authenticateToken } = require('../middlewares/auth');
-const { validateWorkout } = require('../middlewares/validators');
 
 /**
  * @swagger
@@ -164,7 +163,6 @@ router.get(
 router.post(
     '/',
     authenticateToken,
-    validateWorkout,
     workoutCtrl.createWorkout
 );
 
