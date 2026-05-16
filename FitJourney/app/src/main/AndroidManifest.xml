@@ -13,8 +13,7 @@
         android:label="@string/app_name"
         android:roundIcon="@drawable/logo"
         android:supportsRtl="true"
-        android:theme="@style/Theme.FitJourney"
-        android:usesCleartextTraffic="true">
+        android:theme="@style/Theme.FitJourney">
         <activity
             android:name=".ui.workout.WorkoutActivity"
             android:exported="false" />
