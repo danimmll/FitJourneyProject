@@ -26,8 +26,54 @@ const { validateWorkout } = require('../middlewares/validators');
  *     responses:
  *       200:
  *         description: Historial obtenido correctamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id_workout:
+ *                     type: integer
+ *                   id_user:
+ *                     type: integer
+ *                   workout_date:
+ *                     type: string
+ *                     format: date-time
+ *                   duration_minutes:
+ *                     type: integer
+ *                   calories_burned:
+ *                     type: number
+ *                   notes:
+ *                     type: string
+ *                   routine:
+ *                     type: object
+ *                     properties:
+ *                       name:
+ *                         type: string
+ *                   details:
+ *                     type: array
+ *                     items:
+ *                       type: object
+ *                       properties:
+ *                         id_exercise:
+ *                           type: integer
+ *                         sets_performed:
+ *                           type: integer
+ *                         reps_string:
+ *                           type: string
+ *                         max_weight:
+ *                           type: number
  *       401:
  *         description: Token inválido o no proporcionado
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Token no proporcionado"
  *       403:
  *         description: Acceso denegado
  */
@@ -42,6 +88,7 @@ router.get(
  * /api/workouts:
  *   post:
  *     summary: Registrar un nuevo entrenamiento
+ *     description: Registra un nuevo entrenamiento para el usuario autenticado. El middleware `validateWorkout` valida la estructura de `details`.
  *     tags: [Workouts]
  *     security:
  *       - bearerAuth: []
@@ -56,6 +103,7 @@ router.get(
  *                 type: integer
  *                 nullable: true
  *                 example: 10
+ *                 description: ID de rutina asociada (opcional)
  *               duration_minutes:
  *                 type: integer
  *                 example: 60
@@ -67,6 +115,7 @@ router.get(
  *                 example: "Buen rendimiento en entrenamiento de pecho"
  *               details:
  *                 type: array
+ *                 description: Lista de detalles por ejercicio (sets, reps, peso, duración, velocidad)
  *                 items:
  *                   type: object
  *                   properties:
@@ -76,17 +125,39 @@ router.get(
  *                     sets_performed:
  *                       type: integer
  *                       example: 4
- *                     reps_performed:
+ *                     reps_string:
  *                       type: string
  *                       example: "12,10,10,8"
- *                     max_weight_used:
+ *                     max_weight:
  *                       type: number
  *                       example: 80
+ *                     duration_minutes:
+ *                       type: number
+ *                       example: 5
+ *                     speed_kmh:
+ *                       type: number
+ *                       example: 10.5
  *     responses:
  *       201:
  *         description: Entrenamiento registrado correctamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   type: object
  *       400:
  *         description: Datos inválidos
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
  *       401:
  *         description: Usuario no autenticado
  */

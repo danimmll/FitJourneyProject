@@ -7,24 +7,69 @@ const router = express.Router();
  * @swagger
  * tags:
  *   - name: Ejercicios
- *     description: Módulo gestor del inventario estático de modalidades de entrenamiento
+ *     description: Gestión del inventario de ejercicios disponibles en el sistema (solo administradores pueden crear, editar y eliminar)
  */
 
 /**
  * @swagger
  * /api/exercises:
  *   get:
- *     summary: Proyecta la tabla general de ejercicios del sistema
+ *     summary: Obtiene la lista de todos los ejercicios disponibles
+ *     description: Retorna un array con todos los ejercicios registrados en el sistema. Requiere autenticación.
  *     tags: [Ejercicios]
  *     security:
  *       - bearerAuth: []
  *     responses:
  *       200:
- *         description: Array JSON suministrado correctamente
+ *         description: Lista de ejercicios obtenida correctamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id_exercise:
+ *                     type: integer
+ *                     example: 1
+ *                   name:
+ *                     type: string
+ *                     example: "Sentadilla Libre"
+ *                   muscle_group:
+ *                     type: string
+ *                     example: "Piernas"
+ *                   difficulty:
+ *                     type: string
+ *                     enum: [Principiante, Intermedio, Avanzado]
+ *                     example: "Intermedio"
+ *                   description:
+ *                     type: string
+ *                     example: "Ejercicio de fuerza para piernas"
+ *                   image_url:
+ *                     type: string
+ *                     example: "https://images.unsplash.com/..."
+ *                   video_url:
+ *                     type: string
+ *                     example: "https://videos.example.com/..."
+ *                   equipment:
+ *                     type: string
+ *                     example: "Barra"
+ *                   exercise_type:
+ *                     type: string
+ *                     example: "Fuerza"
  *       401:
- *         description: Token en zona de invalidación
+ *         description: Token ausente, inválido o expirado
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Token no proporcionado"
  *   post:
- *     summary: Ensambla y persiste una nueva taxonomía de ejercicio
+ *     summary: Crea un nuevo ejercicio en el sistema (solo admin)
+ *     description: Permite a los administradores crear un nuevo tipo de ejercicio. La URL de imagen se normaliza automáticamente si está vacía.
  *     tags: [Ejercicios]
  *     security:
  *       - bearerAuth: []
@@ -43,25 +88,75 @@ const router = express.Router();
  *               name:
  *                 type: string
  *                 example: "Sentadilla Libre"
+ *                 description: Nombre único del ejercicio
  *               muscle_group:
  *                 type: string
  *                 example: "Piernas"
+ *                 description: Grupo muscular principal trabajado
  *               difficulty:
  *                 type: string
+ *                 enum: [Principiante, Intermedio, Avanzado]
  *                 example: "Intermedio"
+ *                 description: Nivel de dificultad del ejercicio
  *               description:
  *                 type: string
- *                 example: "Descienda mediante retroversión de cadera manteniendo la verticalidad espinal..."
+ *                 example: "Descienda flexionando rodillas manteniendo la espalda recta..."
+ *                 description: Instrucciones detalladas del ejercicio
  *               image_url:
  *                 type: string
  *                 example: "https://midominio.com/sentadilla.jpg"
+ *                 description: URL de imagen (se normaliza si está vacía)
+ *               video_url:
+ *                 type: string
+ *                 example: "https://videos.example.com/sentadilla.mp4"
+ *                 description: URL de video instructivo (opcional)
+ *               equipment:
+ *                 type: string
+ *                 example: "Barra, Mancuernas"
+ *                 description: Equipamiento necesario (opcional)
+ *               exercise_type:
+ *                 type: string
+ *                 example: "Fuerza"
+ *                 description: Tipo de ejercicio (Fuerza, Cardio, Flexibilidad, etc.)
  *     responses:
  *       201:
- *         description: Recurso consolidado en persistencia de datos
+ *         description: Ejercicio creado exitosamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id_exercise:
+ *                   type: integer
+ *                   example: 15
+ *                 name:
+ *                   type: string
+ *                 muscle_group:
+ *                   type: string
+ *                 difficulty:
+ *                   type: string
+ *                 image_url:
+ *                   type: string
  *       401:
- *         description: Carece de autenticidad base
+ *         description: Token ausente, inválido o expirado
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Token no proporcionado"
  *       403:
- *         description: Interceptación por evaluación de políticas administrativas
+ *         description: Permisos insuficientes - Usuario no es administrador
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Acceso denegado: se requieren permisos de administrador"
  */
 router.get('/', authenticateToken, getExercises);
 router.post('/', authenticateToken, isAdmin, createExercise);
@@ -70,7 +165,8 @@ router.post('/', authenticateToken, isAdmin, createExercise);
  * @swagger
  * /api/exercises/{id}:
  *   get:
- *     summary: Recupera una manifestación atómica de un ejercicio por PK
+ *     summary: Obtiene los detalles de un ejercicio específico
+ *     description: Retorna la información completa de un ejercicio por su ID.
  *     tags: [Ejercicios]
  *     security:
  *       - bearerAuth: []
@@ -80,16 +176,61 @@ router.post('/', authenticateToken, isAdmin, createExercise);
  *         required: true
  *         schema:
  *           type: integer
- *         description: Componente numérico de enrutamiento
+ *         description: ID del ejercicio a consultar
+ *         example: 1
  *     responses:
  *       200:
- *         description: Bloque de metadatos transferido exitosamente
+ *         description: Ejercicio encontrado
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id_exercise:
+ *                   type: integer
+ *                   example: 1
+ *                 name:
+ *                   type: string
+ *                   example: "Sentadilla Libre"
+ *                 muscle_group:
+ *                   type: string
+ *                   example: "Piernas"
+ *                 difficulty:
+ *                   type: string
+ *                   example: "Intermedio"
+ *                 description:
+ *                   type: string
+ *                 image_url:
+ *                   type: string
+ *                 video_url:
+ *                   type: string
+ *                 equipment:
+ *                   type: string
+ *                 exercise_type:
+ *                   type: string
  *       401:
- *         description: Falla en middleware de validación HTTP
+ *         description: Token ausente, inválido o expirado
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Token no proporcionado"
  *       404:
- *         description: Inexistencia del nodo solicitado en disco
+ *         description: Ejercicio no encontrado
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Ejercicio no encontrado"
  *   put:
- *     summary: Escribe alteraciones parciales en una métrica de ejercicio preexistente
+ *     summary: Actualiza un ejercicio existente (solo admin)
+ *     description: Permite a los administradores actualizar total o parcialmente los datos de un ejercicio. Solo se actualizan los campos que se envíen.
  *     tags: [Ejercicios]
  *     security:
  *       - bearerAuth: []
@@ -99,8 +240,10 @@ router.post('/', authenticateToken, isAdmin, createExercise);
  *         required: true
  *         schema:
  *           type: integer
- *         description: Índice en tabla relacional
+ *         description: ID del ejercicio a actualizar
+ *         example: 1
  *     requestBody:
+ *       required: true
  *       content:
  *         application/json:
  *           schema:
@@ -108,19 +251,74 @@ router.post('/', authenticateToken, isAdmin, createExercise);
  *             properties:
  *               name:
  *                 type: string
- *                 example: "Sentadilla Libre Editada"
+ *                 example: "Sentadilla Libre Modificada"
+ *               muscle_group:
+ *                 type: string
+ *                 example: "Piernas"
+ *               difficulty:
+ *                 type: string
+ *                 enum: [Principiante, Intermedio, Avanzado]
+ *                 example: "Avanzado"
  *               description:
  *                 type: string
- *                 example: "Instrucciones de reingeniería biomecánica para el módulo..."
+ *                 example: "Versión avanzada con pausa de 3 segundos..."
+ *               image_url:
+ *                 type: string
+ *               video_url:
+ *                 type: string
+ *               equipment:
+ *                 type: string
+ *               exercise_type:
+ *                 type: string
  *     responses:
  *       200:
- *         description: Metadatos sincronizados correctamente
+ *         description: Ejercicio actualizado correctamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id_exercise:
+ *                   type: integer
+ *                 name:
+ *                   type: string
+ *                 muscle_group:
+ *                   type: string
+ *                 difficulty:
+ *                   type: string
+ *       400:
+ *         description: ID de ejercicio inválido
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "ID de ejercicio no válido"
  *       401:
- *         description: Rechazo a nivel de encapsulamiento
+ *         description: Token ausente, inválido o expirado
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Token no proporcionado"
  *       403:
- *         description: RBAC en conflicto con la regla isAdmin
+ *         description: Permisos insuficientes - Usuario no es administrador
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Acceso denegado: se requieren permisos de administrador"
  *   delete:
- *     summary: Proceso restrictivo de destrucción física del bloque del ejercicio
+ *     summary: Elimina un ejercicio del sistema (solo admin)
+ *     description: Permite a los administradores eliminar permanentemente un ejercicio. Esta operación no se puede deshacer.
  *     tags: [Ejercicios]
  *     security:
  *       - bearerAuth: []
@@ -130,14 +328,49 @@ router.post('/', authenticateToken, isAdmin, createExercise);
  *         required: true
  *         schema:
  *           type: integer
- *         description: Target a erradicar de la memoria perenne
+ *         description: ID del ejercicio a eliminar
+ *         example: 1
  *     responses:
  *       200:
- *         description: Filas dependientes borradas o actualizadas por cascada
+ *         description: Ejercicio eliminado correctamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Ejercicio eliminado físicamente de la base de datos"
+ *       400:
+ *         description: ID de ejercicio inválido
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "ID de ejercicio no válido"
  *       401:
- *         description: Inconsistencia del Header de Autorización
+ *         description: Token ausente, inválido o expirado
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Token no proporcionado"
  *       403:
- *         description: Operación prohibida por esquema de roles
+ *         description: Permisos insuficientes - Usuario no es administrador
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Acceso denegado: se requieren permisos de administrador"
  */
 router.get('/:id', authenticateToken, getExerciseById);
 router.put('/:id', authenticateToken, isAdmin, updateExercise);
