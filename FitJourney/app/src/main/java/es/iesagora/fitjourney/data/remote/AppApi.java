@@ -23,7 +23,7 @@ import retrofit2.http.Path;
  */
 public interface AppApi {
 
-    // ── AUTH ────────────────────────────────────────────────────────────────
+    // AUTH ----------------------------------------------------------
 
     /**
      * Registra un nuevo usuario.
@@ -61,7 +61,7 @@ public interface AppApi {
     @POST("auth/delete")
     Call<ResponseBody> deleteAccountPhysical(@Body LoginRequest loginRequest);
 
-    // ── USUARIOS ─────────────────────────────────────────────────────────────
+    // USUARIOS -----------------------------------------------------------
 
     /**
      * Obtiene el perfil del usuario autenticado.
@@ -116,7 +116,7 @@ public interface AppApi {
     @POST("users/deactivate")
     Call<ResponseBody> deactivateUser(@Body LoginRequest request);
 
-    // ── EJERCICIOS ────────────────────────────────────────────────────────────
+    // EJERCICIOS ----------------------------------------------------
 
     /**
      * Obtiene todos los ejercicios disponibles.
@@ -163,7 +163,7 @@ public interface AppApi {
     @DELETE("exercises/{id}")
     Call<Void> deleteExercise(@Path("id") int id);
 
-    // ── RUTINAS ───────────────────────────────────────────────────────────────
+    // RUTINAS -----------------------------------------------------------
 
     /**
      * Obtiene las rutinas disponibles para el usuario.
@@ -210,7 +210,7 @@ public interface AppApi {
     @PUT("routines/{id}")
     Call<ResponseBody> updateRoutine(@Path("id") int id, @Body Routine routine);
 
-    // ── WORKOUTS ──────────────────────────────────────────────────────────────
+    // WORKOUTS ------------------------------------------------------------
 
     /**
      * Obtiene el historial de entrenamientos del usuario.

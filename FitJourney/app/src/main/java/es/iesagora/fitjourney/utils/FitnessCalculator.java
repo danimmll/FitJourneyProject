@@ -11,7 +11,7 @@ import java.util.Calendar;
  */
 public class FitnessCalculator {
     private FitnessCalculator() {
-        /* This utility class should not be instantiated */
+        /*No se deben crear instancias de esta clase*/
     }
 
 
