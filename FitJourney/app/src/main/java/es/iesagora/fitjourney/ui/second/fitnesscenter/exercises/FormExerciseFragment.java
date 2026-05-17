@@ -146,17 +146,17 @@ public class FormExerciseFragment extends Fragment {
         String diff = exerciseToEdit.getDifficulty();
         if (diff != null) {
             switch (diff) {
-                case "1":
-                    diff = PRINCIPIANTE_STRING;
-                    break;
                 case "2":
+                case INTERMEDIO_STRING:
                     diff = INTERMEDIO_STRING;
                     break;
                 case "3":
+                case EXPERTO_STRING:
                     diff = EXPERTO_STRING;
                     break;
                 default:
-                    throw new IllegalStateException("Unexpected value: " + diff);
+                    diff = PRINCIPIANTE_STRING;
+                    break;
             }
             binding.actvDifficulty.setText(diff, false);
         }
