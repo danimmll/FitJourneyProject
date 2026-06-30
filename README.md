@@ -52,4 +52,5 @@ Tener el backend corriendo.
   <img src="https://github.com/user-attachments/assets/f449d811-0c0a-4e6a-8c60-d9935bfcfe44" width="250" />
   <img src="https://github.com/user-attachments/assets/a5829c80-8d72-4ac8-85cf-d672641d577d" width="250" />
   <img src="https://github.com/user-attachments/assets/f03442e1-d32f-4cbd-9174-9b6deaa4c1a2" width="250" />
+  <img src="https://github.com/user-attachments/assets/e2f08222-d9fa-42eb-99bd-29d19ed64d8c" width="250" />
 </div>
