@@ -25,3 +25,5 @@ Thumbs.db
 .idea/
 .gitignore
 FitJourney/app/release/
+*.jks
+keys/
