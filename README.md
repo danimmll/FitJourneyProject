@@ -48,6 +48,8 @@ JDK 11+ configurado en el IDE.
 Tener el backend corriendo.
 
 ## Capturas de pantalla
-<img width="540" height="1200" alt="Foto de pantalla de entrenamiento" src="https://github.com/user-attachments/assets/f449d811-0c0a-4e6a-8c60-d9935bfcfe44" />
-<img width="540" height="1200" alt="Foto de pantalla de apartado de rutinas" src="https://github.com/user-attachments/assets/a5829c80-8d72-4ac8-85cf-d672641d577d" />
-<img width="540" height="1200" alt="Foto de pantalla de inicio de la aplicación" src="https://github.com/user-attachments/assets/f03442e1-d32f-4cbd-9174-9b6deaa4c1a2" />
+<div style="display: flex; gap: 10px;">
+  <img src="https://github.com/user-attachments/assets/f449d811-0c0a-4e6a-8c60-d9935bfcfe44" width="250" />
+  <img src="https://github.com/user-attachments/assets/a5829c80-8d72-4ac8-85cf-d672641d577d" width="250" />
+  <img src="https://github.com/user-attachments/assets/f03442e1-d32f-4cbd-9174-9b6deaa4c1a2" width="250" />
+</div>
