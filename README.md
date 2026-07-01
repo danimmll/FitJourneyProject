@@ -23,7 +23,7 @@ Framework de la api: Node.js
 
 Asincronía: LiveData para la reactividad en la UI.
 
-Base de Datos: SQL (a través de SQLite/Room).
+Base de Datos SQL a través de supabase.
 
 Control de versiones: Git.
 
