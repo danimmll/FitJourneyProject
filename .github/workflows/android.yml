@@ -10,6 +10,11 @@ on:
     paths:
       - 'FitJourney/**'
   workflow_dispatch:
+    inputs:
+      publicar:
+        description: 'Guardar el APK firmado en FitJourney/app/release'
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -18,18 +23,20 @@ jobs:
   build:
     name: Compilar y firmar el APK
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     defaults:
       run:
         working-directory: FitJourney
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: '17'
 
-      - uses: gradle/actions/setup-gradle@v4
+      - uses: gradle/actions/setup-gradle@v5
 
       - name: Tests y build de release
         run: bash ./gradlew --no-daemon testReleaseUnitTest assembleRelease
@@ -58,8 +65,23 @@ jobs:
           "$BT/apksigner" verify --print-certs app-release.apk
           rm -f release.jks
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         with:
           name: fitjourney-apk
           path: FitJourney/app-release.apk
           if-no-files-found: error
+
+      # Solo bajo demanda (o con [publicar-apk] en el mensaje del commit): sustituye el APK
+      # que enlaza el README por el recién firmado.
+      - name: Guardar el APK en el repositorio
+        if: >-
+          (github.event_name == 'workflow_dispatch' && inputs.publicar) ||
+          (github.event_name == 'push' && contains(github.event.head_commit.message, '[publicar-apk]'))
+        working-directory: .
+        run: |
+          cp FitJourney/app-release.apk FitJourney/app/release/app-release.apk
+          git config user.name "danimmll"
+          git config user.email "235920627+danimmll@users.noreply.github.com"
+          git add FitJourney/app/release/app-release.apk
+          git commit -m "APK de release actualizado" || exit 0
+          git push
