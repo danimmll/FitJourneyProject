@@ -86,7 +86,7 @@ jobs:
           paso cp FitJourney/app-release.apk FitJourney/app/release/app-release.apk
           paso git config user.name "danimmll"
           paso git config user.email "235920627+danimmll@users.noreply.github.com"
-          paso git add FitJourney/app/release/app-release.apk
+          paso git add -f FitJourney/app/release/app-release.apk
           if git diff --cached --quiet; then
             echo "El APK no ha cambiado."
             exit 0
