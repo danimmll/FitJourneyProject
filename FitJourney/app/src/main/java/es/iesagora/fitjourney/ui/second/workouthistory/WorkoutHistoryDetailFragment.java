@@ -126,7 +126,7 @@ public class WorkoutHistoryDetailFragment extends Fragment {
         binding.tvDetailDuration.setText(duration + " min");
 
         double calories = getCalories(workout, duration);
-        binding.tvDetailCalories.setText((int) calories + " kcal");
+        binding.tvDetailCalories.setText(Math.round(calories) + " kcal");
 
         if (workout.getDetails() != null) {
 
@@ -142,9 +142,15 @@ public class WorkoutHistoryDetailFragment extends Fragment {
     }
 
     /**
-     * Calcula las calorías estimadas del entrenamiento.
+     * Calorías del entrenamiento: las que se calcularon y guardaron al terminar la sesión,
+     * ejercicio a ejercicio. Solo si no hay ninguna guardada (entrenamientos antiguos) se
+     * estiman con un MET genérico de 6 y la duración total.
      */
     private double getCalories(Workout workout, int duration) {
+        if (workout.getCaloriesBurned() != null && workout.getCaloriesBurned() > 0) {
+            return workout.getCaloriesBurned();
+        }
+
         double weight = 70.0;
 
         if (workout.getUser() != null && workout.getUser().getWeight() != null) {
