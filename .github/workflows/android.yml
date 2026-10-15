@@ -79,12 +79,17 @@ jobs:
           (github.event_name == 'push' && contains(github.event.head_commit.message, '[publicar-apk]'))
         working-directory: .
         run: |
-          cp FitJourney/app-release.apk FitJourney/app/release/app-release.apk
-          git config user.name "danimmll"
-          git config user.email "235920627+danimmll@users.noreply.github.com"
-          git add FitJourney/app/release/app-release.apk
-          git commit -m "APK de release actualizado" || exit 0
-          if ! git push 2> push.log; then
-            echo "::error title=git push::$(tr '\n' ' ' < push.log)"
-            exit 1
+          set +e
+          paso() {
+            "$@" > out.log 2>&1 || { echo "::error title=$1 $2::$(tr '\n' ' ' < out.log)"; exit 1; }
+          }
+          paso cp FitJourney/app-release.apk FitJourney/app/release/app-release.apk
+          paso git config user.name "danimmll"
+          paso git config user.email "235920627+danimmll@users.noreply.github.com"
+          paso git add FitJourney/app/release/app-release.apk
+          if git diff --cached --quiet; then
+            echo "El APK no ha cambiado."
+            exit 0
           fi
+          paso git commit -m "APK de release actualizado"
+          paso git push
