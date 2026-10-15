@@ -1,0 +1,65 @@
+name: Android
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'FitJourney/**'
+      - '.github/workflows/android.yml'
+  pull_request:
+    paths:
+      - 'FitJourney/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Compilar y firmar el APK
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: FitJourney
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: Tests y build de release
+        run: bash ./gradlew --no-daemon testReleaseUnitTest assembleRelease
+
+      # Si existen los secretos con el keystore propio, se firma con él; si no, con una clave
+      # generada en el momento (vale para instalar el APK, no para actualizar uno firmado con otra).
+      - name: Firmar el APK
+        env:
+          KEYSTORE_BASE64: ${{ secrets.FITJOURNEY_KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.FITJOURNEY_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.FITJOURNEY_KEY_ALIAS }}
+        run: |
+          BT="$ANDROID_HOME/build-tools/$(ls "$ANDROID_HOME/build-tools" | sort -V | tail -1)"
+          if [ -n "$KEYSTORE_BASE64" ]; then
+            echo "$KEYSTORE_BASE64" | base64 -d > release.jks
+          else
+            KEYSTORE_PASSWORD=fitjourney
+            KEY_ALIAS=fitjourney
+            keytool -genkeypair -keystore release.jks -storepass "$KEYSTORE_PASSWORD" \
+              -keypass "$KEYSTORE_PASSWORD" -alias "$KEY_ALIAS" -keyalg RSA -keysize 2048 \
+              -validity 10000 -dname "CN=FitJourney"
+          fi
+          "$BT/zipalign" -p -f 4 app/build/outputs/apk/release/app-release-unsigned.apk app-release-aligned.apk
+          "$BT/apksigner" sign --ks release.jks --ks-pass "pass:$KEYSTORE_PASSWORD" \
+            --ks-key-alias "$KEY_ALIAS" --out app-release.apk app-release-aligned.apk
+          "$BT/apksigner" verify --print-certs app-release.apk
+          rm -f release.jks
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: fitjourney-apk
+          path: FitJourney/app-release.apk
+          if-no-files-found: error
