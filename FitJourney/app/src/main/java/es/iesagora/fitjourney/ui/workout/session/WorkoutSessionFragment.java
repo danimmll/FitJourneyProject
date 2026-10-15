@@ -505,7 +505,6 @@ public class WorkoutSessionFragment extends Fragment {
         if (ex == null || ex.getExerciseType() == null) return 6.0f;
 
         List<SerieRow> checked = getCheckedRows(block);
-        int sets = Math.max(1, checked.size());
 
         switch (ex.getExerciseType()) {
             case TYPE_CARDIO:
@@ -513,7 +512,7 @@ public class WorkoutSessionFragment extends Fragment {
             case TYPE_ESTIRAMIENTO:
                 return FitnessCalculator.calculateStretchingMET(false, "Normal", "Intermedio");
             default:
-                return calculateStrengthMET(checked, userWeightKg, sets);
+                return calculateStrengthMET(checked, userWeightKg);
         }
     }
 
@@ -531,14 +530,12 @@ public class WorkoutSessionFragment extends Fragment {
         return FitnessCalculator.calculateCardioMET(8.0f, avgSpeed, 0f);
     }
 
-    private float calculateStrengthMET(List<SerieRow> checked, float userWeightKg, int sets) {
-        float totalReps = 0f, totalWeight = 0f;
+    private float calculateStrengthMET(List<SerieRow> checked, float userWeightKg) {
+        float totalWeight = 0f;
         int count = 0;
 
         for (SerieRow row : checked) {
-            String reps = getText(row.rowBinding.etPrimary);
             String weight = getText(row.rowBinding.etSecondary);
-            if (!reps.isEmpty()) totalReps += Float.parseFloat(reps.replace(",", "."));
             if (!weight.isEmpty()) {
                 totalWeight += Float.parseFloat(weight.replace(",", "."));
                 count++;
@@ -547,9 +544,8 @@ public class WorkoutSessionFragment extends Fragment {
 
         float bodyWeight = userWeightKg > 0 ? userWeightKg : 70f;
         float liftedWeight = count > 0 ? totalWeight / count : bodyWeight * 0.5f;
-        int reps = sets > 0 && totalReps > 0 ? (int) (totalReps / sets) : 10;
 
-        return FitnessCalculator.calculateStrengthMET(liftedWeight, bodyWeight, sets, reps, 90);
+        return FitnessCalculator.calculateStrengthMET(liftedWeight, bodyWeight, 90);
     }
 
     private float getUserWeight() {

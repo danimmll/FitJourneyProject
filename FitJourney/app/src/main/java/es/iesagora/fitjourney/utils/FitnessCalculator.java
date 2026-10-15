@@ -161,20 +161,35 @@ public class FitnessCalculator {
     }
 
     /**
-     * Calcula el MET para entrenamiento de fuerza.
-     * Tiene en cuenta peso levantado, peso corporal, series, repeticiones y descanso.
-     *
-     * @return MET estimado del entrenamiento de fuerza
+     * Rango del entrenamiento con pesas según el Compendium of Physical Activities
+     * (Ainsworth et al., 2011): unos 3,5 MET con esfuerzo ligero y 6 MET con esfuerzo
+     * vigoroso, contando los descansos entre series.
      */
-    public static float calculateStrengthMET(float weightLiftedKg, float bodyWeightKg, int sets, int reps, int restSeconds) {
-        float baseMet = 6f;
-        float intensityFactor = clamp(weightLiftedKg / bodyWeightKg, 0.3f, 1.5f);
-        float volumeFactor = clamp((sets * reps) / 30f, 0.5f, 2.0f);
+    private static final float MET_FUERZA_LIGERO = 3.5f;
+    private static final float MET_FUERZA_VIGOROSO = 6.0f;
 
-        float safeRestSeconds = restSeconds > 0 ? restSeconds : 1f;
-        float restFactor = clamp(60f / safeRestSeconds, 0.7f, 1.1f);
+    /**
+     * Calcula el MET para entrenamiento de fuerza.
+     * Coloca el ejercicio dentro del rango del Compendium según la carga relativa al peso
+     * corporal y el descanso entre series. Las series y las repeticiones no cambian el MET:
+     * ya se notan en la duración, que es la que multiplica en {@link #calculateCaloriesBurned}.
+     *
+     * @param weightLiftedKg peso medio levantado en las series
+     * @param bodyWeightKg peso corporal del usuario
+     * @param restSeconds descanso entre series en segundos
+     * @return MET estimado, entre 3,5 y 6
+     */
+    public static float calculateStrengthMET(float weightLiftedKg, float bodyWeightKg, int restSeconds) {
+        float safeBodyWeight = bodyWeightKg > 0 ? bodyWeightKg : 70f;
+        float relativeLoad = weightLiftedKg / safeBodyWeight;
+        // 0 con un cuarto del peso corporal o menos; 1 a partir del propio peso corporal
+        float intensity = clamp((relativeLoad - 0.25f) / 0.75f, 0f, 1f);
 
-        return baseMet * (1f + intensityFactor) * (1f + volumeFactor) * restFactor;
+        // 0 con dos minutos de descanso o más; 1 con medio minuto o menos
+        float density = clamp((120f - restSeconds) / 90f, 0f, 1f);
+
+        float effort = 0.75f * intensity + 0.25f * density;
+        return MET_FUERZA_LIGERO + (MET_FUERZA_VIGOROSO - MET_FUERZA_LIGERO) * effort;
     }
 
     /**
